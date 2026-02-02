@@ -43,7 +43,7 @@ export const itemRoutesLive = HttpApiBuilder.group(Api, "items", (handlers) =>
       "getAllItems",
       Effect.fn(function* () {
         return { items };
-      }),
+      }, Effect.delay("1 seconds")),
     ),
 );
 

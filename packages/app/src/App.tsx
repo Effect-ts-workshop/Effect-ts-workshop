@@ -27,7 +27,7 @@ import { InventoryItemId } from 'shared/item'
 import { Cause } from 'effect'
 
 function App() {
-  const result = useAtomValue(ApiClient.query("items", "getAllItems", {}))
+  const result = useAtomValue(ApiClient.query("items", "getAllItems", {reactivityKeys: ['items']}))
   const addItem = useAtomSet(ApiClient.mutation("items", "addItem"))
   const updateItemById = useAtomSet(ApiClient.mutation("items", "updateItemById"))
   const removeItemById = useAtomSet(ApiClient.mutation("items", "removeItemById"))
@@ -38,13 +38,13 @@ function App() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (editingItem) {
-      updateItemById({path: {itemId: editingItem.id}, payload: { brand: formData.brand, model: formData.model }})
+      updateItemById({path: {itemId: editingItem.id}, payload: { brand: formData.brand, model: formData.model }, reactivityKeys: ['items' ]})
     } else {
       addItem({payload: {
         id: InventoryItemId(crypto.randomUUID()),
         brand: formData.brand,
         model: formData.model,
-      }})
+      }, reactivityKeys: ['items' ]})
     }
     resetForm()
   }
@@ -56,7 +56,7 @@ function App() {
   }
 
   const handleDelete = (itemId: InventoryItemId) => {
-    removeItemById({path: {itemId}})
+    removeItemById({path: {itemId}, reactivityKeys: ['items' ]})
   }
 
   const resetForm = () => {

@@ -21,6 +21,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Result, useAtomSet, useAtomValue } from '@effect-atom/atom-react'
 import { ApiClient } from './lib/client'
 import { InventoryItemId } from 'shared/item'
@@ -123,8 +124,26 @@ function App() {
       </div>
 
       {Result.builder(result)
-    .onInitial(() => <div>Loading...</div>)
-    .onWaiting(() => <div>Loading...</div>)
+    .onInitial(() => (
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Brand</TableHead>
+            <TableHead>Model</TableHead>
+            <TableHead className="w-25">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {[1, 2, 3].map((i) => (
+            <TableRow key={i}>
+              <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+              <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+              <TableCell><Skeleton className="h-8 w-20" /></TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    ))
     .onFailure((cause) => <div>Error: {Cause.pretty(cause)}</div>)
     .onSuccess(({ items }) => {
       if (items.length === 0){

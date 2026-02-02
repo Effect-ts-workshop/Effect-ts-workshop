@@ -1,5 +1,3 @@
-export interface InventoryItem {
-  id: string
-  brand: string
-  model: string
-}
+import { InventoryItemSchema } from "shared/item";
+
+export type InventoryItem = typeof InventoryItemSchema.Type;

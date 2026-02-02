@@ -5,10 +5,14 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=app",
+    "dev": "npm run dev --workspace=app,api",
     "build": "npm run build --workspace=app"
   },
   "devDependencies": {
     "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "@effect/platform": "^0.94.2",
+    "effect": "^3.19.15"
   }
 }

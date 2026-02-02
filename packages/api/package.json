@@ -1,5 +1,12 @@
 {
   "name": "api",
   "version": "0.0.1",
-  "private": true
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --experimental-strip-types server.ts"
+  },
+  "dependencies": {
+    "@effect/platform-node": "^0.104.1"
+  }
 }

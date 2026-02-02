@@ -21,9 +21,16 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Result, useAtomSet, useAtomValue } from '@effect-atom/atom-react'
+import { ApiClient } from './lib/client'
+import { InventoryItemId } from 'shared/item'
+import { Cause } from 'effect'
 
 function App() {
-  const [items, setItems] = useState<InventoryItem[]>([])
+  const result = useAtomValue(ApiClient.query("items", "getAllItems", {}))
+  const addItem = useAtomSet(ApiClient.mutation("items", "addItem"))
+  const updateItemById = useAtomSet(ApiClient.mutation("items", "updateItemById"))
+  const removeItemById = useAtomSet(ApiClient.mutation("items", "removeItemById"))
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null)
   const [formData, setFormData] = useState({ brand: '', model: '' })
@@ -31,18 +38,13 @@ function App() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (editingItem) {
-      setItems(items.map(item =>
-        item.id === editingItem.id
-          ? { ...item, brand: formData.brand, model: formData.model }
-          : item
-      ))
+      updateItemById({path: {itemId: editingItem.id}, payload: { brand: formData.brand, model: formData.model }})
     } else {
-      const newItem: InventoryItem = {
-        id: crypto.randomUUID(),
+      addItem({payload: {
+        id: InventoryItemId(crypto.randomUUID()),
         brand: formData.brand,
         model: formData.model,
-      }
-      setItems([...items, newItem])
+      }})
     }
     resetForm()
   }
@@ -53,8 +55,8 @@ function App() {
     setIsDialogOpen(true)
   }
 
-  const handleDelete = (id: string) => {
-    setItems(items.filter(item => item.id !== id))
+  const handleDelete = (itemId: InventoryItemId) => {
+    removeItemById({path: {itemId}})
   }
 
   const resetForm = () => {
@@ -120,11 +122,20 @@ function App() {
         </Dialog>
       </div>
 
-      {items.length === 0 ? (
+      {Result.builder(result)
+    .onInitial(() => <div>Loading...</div>)
+    .onWaiting(() => <div>Loading...</div>)
+    .onFailure((cause) => <div>Error: {Cause.pretty(cause)}</div>)
+    .onSuccess(({ items }) => {
+      if (items.length === 0){
+        return  (
         <div className="text-center py-12 text-muted-foreground">
           No items in inventory. Add your first item to get started.
         </div>
-      ) : (
+      )
+      }
+      
+      return (
         <Table>
           <TableHeader>
             <TableRow>
@@ -159,8 +170,9 @@ function App() {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
-      )}
+        </Table>)
+    }).render() 
+      }
     </div>
   )
 }

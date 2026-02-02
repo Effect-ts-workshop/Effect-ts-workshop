@@ -1,0 +1,14 @@
+{
+  "name": "inventory-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=app",
+    "build": "npm run build --workspace=app"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

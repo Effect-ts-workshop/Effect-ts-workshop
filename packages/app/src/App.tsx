@@ -1,16 +1,4 @@
-import { useState } from 'react'
-import type { InventoryItem } from './types/inventory'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import {
   Dialog,
   DialogContent,
@@ -20,15 +8,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Result, useAtomSet, useAtomValue } from '@effect-atom/atom-react'
-import { ApiClient } from './lib/client'
+import { Pencil, Plus, Trash2 } from 'lucide-react'
+import { useState } from 'react'
 import { InventoryItemId } from 'shared/item'
-import { Cause } from 'effect'
+import { ApiClient, ApiRpcClient } from './lib/client'
+import type { InventoryItem } from './types/inventory'
 
 function App() {
-  const result = useAtomValue(ApiClient.query("items", "getAllItems", {reactivityKeys: ['items']}))
+  const result = useAtomValue(ApiRpcClient.query( "getAllItems", undefined, {reactivityKeys: ['items']}))
   const addItem = useAtomSet(ApiClient.mutation("items", "addItem"))
   const updateItemById = useAtomSet(ApiClient.mutation("items", "updateItemById"))
   const removeItemById = useAtomSet(ApiClient.mutation("items", "removeItemById"))
@@ -144,7 +143,6 @@ function App() {
         </TableBody>
       </Table>
     ))
-    .onFailure((cause) => <div>Error: {Cause.pretty(cause)}</div>)
     .onSuccess(({ items }) => {
       if (items.length === 0){
         return  (

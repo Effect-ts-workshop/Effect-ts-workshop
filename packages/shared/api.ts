@@ -2,9 +2,10 @@ import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import { pipe, Schema } from "effect";
 import {
   getAllItemsResponseSchema,
+  getItemByIdResponseSchema,
   InventoryItemIdSchema,
   InventoryItemSchema,
-} from "./item.ts";
+} from "./item";
 
 export const Api = HttpApi.make("Api").add(
   HttpApiGroup.make("items")
@@ -23,7 +24,7 @@ export const Api = HttpApi.make("Api").add(
             itemId: InventoryItemIdSchema,
           }),
         )
-        .addSuccess(Schema.Option(InventoryItemSchema)),
+        .addSuccess(getItemByIdResponseSchema),
     )
     .add(
       HttpApiEndpoint.put("updateItemById", "/items/:itemId")

@@ -1,4 +1,4 @@
-import { Array } from "effect";
+import { Array, Effect } from "effect";
 import { InventoryItemId, InventoryItemSchema } from "shared/item";
 
 type Item = typeof InventoryItemSchema.Type;
@@ -17,7 +17,7 @@ export const itemRepository = {
   findById: (id: InventoryItemId) => {
     return Array.findFirst(items, (item) => item.id === id);
   },
-  getAll: () => {
+  getAll: Effect.fn(function* () {
     return items;
-  },
+  }, Effect.delay("1 second")),
 };

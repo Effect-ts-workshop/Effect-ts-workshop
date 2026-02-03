@@ -32,8 +32,8 @@ export const itemRoutesLive = HttpApiBuilder.group(Api, "items", (handlers) =>
     .handle(
       "getAllItems",
       Effect.fn(function* () {
-        const items = itemRepository.getAll();
+        const items = yield* itemRepository.getAll();
         return { items };
-      }, Effect.delay("1 seconds")),
+      }),
     ),
 );

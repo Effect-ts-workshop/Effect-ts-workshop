@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./api": "./api.ts",
-    "./item": "./item.ts"
+    "./*": "./*.ts"
   }
 }

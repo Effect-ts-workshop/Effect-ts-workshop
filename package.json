@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@effect/platform": "^0.94.2",
+    "@effect/rpc": "^0.73.0",
     "effect": "^3.19.15"
   }
 }

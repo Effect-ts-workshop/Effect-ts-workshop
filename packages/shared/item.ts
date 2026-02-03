@@ -16,3 +16,7 @@ export const InventoryItemSchema = Schema.Struct({
   brand: Schema.String,
   model: Schema.String,
 });
+
+export const getAllItemsResponseSchema = Schema.Struct({
+  items: Schema.Array(InventoryItemSchema),
+});

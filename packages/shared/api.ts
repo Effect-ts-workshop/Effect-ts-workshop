@@ -1,6 +1,10 @@
 import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
 import { pipe, Schema } from "effect";
-import { InventoryItemIdSchema, InventoryItemSchema } from "./item.ts";
+import {
+  getAllItemsResponseSchema,
+  InventoryItemIdSchema,
+  InventoryItemSchema,
+} from "./item.ts";
 
 export const Api = HttpApi.make("Api").add(
   HttpApiGroup.make("items")
@@ -9,7 +13,7 @@ export const Api = HttpApi.make("Api").add(
     )
     .add(
       HttpApiEndpoint.get("getAllItems", "/items").addSuccess(
-        Schema.Struct({ items: Schema.Array(InventoryItemSchema) }),
+        getAllItemsResponseSchema,
       ),
     )
     .add(

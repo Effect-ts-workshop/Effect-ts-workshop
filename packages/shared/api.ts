@@ -1,45 +1,45 @@
-import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform";
-import { pipe, Schema } from "effect";
+import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform"
+import { pipe, Schema } from "effect"
 import {
   getAllItemsResponseSchema,
   getItemByIdResponseSchema,
   InventoryItemIdSchema,
-  InventoryItemSchema,
-} from "./item";
+  InventoryItemSchema
+} from "./item"
 
 export const Api = HttpApi.make("Api").add(
   HttpApiGroup.make("items")
     .add(
-      HttpApiEndpoint.post("addItem", "/items").setPayload(InventoryItemSchema),
+      HttpApiEndpoint.post("addItem", "/items").setPayload(InventoryItemSchema)
     )
     .add(
       HttpApiEndpoint.get("getAllItems", "/items").addSuccess(
-        getAllItemsResponseSchema,
-      ),
+        getAllItemsResponseSchema
+      )
     )
     .add(
       HttpApiEndpoint.get("getItemById", "/items/:itemId")
         .setPath(
           Schema.Struct({
-            itemId: InventoryItemIdSchema,
-          }),
+            itemId: InventoryItemIdSchema
+          })
         )
-        .addSuccess(getItemByIdResponseSchema),
+        .addSuccess(getItemByIdResponseSchema)
     )
     .add(
       HttpApiEndpoint.put("updateItemById", "/items/:itemId")
         .setPath(
           Schema.Struct({
-            itemId: InventoryItemIdSchema,
-          }),
+            itemId: InventoryItemIdSchema
+          })
         )
-        .setPayload(pipe(InventoryItemSchema, Schema.omit("id"))),
+        .setPayload(pipe(InventoryItemSchema, Schema.omit("id")))
     )
     .add(
       HttpApiEndpoint.del("removeItemById", "/items/:itemId").setPath(
         Schema.Struct({
-          itemId: InventoryItemIdSchema,
-        }),
-      ),
-    ),
-);
+          itemId: InventoryItemIdSchema
+        })
+      )
+    )
+)

@@ -1,26 +1,26 @@
-import { Rpc, RpcGroup } from "@effect/rpc";
+import { Rpc, RpcGroup } from "@effect/rpc"
 import {
   getAllItemsResponseSchema,
   getItemByIdResponseSchema,
   InventoryItemIdSchema,
-  InventoryItemSchema,
-} from "./item";
+  InventoryItemSchema
+} from "./item"
 
 export class ItemRpcs extends RpcGroup.make(
   Rpc.make("addItem", {
-    payload: InventoryItemSchema,
+    payload: InventoryItemSchema
   }),
   Rpc.make("getAllItems", {
-    success: getAllItemsResponseSchema,
+    success: getAllItemsResponseSchema
   }),
   Rpc.make("getItemById", {
     payload: { id: InventoryItemIdSchema },
-    success: getItemByIdResponseSchema,
+    success: getItemByIdResponseSchema
   }),
   Rpc.make("updateItem", {
-    payload: InventoryItemSchema,
+    payload: InventoryItemSchema
   }),
   Rpc.make("removeItemById", {
-    payload: { id: InventoryItemIdSchema },
-  }),
+    payload: { id: InventoryItemIdSchema }
+  })
 ) {}

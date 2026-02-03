@@ -1,3 +1,3 @@
-import { InventoryItemSchema } from "shared/item";
+import type { InventoryItemSchema } from "shared/item"
 
-export type InventoryItem = typeof InventoryItemSchema.Type;
+export type InventoryItem = typeof InventoryItemSchema.Type

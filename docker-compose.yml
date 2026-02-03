@@ -1,0 +1,35 @@
+services:
+  postgres-dev:
+    image: postgres:18.1
+    restart: always
+    environment:
+      POSTGRES_USER: effect-workshop
+      POSTGRES_PASSWORD: effect-workshop
+      POSTGRES_DB: effect-workshop
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: "pg_isready"
+      interval: 3s
+      timeout: 5s
+      retries: 5
+  signoz:
+    container_name: signoz
+    image: ghcr.io/aetherall/signoz-standalone:latest
+    environment:
+      SIGNOZ_ADMIN_EMAIL: admin@signoz.local
+      SIGNOZ_ADMIN_PASSWORD: admin123
+      SIGNOZ_ADMIN_NAME: Admin
+      SIGNOZ_TELEMETRY_ENABLED: false
+    ports:
+      - 9999:8080
+      - 4318:4318
+    volumes:
+      - signoz_db_telemetry:/var/lib/clickhouse
+      - signoz_db_application:/var/lib/signoz
+
+volumes:
+  signoz_db_telemetry:
+    name: signoz_db_telemetry
+  signoz_db_application:
+    name: signoz_db_application

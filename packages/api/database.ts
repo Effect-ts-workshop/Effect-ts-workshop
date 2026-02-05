@@ -1,7 +1,7 @@
 import { PgClient } from "@effect/sql-pg"
 import { Config, Redacted } from "effect"
 
-export const db = PgClient.layerConfig({
+export const dbLayer = PgClient.layerConfig({
   host: Config.string("DB_HOST").pipe(
     Config.withDefault("localhost")
   ),

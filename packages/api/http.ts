@@ -2,7 +2,7 @@ import { HttpApiBuilder } from "@effect/platform"
 import { Effect } from "effect"
 import { Api } from "shared/api"
 import { itemRepository } from "./db"
-import { UserService } from "./db/users-repository"
+import { ItemService } from "./db/item-repository"
 
 export const itemRoutesLive = HttpApiBuilder.group(Api, "items", (handlers) =>
   handlers
@@ -34,13 +34,8 @@ export const itemRoutesLive = HttpApiBuilder.group(Api, "items", (handlers) =>
     .handle(
       "getAllItems",
       Effect.fn(function*() {
-        const items = yield* itemRepository.getAll()
-        return { items }
+        const users = yield* ItemService
+        const allUsers = yield* users.getUsers()
+        return { items: allUsers }
       })
     ))
-
-export const getUsersHandler = Effect.gen(function*() {
-  const userService = yield* UserService
-  const users = yield* userService.getUsers
-  return users
-})

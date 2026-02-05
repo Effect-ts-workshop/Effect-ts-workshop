@@ -8,6 +8,8 @@ import { Layer, pipe } from "effect"
 import { createServer } from "node:http"
 import { Api } from "shared/api"
 import { ItemRpcs } from "shared/rpc"
+// import { db } from "./database"
+// import { UserServiceLive } from "./db/users-repository"
 import { itemRoutesLive } from "./http"
 import { itemHandlers } from "./rpc"
 
@@ -25,6 +27,7 @@ const rpcRoutes = pipe(
   Layer.provide(RpcSerialization.layerJson)
 )
 
+// const allRoutes = Layer.mergeAll(apiRoutes, rpcRoutes, db, UserServiceLive)
 const allRoutes = Layer.mergeAll(apiRoutes, rpcRoutes)
 
 const TracingLive = NodeSdk.layer(() => ({

@@ -15,7 +15,7 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
-  "eslint.validate": ["markdown", "javascript", "typescript"],
+  "eslint.validate": ["markdown", "javascript", "typescript", "javascriptreact", "typescriptreact"],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },

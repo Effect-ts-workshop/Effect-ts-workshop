@@ -58,7 +58,9 @@ function App() {
           open={isDialogOpen}
           onOpenChange={(open) => {
             setIsDialogOpen(open)
-            if (!open) resetForm()
+            if (!open) {
+              resetForm()
+            }
           }}
         >
           <DialogTrigger asChild>
@@ -68,15 +70,15 @@ function App() {
             </Button>
           </DialogTrigger>
           <DialogContent>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <upsertForm.Initialize defaultValues={{ brand: "", model: "" }}>
-                <DialogHeader>
-                  <DialogTitle>{editingItem ? "Edit Item" : "Add New Item"}</DialogTitle>
-                  <DialogDescription>
-                    {editingItem ? "Update the inventory item details." : "Add a new item to your inventory."}
-                  </DialogDescription>
-                </DialogHeader>
+            <DialogHeader>
+              <DialogTitle>{editingItem ? "Edit Item" : "Add New Item"}</DialogTitle>
+              <DialogDescription>
+                {editingItem ? "Update the inventory item details." : "Add a new item to your inventory."}
+              </DialogDescription>
+            </DialogHeader>
 
+            <form onSubmit={(e) => e.preventDefault()}>
+              <upsertForm.Initialize defaultValues={editingItem || { brand: "", model: "" }}>
                 <div className="grid gap-4 py-4">
                   <upsertForm.brand />
                   <upsertForm.model />

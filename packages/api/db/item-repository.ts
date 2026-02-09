@@ -34,7 +34,7 @@ export class ItemRepository extends Effect.Service<ItemRepository>()("app/ItemRe
       return items
     })
 
-    return { getAll, add: repo.insert }
+    return { getAll, add: repo.insert, update: repo.update, delete: repo.delete, findById: repo.findById }
   }),
   // Specify dependencies
   dependencies: [SqlLive]

@@ -1,4 +1,4 @@
-import { Brand, Schema } from "effect"
+import { Brand, pipe, Schema } from "effect"
 
 export type InventoryItemId = string & Brand.Brand<"inventory_item_id">
 export const InventoryItemId = Brand.nominal<InventoryItemId>()
@@ -13,8 +13,8 @@ export const InventoryItemIdSchema = Schema.UUID.pipe(
 
 export const InventoryItemSchema = Schema.Struct({
   id: InventoryItemIdSchema,
-  brand: Schema.String,
-  model: Schema.String
+  brand: pipe(Schema.String, Schema.nonEmptyString({ message: () => "Mandatory field" })),
+  model: pipe(Schema.String, Schema.nonEmptyString({ message: () => "Mandatory field" }))
 })
 
 export const getItemByIdResponseSchema = Schema.Option(InventoryItemSchema)

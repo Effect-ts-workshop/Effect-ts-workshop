@@ -1,6 +1,6 @@
 import { FormBuilder, FormReact } from "@lucas-barake/effect-form-react"
-import { Effect, Option, pipe, Schema } from "effect"
-import { InventoryItemId } from "shared/item"
+import { Effect, Option } from "effect"
+import { InventoryItemId, InventoryItemSchema } from "shared/item"
 import { Field, FieldError } from "./components/ui/field"
 import { Input } from "./components/ui/input"
 import { Label } from "./components/ui/label"
@@ -8,8 +8,8 @@ import { ApiClient } from "./lib/client"
 import type { InventoryItem } from "./types/inventory"
 
 const upsertFormBuilder = FormBuilder.empty
-  .addField("brand", pipe(Schema.String, Schema.nonEmptyString({ message: () => "Mandatory field" })))
-  .addField("model", pipe(Schema.String, Schema.nonEmptyString({ message: () => "Mandatory field" })))
+  .addField("brand", InventoryItemSchema.fields.brand)
+  .addField("model", InventoryItemSchema.fields.model)
 
 export const upsertForm = FormReact.make(upsertFormBuilder, {
   fields: {

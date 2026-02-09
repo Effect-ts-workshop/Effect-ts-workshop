@@ -4,13 +4,13 @@ import type { InventoryItemId } from "shared/item"
 import { EmptyInventory } from "./EmptyInventory"
 import { InventoryTable } from "./InventoryTable"
 import { InventoryTableSkeleton } from "./InventoryTableSkeleton"
-import { ApiClient, ApiRpcClient } from "./lib/client"
+import { ApiClient } from "./lib/client"
 import type { InventoryItem } from "./types/inventory"
 import { upsertForm } from "./UpsertForm"
 import { UpsertItemDialog } from "./UpsertItemDialog"
 
 function App() {
-  const result = useAtomValue(ApiRpcClient.query("getAllItems", undefined, { reactivityKeys: ["items"] }))
+  const result = useAtomValue(ApiClient.query("items", "getAllItems", { reactivityKeys: ["items"] }))
   const removeItemById = useAtomSet(ApiClient.mutation("items", "removeItemById"))
   const reset = useAtomSet(upsertForm.reset)
   const [isDialogOpen, setIsDialogOpen] = useState(false)

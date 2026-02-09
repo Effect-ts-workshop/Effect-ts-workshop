@@ -1,15 +1,16 @@
 import { HttpApiBuilder } from "@effect/platform"
-import { Effect } from "effect"
+import { Effect, pipe } from "effect"
 import { Api } from "shared/api"
 import { itemRepository } from "./db"
-import { ItemService } from "./db/item-repository"
+import { ItemRepository } from "./db/item-repository"
 
 export const itemRoutesLive = HttpApiBuilder.group(Api, "items", (handlers) =>
   handlers
     .handle(
       "addItem",
       Effect.fn(function*({ payload }) {
-        yield* itemRepository.add(payload)
+        const users = yield* ItemRepository
+        yield* users.add({ ...payload, createdAt: undefined, updatedAt: undefined })
       })
     )
     .handle(
@@ -33,9 +34,15 @@ export const itemRoutesLive = HttpApiBuilder.group(Api, "items", (handlers) =>
     )
     .handle(
       "getAllItems",
-      Effect.fn(function*() {
-        const users = yield* ItemService
-        const allUsers = yield* users.getUsers()
-        return { items: allUsers }
-      })
+      Effect.fn(
+        function*() {
+          const users = yield* ItemRepository
+          const allUsers = yield* pipe(
+            users.getAll(),
+            Effect.tapError(Effect.logError),
+            Effect.catchAll(() => Effect.succeed([]))
+          )
+          return { items: allUsers }
+        }
+      )
     ))

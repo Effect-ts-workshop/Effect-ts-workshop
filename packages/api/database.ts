@@ -1,7 +1,7 @@
 import { PgClient } from "@effect/sql-pg"
-import { Config, Redacted } from "effect"
+import { Config, Redacted, String } from "effect"
 
-export const dbLayer = PgClient.layerConfig({
+export const SqlLive = PgClient.layerConfig({
   host: Config.string("DB_HOST").pipe(
     Config.withDefault("localhost")
   ),
@@ -16,5 +16,7 @@ export const dbLayer = PgClient.layerConfig({
   ),
   password: Config.redacted("DB_PASSWORD").pipe(
     Config.withDefault(Redacted.make("effect-workshop"))
-  )
+  ),
+  transformQueryNames: Config.succeed(String.camelToSnake),
+  transformResultNames: Config.succeed(String.snakeToCamel)
 })

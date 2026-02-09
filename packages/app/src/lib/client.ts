@@ -10,12 +10,12 @@ import { Api } from "shared/api"
 import { ItemRpcs } from "shared/rpc"
 
 const TracingLive = WebSdk.layer(() => ({
-  resource: {serviceName: 'app'},
-  spanProcessor: new BatchSpanProcessor(new OTLPTraceExporter({url: 'http://localhost:5173/v1/traces'}))
+  resource: { serviceName: "app" },
+  spanProcessor: new BatchSpanProcessor(new OTLPTraceExporter({ url: "http://localhost:5173/v1/traces" }))
 }))
 
 Atom.runtime.addGlobalLayer(
-  TracingLive,
+  TracingLive
 )
 
 export class ApiClient extends AtomHttpApi.Tag<ApiClient>()("ApiClient", {

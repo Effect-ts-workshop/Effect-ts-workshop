@@ -1,8 +1,6 @@
-import { useAtomSet, useAtomValue } from "@effect-atom/atom-react"
 import { FormBuilder, FormReact } from "@lucas-barake/effect-form-react"
 import { Effect, Option, pipe, Schema } from "effect"
 import { InventoryItemId } from "shared/item"
-import { Button } from "./components/ui/button"
 import { Field, FieldError } from "./components/ui/field"
 import { Input } from "./components/ui/input"
 import { Label } from "./components/ui/label"
@@ -13,7 +11,6 @@ const upsertFormBuilder = FormBuilder.empty
   .addField("brand", pipe(Schema.String, Schema.nonEmptyString({ message: () => "Mandatory field" })))
   .addField("model", pipe(Schema.String, Schema.nonEmptyString({ message: () => "Mandatory field" })))
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const upsertForm = FormReact.make(upsertFormBuilder, {
   fields: {
     brand: ({ field }) => (
@@ -71,13 +68,3 @@ export const upsertForm = FormReact.make(upsertFormBuilder, {
       }
     })
 })
-
-export function SubmitButton({ editingItem }: { editingItem: InventoryItem | null }) {
-  const submitResult = useAtomValue(upsertForm.submit)
-  const submit = useAtomSet(upsertForm.submit)
-  return (
-    <Button type="submit" onClick={() => submit({ editingItem })} disabled={submitResult.waiting}>
-      {editingItem ? "Update" : "Add"}
-    </Button>
-  )
-}

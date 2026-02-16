@@ -20,3 +20,7 @@ export const SqlLive = PgClient.layerConfig({
   transformQueryNames: Config.succeed(String.camelToSnake),
   transformResultNames: Config.succeed(String.snakeToCamel)
 })
+
+// npm i @tanstack/react-router @tanstack/react-router-devtools
+
+// npm i -D @tanstack/router-plugin

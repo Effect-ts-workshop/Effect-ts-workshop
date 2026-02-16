@@ -1,15 +1,20 @@
 import { Result, useAtomSet, useAtomSubscribe, useAtomValue } from "@effect-atom/atom-react"
+import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 import type { InventoryItemId } from "shared/item"
-import { EmptyInventory } from "./EmptyInventory"
-import { InventoryTable } from "./InventoryTable"
-import { InventoryTableSkeleton } from "./InventoryTableSkeleton"
-import { ApiClient } from "./lib/client"
-import type { InventoryItem } from "./types/inventory"
-import { upsertForm } from "./UpsertForm"
-import { UpsertItemDialog } from "./UpsertItemDialog"
+import { EmptyInventory } from "../EmptyInventory"
+import { InventoryTable } from "../InventoryTable"
+import { InventoryTableSkeleton } from "../InventoryTableSkeleton"
+import { ApiClient } from "../lib/client"
+import type { InventoryItem } from "../types/inventory"
+import { upsertForm } from "../UpsertForm"
+import { UpsertItemDialog } from "../UpsertItemDialog"
 
-function App() {
+export const Route = createFileRoute("/")({
+  component: Index
+})
+
+function Index() {
   const result = useAtomValue(ApiClient.query("items", "getAllItems", { reactivityKeys: ["items"] }))
   const removeItemById = useAtomSet(ApiClient.mutation("items", "removeItemById"))
   const reset = useAtomSet(upsertForm.reset)
@@ -73,4 +78,4 @@ function App() {
   )
 }
 
-export default App
+// export default Index()

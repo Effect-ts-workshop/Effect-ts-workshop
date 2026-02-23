@@ -1,16 +1,17 @@
 import { HttpApiBuilder } from "@effect/platform"
-import { Effect, pipe } from "effect"
+import { Effect, Option, pipe } from "effect"
 import { Api } from "shared/api"
 import { ItemRepository } from "./db/item-repository"
+import { ItemRepositoryDrizzle } from "./db/item-repository-drizzle"
 
 export const itemRoutesLive = HttpApiBuilder.group(Api, "items", (handlers) =>
   handlers
     .handle(
       "addItem",
       Effect.fn(function*({ payload }) {
-        const items = yield* ItemRepository
-        yield* items.add({ ...payload, createdAt: undefined, updatedAt: undefined })
-      })
+        const items = yield* ItemRepositoryDrizzle
+        yield* items.add(payload)
+      }, Effect.catchTag("EffectDrizzleQueryError", () => Effect.succeed({} as any)))
     )
     .handle(
       "updateItemById",
@@ -28,11 +29,15 @@ export const itemRoutesLive = HttpApiBuilder.group(Api, "items", (handlers) =>
     )
     .handle(
       "getItemById",
-      Effect.fn(function*({ path }) {
-        const items = yield* ItemRepository
-        const item = yield* items.findById(path.itemId)
-        return item
-      })
+      Effect.fn(
+        function*({ path }) {
+          const items = yield* ItemRepositoryDrizzle
+          const item = yield* items.findById(path.itemId)
+          return item
+        },
+        Effect.tap(Effect.logInfo("coucou")),
+        Effect.catchTag("EffectDrizzleQueryError", () => Effect.succeed(Option.none()))
+      )
     )
     .handle(
       "getAllItems",

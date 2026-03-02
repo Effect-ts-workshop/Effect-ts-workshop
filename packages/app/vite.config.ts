@@ -8,6 +8,8 @@ export default defineConfig({
   plugins: [
     tanstackRouter({
       target: "react",
+      virtualRouteConfig: "src/routes.ts",
+      routesDirectory: "src/views",
       autoCodeSplitting: true
     }),
     react()
@@ -32,5 +34,3 @@ export default defineConfig({
     }
   }
 })
-
-// https://tanstack.com/router/latest/docs/installation/manual#srcroutes__roottsx

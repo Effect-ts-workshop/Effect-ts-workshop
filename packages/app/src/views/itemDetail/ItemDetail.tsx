@@ -3,10 +3,10 @@ import { createFileRoute, Link } from "@tanstack/react-router"
 import { Option, Schema } from "effect"
 import { InventoryItemIdSchema } from "shared/item"
 import { Separator } from "../../components/ui/separator"
-import { Skeleton } from "../../components/ui/skeleton"
 import { ApiClient } from "../../lib/client"
+import { ItemDetailSkeleton } from "./ItemDetailSkeleton"
 
-export const Route = createFileRoute("/items/$id")({
+export const Route = createFileRoute("/items_/$id")({
   params: {
     parse: Schema.decodeSync(Schema.Struct({ id: InventoryItemIdSchema }))
   },
@@ -68,27 +68,6 @@ function ItemDetail() {
             })
           )
           .render()}
-      </div>
-    </div>
-  )
-}
-
-function ItemDetailSkeleton() {
-  return (
-    <div className="space-y-4">
-      <Skeleton className="h-8 w-48" />
-      <Separator />
-      <div className="space-y-3">
-        <Skeleton className="h-5 w-24" />
-        <Skeleton className="h-6 w-64" />
-      </div>
-      <div className="space-y-3">
-        <Skeleton className="h-5 w-24" />
-        <Skeleton className="h-6 w-64" />
-      </div>
-      <div className="space-y-3">
-        <Skeleton className="h-5 w-24" />
-        <Skeleton className="h-6 w-48" />
       </div>
     </div>
   )

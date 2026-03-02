@@ -1,64 +1,29 @@
-import { Button } from "@/components/ui/button"
+import { ButtonLink } from "@/components/ui/button-link"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Result, useAtomSet, useAtomSubscribe, useAtomValue } from "@effect-atom/atom-react"
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { Pencil, Trash2 } from "lucide-react"
-import { useState } from "react"
-import type { InventoryItemId } from "shared/item"
+import { Result, useAtomValue } from "@effect-atom/atom-react"
+import { createFileRoute, Outlet } from "@tanstack/react-router"
+import { Pencil, Plus, Trash2 } from "lucide-react"
+import type { MouseEventHandler } from "react"
 import { ApiClient } from "../../lib/client"
 import type { InventoryItem } from "../../types/inventory"
-import { upsertForm } from "../../UpsertForm"
-import { UpsertItemDialog } from "../../UpsertItemDialog"
 
-export const Route = createFileRoute("/items/")({
+export const Route = createFileRoute("/items")({
   component: Index
 })
 
 function Index() {
   const result = useAtomValue(ApiClient.query("items", "getAllItems", { reactivityKeys: ["items"] }))
-  const removeItemById = useAtomSet(ApiClient.mutation("items", "removeItemById"))
-  const reset = useAtomSet(upsertForm.reset)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null)
-  const navigate = useNavigate()
-
-  const handleEdit = (item: InventoryItem) => {
-    setEditingItem(item)
-    setIsDialogOpen(true)
-  }
-
-  const handleDelete = (itemId: InventoryItemId) => {
-    removeItemById({ path: { itemId }, reactivityKeys: ["items"] })
-  }
-
-  const resetForm = () => {
-    reset()
-    setEditingItem(null)
-    setIsDialogOpen(false)
-  }
-
-  useAtomSubscribe(
-    upsertForm.submit,
-    (result) => {
-      if (Result.isSuccess(result)) {
-        resetForm()
-      }
-    },
-    { immediate: false }
-  )
 
   return (
     <>
       <div className="container mx-auto py-10 px-4">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Inventory</h1>
-          <UpsertItemDialog
-            isOpen={isDialogOpen}
-            onOpenChange={setIsDialogOpen}
-            editingItem={editingItem}
-            onReset={resetForm}
-          />
+          <ButtonLink to="/items/create">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Item
+          </ButtonLink>
         </div>
 
         {Result.builder(result)
@@ -69,14 +34,12 @@ function Index() {
               : (
                 <InventoryTable
                   items={items}
-                  onRowClick={(item) => navigate({ to: "/items/$id", params: { id: item.id } })}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
                 />
               )
           )
           .render()}
       </div>
+      <Outlet />
     </>
   )
 }
@@ -111,28 +74,41 @@ function InventoryTableSkeleton() {
 }
 
 function InventoryItemRow({
-  item,
-  onRowClick,
-  onDelete,
-  onEdit
+  item
 }: {
   item: InventoryItem
-  onRowClick: (item: InventoryItem) => void
-  onEdit: (item: InventoryItem) => void
-  onDelete: (itemId: InventoryItemId) => void
 }) {
+  const navigate = Route.useNavigate()
+  const onRowClick: MouseEventHandler<HTMLTableRowElement> = (e) => {
+    if (e.defaultPrevented) {
+      return
+    }
+
+    navigate({ to: "/items/$id", params: { id: item.id } })
+  }
+
   return (
-    <TableRow onClick={() => onRowClick(item)}>
+    <TableRow onClick={onRowClick} className="cursor-pointer">
       <TableCell className="font-medium">{item.brand}</TableCell>
       <TableCell>{item.model}</TableCell>
       <TableCell>
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon" onClick={() => onEdit(item)}>
+          <ButtonLink
+            to="/items/$id/edit"
+            params={{ id: item.id }}
+            variant="ghost"
+            size="icon"
+          >
             <Pencil className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => onDelete(item.id)}>
+          </ButtonLink>
+          <ButtonLink
+            to="/items/$id/remove"
+            params={{ id: item.id }}
+            variant="ghost"
+            size="icon"
+          >
             <Trash2 className="h-4 w-4" />
-          </Button>
+          </ButtonLink>
         </div>
       </TableCell>
     </TableRow>
@@ -140,15 +116,9 @@ function InventoryItemRow({
 }
 
 function InventoryTable({
-  items,
-  onRowClick,
-  onDelete,
-  onEdit
+  items
 }: {
   items: ReadonlyArray<InventoryItem>
-  onRowClick: (item: InventoryItem) => void
-  onEdit: (item: InventoryItem) => void
-  onDelete: (itemId: InventoryItemId) => void
 }) {
   return (
     <Table>
@@ -160,9 +130,7 @@ function InventoryTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {items.map((item) => (
-          <InventoryItemRow key={item.id} item={item} onRowClick={onRowClick} onEdit={onEdit} onDelete={onDelete} />
-        ))}
+        {items.map((item) => <InventoryItemRow key={item.id} item={item} />)}
       </TableBody>
     </Table>
   )

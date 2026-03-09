@@ -81,7 +81,7 @@ function Index() {
   )
 }
 
-function InventoryTableSkeleton() {
+export function InventoryTableSkeleton() {
   return (
     <Table>
       <TableHeader>

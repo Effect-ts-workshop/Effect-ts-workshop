@@ -5,7 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=app,api",
+    "dev": "npm run dev --workspaces=app,api",
     "build": "npm run build --workspace=app",
     "lint": "eslint \"**/{src,test,examples,scripts,dtslint}/**/*.{ts,mjs}\"",
     "lint-fix": "npm run lint --fix"
@@ -31,6 +31,7 @@
     "@opentelemetry/sdk-trace-base": "^2.5.0",
     "@tanstack/react-router": "^1.160.0",
     "@tanstack/react-router-devtools": "^1.160.0",
-    "effect": "^3.19.19"
+    "effect": "^3.19.19",
+    "vitest": "^4.0.18"
   }
 }

@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx --watch server.ts"
+    "dev": "tsx --watch server.ts",
+    "test": "vitest"
   },
   "dependencies": {
     "@effect/platform-node": "^0.104.1",

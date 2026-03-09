@@ -1,0 +1,8 @@
+{
+  "label": "Partie 3 — Contexte",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Apprenez à déclarer les dépendances de votre programme dans le type Effect, et à les fournir via des Layers."
+  }
+}

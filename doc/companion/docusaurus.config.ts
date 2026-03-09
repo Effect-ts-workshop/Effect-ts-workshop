@@ -1,0 +1,58 @@
+import { themes as prismThemes } from "prism-react-renderer";
+import type { Config } from "@docusaurus/types";
+import type * as Preset from "@docusaurus/preset-classic";
+
+const config: Config = {
+  title: "Effect-TS Workshop Companion",
+  tagline: "Maîtrise Effect-TS par la pratique",
+  favicon: "img/favicon.ico",
+
+  url: "https://effect-workshop.github.io",
+  trailingSlash: true,
+  baseUrl: "/",
+
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
+
+  i18n: {
+    defaultLocale: "fr",
+    locales: ["fr"],
+  },
+
+  presets: [
+    [
+      "classic",
+      {
+        docs: {
+          sidebarPath: "./sidebars.ts",
+          routeBasePath: "/",
+        },
+        blog: false,
+        theme: {
+          customCss: "./src/css/custom.css",
+        },
+      } satisfies Preset.Options,
+    ],
+  ],
+
+  themeConfig: {
+    navbar: {
+      title: "Effect-TS Workshop",
+      items: [
+        {
+          type: "docSidebar",
+          sidebarId: "tutorialSidebar",
+          position: "left",
+          label: "Workshop",
+        },
+      ],
+    },
+    prism: {
+      theme: prismThemes.github,
+      darkTheme: prismThemes.dracula,
+      additionalLanguages: ["typescript"],
+    },
+  } satisfies Preset.ThemeConfig,
+};
+
+export default config;

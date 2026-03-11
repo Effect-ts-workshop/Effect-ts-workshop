@@ -1,0 +1,81 @@
+import { Effect, pipe } from "effect"
+import { describe, expect, it } from "vitest"
+
+describe("FP utils", () => {
+  it("pipe", () => {
+    // Given
+    function add(a: number, b: number) {
+      return a + b
+    }
+    function multiply(a: number, b: number) {
+      return a * b
+    }
+
+    // When
+    const result = pipe(
+      add(4, 6),
+      (a) => multiply(a, 4)
+    )
+
+    // Then
+    expect(result).toEqual(40)
+  })
+
+  it("curried function", () => {
+    // Given
+    const add = (a: number) => (b: number) => a + b
+    const multiply = (a: number) => (b: number) => a * b
+
+    // When
+    const result = pipe(
+      4,
+      add(6),
+      multiply(4)
+    )
+
+    // Then
+    expect(result).toEqual(40)
+  })
+})
+
+describe("Effect basics", () => {
+  it("Sync operation", () => {
+    // Given
+    function add(a: number, b: number): Effect.Effect<number> {
+      return Effect.succeed(a + b)
+    }
+
+    // When
+    const program = add(2, 8)
+
+    // Then
+    expect(Effect.runSync(program)).toEqual(10)
+  })
+  it("Should chain operations using the pipe function", () => {
+    // Given
+    const add = (a: number) => (b: number) => a + b
+
+    // When
+    const result = pipe(2, add(3), add(5))
+
+    // Then
+    expect(result).toEqual(10)
+  })
+
+  it("Async operation", async () => {
+    // Given
+    function addWithDelay(a: number, b: number): Effect.Effect<number> {
+      return Effect.promise(() =>
+        new Promise((resolve) => {
+          setTimeout(() => resolve(a + b), 200)
+        })
+      )
+    }
+
+    // When
+    const program = addWithDelay(2, 8)
+
+    // Then
+    await expect(Effect.runPromise(program)).resolves.toEqual(10)
+  })
+})

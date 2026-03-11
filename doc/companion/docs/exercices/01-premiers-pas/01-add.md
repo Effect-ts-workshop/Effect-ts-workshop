@@ -6,7 +6,7 @@ sidebar_position: 1
 
 - [ ] remove multiply
 - [ ] introduire le pipe dans `doc/companion/docs/exercices/01-premiers-pas/02-delay.md`
-      :::
+:::
 
 # Exercice 1 — Addition synchrone
 

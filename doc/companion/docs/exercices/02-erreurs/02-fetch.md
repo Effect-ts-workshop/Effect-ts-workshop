@@ -2,6 +2,11 @@
 sidebar_position: 2
 ---
 
+:::danger TODO
+
+- [ ] Change exercice to implement fetch with explicit errors `NetworkError` & `HTTPResponseError`
+:::
+
 # Exercice 4 — Requête réseau typée
 
 ## Les erreurs asynchrones sont pires

@@ -2,6 +2,12 @@
 sidebar_position: 2
 ---
 
+:::danger TODO
+
+- [ ] remove current exercice
+- [ ] nouvel exercice: wrap async function with Effect
+:::
+
 # Exercice 2 — Délai asynchrone
 
 ## Le problème de l'asynchronicité classique

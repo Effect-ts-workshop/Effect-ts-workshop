@@ -5,6 +5,7 @@ sidebar_position: 2
 :::danger TODO
 
 - [ ] Change exercice to implement fetch with explicit errors `NetworkError` & `HTTPResponseError`
+- [ ] Add tip: use signal provided to leverage interruptibility capabilities
 :::
 
 # Exercice 4 — Requête réseau typée

@@ -60,7 +60,7 @@ describe("Effect basics", () => {
 
   it("should create tagged errors", async () => {
     const netError = new NetworkError({ error: "unknown" })
-    expect(netError._tag).toBe("NetworError")
+    expect(netError._tag).toBe("NetworkError")
 
     const httpError = new HTTPResponseError({ response: "fake" as any })
     expect(httpError).toMatchObject({ "_tag": "HTTPResponseError" })

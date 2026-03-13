@@ -1,15 +1,16 @@
-import { Data, Effect, pipe } from "effect"
+import { Effect, pipe } from "effect"
+import type { UnknownException } from "effect/Cause"
 import type { Response } from "undici"
 import { fetch as baseFetch } from "undici"
-import { describe, expect, it } from "vitest"
+import { describe, expect, expectTypeOf, it } from "vitest"
+import { getJoke, HTTPResponseError, NetworkError } from "../sandbox"
 
 describe("Effect basics", () => {
   it("should track error explicitly", () => {
     // Given
-    class NombreNégatif extends Data.TaggedError("NombreNégatif") {}
-    function racineCarrée(n: number): Effect.Effect<number, NombreNégatif> {
+    function racineCarrée(n: number): Effect.Effect<number, Error> {
       if (n < 0) {
-        return Effect.fail(new NombreNégatif())
+        return Effect.fail(new Error("toto"))
       }
 
       return Effect.succeed(Math.sqrt(n))
@@ -26,9 +27,8 @@ describe("Effect basics", () => {
 
   it("should track every possible errors", async () => {
     // Given
-    class NetworkError extends Data.TaggedError("NetworkError")<{ error: unknown }> {}
-
-    class HTTPResponseError extends Data.TaggedError("HTTPResponseError")<{ response: Response }> {}
+    class NetworkError extends Error {}
+    class HTTPResponseError extends Error {}
 
     type Fetch = (
       ...args: Parameters<typeof baseFetch>
@@ -41,11 +41,11 @@ describe("Effect basics", () => {
               signal,
               ...init
             }),
-          catch: (error) => new NetworkError({ error })
+          catch: (error) => new NetworkError(String(error))
         }),
         Effect.filterOrFail(
           (response) => response.ok,
-          (response) => new HTTPResponseError({ response })
+          (response) => new HTTPResponseError(response.statusText)
         )
       )
 
@@ -58,50 +58,53 @@ describe("Effect basics", () => {
     await expect(Effect.runPromise(invalidProgram)).rejects.toThrow()
   })
 
-  it("should always get a joke", async () => {
+  it("should create tagged errors", async () => {
+    const netError = new NetworkError({ error: "unknown" })
+    expect(netError._tag).toBe("NetworError")
+
+    const httpError = new HTTPResponseError({ response: "fake" as any })
+    expect(httpError).toMatchObject({ "_tag": "HTTPResponseError" })
+  })
+
+  it("should catch single error", async () => {
     // Given
-    class NetworkError extends Data.TaggedError("NetworkError")<{ error: unknown }> {}
-
-    class HTTPResponseError extends Data.TaggedError("HTTPResponseError")<{ response: Response }> {}
-
-    type Fetch = (
-      ...args: Parameters<typeof baseFetch>
-    ) => Effect.Effect<Response, NetworkError | HTTPResponseError>
-    const fetch: Fetch = (input, init) =>
-      pipe(
-        Effect.tryPromise({
-          try: (signal) =>
-            baseFetch(input, {
-              signal,
-              ...init
-            }),
-          catch: (error) => new NetworkError({ error })
-        }),
-        Effect.filterOrFail(
-          (response) => response.ok,
-          (response) => new HTTPResponseError({ response })
-        )
-      )
-    const getJoke = () =>
-      pipe(
-        fetch("https://api.chucknorris.io/jokes/random"),
-        Effect.flatMap((a) => Effect.tryPromise(() => a.json())),
-        Effect.map((a) => String((a as any).value))
-      )
 
     // When
     const program = pipe(
       getJoke(),
-      Effect.catchTag(
-        "HTTPResponseError",
-        () =>
-          Effect.succeed(
-            "Chuck Norris never gets a 500 Internal Server Error. The server fixes itself before responding."
-          )
-      )
+      // catch here
+      Effect.catchTag("HTTPResponseError", () => Effect.succeed("COUCOU"))
     )
 
-    // Then
-    await expect(Effect.runPromise(program)).resolves.toMatchObject({ status: 200 })
+    expectTypeOf(program).toMatchTypeOf<Effect.Effect<string, UnknownException | NetworkError, never>>()
+  })
+
+  it("should some errors", async () => {
+    // Given
+
+    // When
+    const program = pipe(
+      getJoke(),
+      // catch here
+      Effect.catchTags({
+        HTTPResponseError: () => Effect.succeed("COUCOU"),
+        NetworkError: () => Effect.succeed("COUCOU")
+      })
+    )
+
+    expectTypeOf(program).toMatchTypeOf<Effect.Effect<string, UnknownException, never>>()
+  })
+
+  it("should always get a joke", async () => {
+    // Given
+
+    // When
+    const program = pipe(
+      getJoke(),
+      // catch here
+      Effect.catchAll(() => Effect.succeed("COUCOU"))
+    )
+
+    expectTypeOf(program).toMatchTypeOf<Effect.Effect<string, never, never>>()
   })
 })

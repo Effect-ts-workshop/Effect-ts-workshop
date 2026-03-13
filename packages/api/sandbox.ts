@@ -1,0 +1,33 @@
+import { Data, Effect, pipe } from "effect"
+import type { Response } from "undici"
+import { fetch as baseFetch } from "undici"
+
+export class NetworkError extends Data.TaggedError("NetworkError")<{ error: unknown }> {}
+
+export class HTTPResponseError extends Data.TaggedError("HTTPResponseError")<{ response: Response }> {}
+
+type Fetch = (
+  ...args: Parameters<typeof baseFetch>
+) => Effect.Effect<Response, NetworkError | HTTPResponseError>
+const fetch: Fetch = (input, init) =>
+  pipe(
+    Effect.tryPromise({
+      try: (signal) =>
+        baseFetch(input, {
+          signal,
+          ...init
+        }),
+      catch: (error) => new NetworkError({ error })
+    }),
+    Effect.filterOrFail(
+      (response) => response.ok,
+      (response) => new HTTPResponseError({ response })
+    )
+  )
+
+export const getJoke = () =>
+  pipe(
+    fetch("https://api.chucknorris.io/jokes/random"),
+    Effect.flatMap((a) => Effect.tryPromise(() => a.json())),
+    Effect.map((a) => String((a as any).value))
+  )

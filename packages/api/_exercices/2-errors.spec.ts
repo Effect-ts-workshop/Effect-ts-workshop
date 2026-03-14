@@ -1,11 +1,11 @@
 import { Effect, pipe } from "effect"
-import type { UnknownException } from "effect/Cause"
+import { UnknownException } from "effect/Cause"
 import type { Response } from "undici"
 import { fetch as baseFetch } from "undici"
 import { describe, expect, expectTypeOf, it } from "vitest"
 import { getJoke, HTTPResponseError, NetworkError } from "../sandbox"
 
-describe("Effect basics", () => {
+describe("Effect basics - Errors", () => {
   it("should track error explicitly", () => {
     // Given
     function racineCarrée(n: number): Effect.Effect<number, Error> {
@@ -76,7 +76,7 @@ describe("Effect basics", () => {
       Effect.catchTag("HTTPResponseError", () => Effect.succeed("COUCOU"))
     )
 
-    expectTypeOf(program).toMatchTypeOf<Effect.Effect<string, UnknownException | NetworkError, never>>()
+    expectTypeOf(program).toEqualTypeOf<Effect.Effect<string, UnknownException | NetworkError, never>>()
   })
 
   it("should some errors", async () => {
@@ -92,7 +92,7 @@ describe("Effect basics", () => {
       })
     )
 
-    expectTypeOf(program).toMatchTypeOf<Effect.Effect<string, UnknownException, never>>()
+    expectTypeOf(program).toEqualTypeOf<Effect.Effect<string, UnknownException, never>>()
   })
 
   it("should always get a joke", async () => {
@@ -105,6 +105,28 @@ describe("Effect basics", () => {
       Effect.catchAll(() => Effect.succeed("COUCOU"))
     )
 
-    expectTypeOf(program).toMatchTypeOf<Effect.Effect<string, never, never>>()
+    expectTypeOf(program).toEqualTypeOf<Effect.Effect<string, never, never>>()
+  })
+
+  it("CatchTags: ideal for precise errors VS CatchAll secure nest for the rest", async () => {
+    // catchTags to handle precisely errors
+    const catchTagsResult = pipe(
+      Effect.fail(new UnknownException("panic")),
+      Effect.catchTags({
+        // Your errors
+      })
+    )
+
+    // catchAll = catch everything
+    const catchAllResult = pipe(
+      Effect.fail(new UnknownException("panic")),
+      Effect.catchAll(() => Effect.succeed("ok"))
+    )
+
+    expectTypeOf(catchTagsResult).toEqualTypeOf<Effect.Effect<never, UnknownException, never>>()
+    expectTypeOf(catchAllResult).toEqualTypeOf<Effect.Effect<string, never, never>>()
+
+    await expect(Effect.runPromise(catchTagsResult)).rejects.toThrow()
+    await expect(Effect.runPromise(catchAllResult)).resolves.toBe("ok")
   })
 })

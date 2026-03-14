@@ -1,43 +1,6 @@
 import { Effect, pipe } from "effect"
 import { describe, expect, it } from "vitest"
 
-describe("FP utils", () => {
-  it("pipe", () => {
-    // Given
-    function add(a: number, b: number) {
-      return a + b
-    }
-    function multiply(a: number, b: number) {
-      return a * b
-    }
-
-    // When
-    const result = pipe(
-      add(4, 6),
-      (a) => multiply(a, 4)
-    )
-
-    // Then
-    expect(result).toEqual(40)
-  })
-
-  it("curried function", () => {
-    // Given
-    const add = (a: number) => (b: number) => a + b
-    const multiply = (a: number) => (b: number) => a * b
-
-    // When
-    const result = pipe(
-      4,
-      add(6),
-      multiply(4)
-    )
-
-    // Then
-    expect(result).toEqual(40)
-  })
-})
-
 describe("Effect basics", () => {
   it("Sync operation", () => {
     // Given
@@ -93,5 +56,42 @@ describe("Effect basics", () => {
 
     // Then
     await expect(Effect.runPromise(program)).resolves.toEqual(10)
+  })
+})
+
+describe("FP utils", () => {
+  it("pipe", () => {
+    // Given
+    function add(a: number, b: number) {
+      return a + b
+    }
+    function multiply(a: number, b: number) {
+      return a * b
+    }
+
+    // When
+    const result = pipe(
+      add(4, 6),
+      (a) => multiply(a, 4)
+    )
+
+    // Then
+    expect(result).toEqual(40)
+  })
+
+  it("curried function", () => {
+    // Given
+    const add = (a: number) => (b: number) => a + b
+    const multiply = (a: number) => (b: number) => a * b
+
+    // When
+    const result = pipe(
+      4,
+      add(6),
+      multiply(4)
+    )
+
+    // Then
+    expect(result).toEqual(40)
   })
 })

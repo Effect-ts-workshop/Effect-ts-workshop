@@ -51,15 +51,31 @@ describe("Effect basics", () => {
     // Then
     expect(Effect.runSync(program)).toEqual(10)
   })
-  it("Should chain operations using the pipe function", () => {
+
+  it("Should transform effect value", () => {
     // Given
     const add = (a: number) => (b: number) => a + b
 
     // When
-    const result = pipe(2, add(3), add(5))
+    const result = pipe(
+      Effect.succeed(2),
+      Effect.map(add(3)),
+      Effect.map(add(5))
+    )
 
     // Then
-    expect(result).toEqual(10)
+    expect(Effect.runSync(result)).toEqual(10)
+  })
+
+  it("Should transform effect value and flatten to avoid Effect<Effect<number>>", () => {
+    // Given
+    const add = (a: number) => (b: number) => Effect.succeed(a + b)
+
+    // When
+    const result = pipe(Effect.succeed(2), Effect.flatMap(add(8)))
+
+    // Then
+    expect(Effect.runSync(result)).toEqual(10)
   })
 
   it("Async operation", async () => {

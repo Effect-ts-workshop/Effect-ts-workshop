@@ -4,6 +4,15 @@
       {
         "name": "@effect/language-service"
       }
-    ]
-  }
+    ],
+  },
+  "exclude": [],
+  "references": [
+    {
+      "path": "./packages/api"
+    },
+    {
+      "path": "./packages/app"
+    }
+  ]
 }

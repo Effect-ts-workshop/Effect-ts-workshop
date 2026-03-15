@@ -1,4 +1,4 @@
-import { Match, pipe } from "effect"
+import { Array, Match, Option, pipe } from "effect"
 import { describe, expect, it } from "vitest"
 
 describe("Pattern matching", () => {
@@ -25,16 +25,31 @@ describe("Pattern matching", () => {
         Match.exhaustive
       )
 
-    /**
-     * TODO
-     * Match.exhaustive does not have TS error when Match is not complete 🤬🤬😱
-     * Maybe a TS config to fix
-     */
-
     // Then
     expect(getValue({ type: "number", value: 42 })).toEqual("42")
     expect(getValue({ type: "text", value: "awesome" })).toEqual("awesome")
     expect(getValue({ type: "select", multiple: false, value: "selected" })).toEqual("selected")
     expect(getValue({ type: "select", multiple: true, value: ["selected", "a", "lot"] })).toEqual("selected, a, lot")
+  })
+
+  it("should handle optional value", () => {
+    // Given
+    const allValues = ["you got me"]
+
+    // When
+    const getValueAt = (index: number) =>
+      pipe(
+        allValues,
+        Array.get(index),
+        // match here
+        Option.match({
+          onSome: (v) => v.toUpperCase(),
+          onNone: () => `DEFAULT`
+        })
+      )
+
+    // Then
+    expect(getValueAt(0)).toEqual("YOU GOT ME")
+    expect(getValueAt(42)).toEqual("DEFAULT")
   })
 })

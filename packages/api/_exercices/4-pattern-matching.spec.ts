@@ -52,4 +52,136 @@ describe("Pattern matching", () => {
     expect(getValueAt(0)).toEqual("YOU GOT ME")
     expect(getValueAt(42)).toEqual("DEFAULT")
   })
+  it("should wrap result in Option with Match.option (product availability)", () => {
+    // Given — stock d'un produit
+    type StockStatus =
+      | { status: "in_stock"; quantity: number }
+      | { status: "out_of_stock" }
+      | { status: "discontinued" }
+
+    // When — renvoie le délai de livraison estimé seulement si disponible
+    const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
+      pipe(
+        Match.value(stock),
+        Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
+        Match.option
+      )
+
+    // Then
+    expect(getDeliveryDays({ status: "in_stock", quantity: 50 })).toEqual(Option.some(2))
+    expect(getDeliveryDays({ status: "in_stock", quantity: 3 })).toEqual(Option.some(5))
+    expect(getDeliveryDays({ status: "out_of_stock" })).toEqual(Option.none())
+    expect(getDeliveryDays({ status: "discontinued" })).toEqual(Option.none())
+  })
+
+  it("should match on _tag discriminated union (notifications)", () => {
+    // Given — un système de notifications avec des canaux différents
+    type EmailNotification = { _tag: "Email"; to: string; subject: string }
+    type SmsNotification = { _tag: "Sms"; phone: string; body: string }
+    type PushNotification = { _tag: "Push"; deviceId: string; title: string }
+    type Notification = EmailNotification | SmsNotification | PushNotification
+
+    // When
+    const describe = (notif: Notification): string =>
+      pipe(
+        Match.value(notif),
+        Match.tag("Email", (n) => `Email to ${n.to}: ${n.subject}`),
+        Match.tag("Sms", (n) => `SMS to ${n.phone}: ${n.body}`),
+        Match.tag("Push", (n) => `Push on ${n.deviceId}: ${n.title}`),
+        Match.exhaustive
+      )
+
+    // Then
+    expect(describe({ _tag: "Email", to: "alice@example.com", subject: "Hello" })).toEqual(
+      "Email to alice@example.com: Hello"
+    )
+    expect(describe({ _tag: "Sms", phone: "+33612345678", body: "Votre code: 1234" })).toEqual(
+      "SMS to +33612345678: Votre code: 1234"
+    )
+    expect(describe({ _tag: "Push", deviceId: "device-42", title: "Nouvelle commande" })).toEqual(
+      "Push on device-42: Nouvelle commande"
+    )
+  })
+
+  it("should use orElse as a fallback for unmatched cases (payment methods)", () => {
+    // Given — méthodes de paiement connues, avec fallback pour les inconnues
+    type PaymentMethod = "card" | "paypal" | "crypto" | "check" | string
+
+    // When
+    const getProcessingFee = (method: PaymentMethod): string =>
+      pipe(
+        Match.value(method),
+        Match.when("card", () => "1.5%"),
+        Match.when("paypal", () => "2.9%"),
+        Match.when("crypto", () => "0%"),
+        Match.orElse(() => "unknown method, default fee: 3%")
+      )
+
+    // Then
+    expect(getProcessingFee("card")).toEqual("1.5%")
+    expect(getProcessingFee("paypal")).toEqual("2.9%")
+    expect(getProcessingFee("crypto")).toEqual("0%")
+    expect(getProcessingFee("check")).toEqual("unknown method, default fee: 3%")
+  })
+
+  it("should exclude a specific case with Match.not (order status)", () => {
+    // Given — statuts d'une commande
+    type OrderStatus = "pending" | "processing" | "shipped" | "cancelled"
+
+    // When — tout ce qui n'est pas annulé peut être tracké
+    const isTrackable = (status: OrderStatus): boolean =>
+      pipe(
+        Match.value(status),
+        Match.not("cancelled", () => true),
+        Match.orElse(() => false)
+      )
+
+    // Then
+    expect(isTrackable("pending")).toEqual(true)
+    expect(isTrackable("processing")).toEqual(true)
+    expect(isTrackable("shipped")).toEqual(true)
+    expect(isTrackable("cancelled")).toEqual(false)
+  })
+
+  it("should match multiple conditions with whenOr (user roles)", () => {
+    // Given — rôles utilisateurs avec accès au back-office
+    type Role = "viewer" | "editor" | "admin" | "superAdmin"
+
+    // When — admin et superAdmin ont accès au dashboard
+    const canAccessDashboard = (role: Role): boolean =>
+      pipe(
+        Match.value(role),
+        Match.whenOr("admin", "superAdmin", () => true),
+        Match.orElse(() => false)
+      )
+
+    // Then
+    expect(canAccessDashboard("viewer")).toEqual(false)
+    expect(canAccessDashboard("editor")).toEqual(false)
+    expect(canAccessDashboard("admin")).toEqual(true)
+    expect(canAccessDashboard("superAdmin")).toEqual(true)
+  })
+
+  it("should use built-in predicates to match on primitive types (form field validation)", () => {
+    // Given — une valeur de champ de formulaire de type inconnu
+    type FieldValue = string | number | boolean | null
+
+    // When
+    const formatForDisplay = (value: FieldValue): string =>
+      pipe(
+        Match.value(value),
+        Match.when(Match.null, () => "—"),
+        Match.when(Match.boolean, (b) => (b ? "Oui" : "Non")),
+        Match.when(Match.number, (n) => n.toLocaleString("fr-FR")),
+        Match.when(Match.string, (s) => s),
+        Match.exhaustive
+      )
+
+    // Then
+    expect(formatForDisplay(null)).toEqual("—")
+    expect(formatForDisplay(true)).toEqual("Oui")
+    expect(formatForDisplay(false)).toEqual("Non")
+    expect(formatForDisplay(1234567)).toEqual("1\u202f234\u202f567") // séparateur milliers fr-FR
+    expect(formatForDisplay("bonjour")).toEqual("bonjour")
+  })
 })

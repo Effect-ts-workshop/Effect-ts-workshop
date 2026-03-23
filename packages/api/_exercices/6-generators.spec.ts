@@ -48,4 +48,8 @@ describe("Effect context", () => {
     const programGen = pipe(fetchJokeGen(jokeId), Effect.provide(NodeHttpClient.layerUndici))
     expect((await Effect.runPromise(program)).data).toEqual((await Effect.runPromise(programGen)).data)
   })
+
+  it.todo("Imperative control flow", () => {})
+  it.todo("dual API", () => {})
+  it.todo("yield error/either/option", () => {})
 })

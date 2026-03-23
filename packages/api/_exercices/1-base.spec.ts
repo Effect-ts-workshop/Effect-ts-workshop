@@ -57,6 +57,26 @@ describe("Effect basics", () => {
     // Then
     await expect(Effect.runPromise(program)).resolves.toEqual(10)
   })
+
+  it("Async operation that could fail", async () => {
+    // Given
+    function divideWithDelay(a: number, b: number): Promise<number> {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(a / b), 200)
+      })
+    }
+
+    // When
+    const program = pipe(
+      Effect.tryPromise({
+        try: () => divideWithDelay(2, 0),
+        catch: (_error) => 99
+      })
+    )
+
+    // Then
+    await expect(Effect.runPromise(program)).resolves.toEqual(99)
+  })
 })
 
 describe("FP utils", () => {

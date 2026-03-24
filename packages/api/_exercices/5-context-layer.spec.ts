@@ -68,5 +68,7 @@ describe("Effect context", () => {
     )
   })
 
+  it.todo("Prevent dependency leakage", () => {})
   it.todo("Using helper to create Service", () => {})
+  it.todo("Easily testing services", () => {})
 })

@@ -3,6 +3,10 @@ import { NodeHttpClient } from "@effect/platform-node"
 import { Context, Effect, Layer, pipe } from "effect"
 import { describe, expect, expectTypeOf, it } from "vitest"
 
+/**
+ * Key points to document:
+ * - Avoiding Requirement Leakage
+ */
 describe("Effect context", () => {
   it("Using a service", async () => {
     // Given
@@ -68,7 +72,60 @@ describe("Effect context", () => {
     )
   })
 
-  it.todo("Prevent dependency leakage", () => {})
-  it.todo("Using helper to create Service", () => {})
-  it.todo("Easily testing services", () => {})
+  it("Simplifying service definitions", async () => {
+    class JokeService extends Effect.Service<JokeService>()("JokeService", {
+      effect: pipe(
+        HttpClient.HttpClient,
+        Effect.map((client) => {
+          return {
+            getRandom: () =>
+              pipe(
+                client.get("https://api.chucknorris.io/jokes/random"),
+                Effect.flatMap((response) => response.json),
+                Effect.map((joke) => (joke as { value: string }).value),
+                Effect.orElseSucceed(() => "No jokes for today")
+              )
+          }
+        })
+      ),
+      dependencies: [NodeHttpClient.layer]
+    }) {}
+
+    const program = pipe(JokeService, Effect.flatMap((jokes) => jokes.getRandom()))
+    await expect(Effect.runPromise(pipe(program, Effect.provide(JokeService.Default)))).resolves.toEqual(
+      expect.any(String)
+    )
+  })
+
+  it("Easily testing services", async () => {
+    class JokeService extends Effect.Service<JokeService>()("JokeService", {
+      effect: pipe(
+        HttpClient.HttpClient,
+        Effect.map((client) => {
+          return {
+            getRandom: () =>
+              pipe(
+                client.get("https://api.chucknorris.io/jokes/random"),
+                Effect.flatMap((response) => response.json),
+                Effect.map((joke) => (joke as { value: string }).value),
+                Effect.orElseSucceed(() => "No jokes for today")
+              )
+          }
+        })
+      ),
+      dependencies: [NodeHttpClient.layer]
+    }) {}
+
+    const ClientTest = Layer.mock(
+      HttpClient.HttpClient,
+      {
+        get: () => Effect.fail(undefined)
+      } as any
+    )
+
+    const JokeServiceTest = pipe(JokeService.DefaultWithoutDependencies, Layer.provide(ClientTest))
+    const program = pipe(JokeService, Effect.flatMap((jokes) => jokes.getRandom()))
+    await expect(Effect.runPromise(pipe(program, Effect.provide(JokeServiceTest)))).resolves
+      .toEqual("No jokes for today")
+  })
 })

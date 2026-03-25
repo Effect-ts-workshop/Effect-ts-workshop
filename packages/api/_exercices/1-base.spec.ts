@@ -1,4 +1,5 @@
 import { Effect, pipe } from "effect"
+import { fetch as baseFetch } from "undici"
 import { describe, expect, it } from "vitest"
 
 describe("Effect basics", () => {
@@ -60,22 +61,30 @@ describe("Effect basics", () => {
 
   it("Async operation that could fail", async () => {
     // Given
-    function divideWithDelay(a: number, b: number): Promise<number> {
-      return new Promise((resolve) => {
-        setTimeout(() => resolve(a / b), 200)
-      })
-    }
-
+    type Fetch = (
+      ...args: Parameters<typeof baseFetch>
+    ) => Effect.Effect<Response, Error>
+    const fetch: Fetch = (input, init) =>
+      pipe(
+        Effect.tryPromise({
+          try: (signal) =>
+            baseFetch(input, {
+              signal,
+              ...init
+            }),
+          catch: (_error) => new Error("meh")
+        })
+      )
     // When
-    const program = pipe(
-      Effect.tryPromise({
-        try: () => divideWithDelay(2, 0),
-        catch: (_error) => 99
-      })
-    )
+    const asyncProgramThatSucceeds = fetch("https://api.chucknorris.io/jokes/random")
+    const asyncProgramThatFails = fetch("https://fail")
 
     // Then
-    await expect(Effect.runPromise(program)).resolves.toEqual(99)
+    await expect(Effect.runPromise(asyncProgramThatSucceeds)).resolves.toEqual(expect.objectContaining({
+      status: 200,
+      statusText: "OK"
+    }))
+    await expect(Effect.runPromise(asyncProgramThatFails)).rejects.toThrow(`meh`)
   })
 })
 

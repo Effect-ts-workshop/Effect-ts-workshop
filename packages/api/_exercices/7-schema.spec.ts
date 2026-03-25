@@ -1,25 +1,40 @@
-import { Effect, pipe, Schema } from "effect"
-import { describe, expect, it } from "vitest"
+import { pipe, Schema } from "effect"
+import { ParseError } from "effect/ParseResult"
+import { describe, expect, expectTypeOf, it } from "vitest"
+import { ColorSchema, PlayerSchema, type Team, TeamSchema } from "../sandbox"
 
 describe("Schema", () => {
-  it("Validate data", () => {
+  it.skip("Validate data", () => {
     // Given
-    const number_one = 3
-    const number_two = "two"
+    function validateStringOne(n: unknown): number {
+      return pipe(n, Schema.decodeUnknownSync(Schema.Number))
+    }
 
     // When
-    const program_one = pipe(number_one, Schema.decodeUnknown(Schema.Number))
-    const program_two = pipe(number_two, Schema.decodeUnknown(Schema.Number))
+    const program = () => validateStringOne("One")
+    const invalidProgram = () => validateStringOne("0ne")
 
     // Then
-    expect(Effect.runSync(program_one)).toEqual(3)
-    expect(Effect.runSync(program_two)).toThrow()
+    expect(program).not.toThrow()
+    expect(invalidProgram).toThrow(ParseError)
   })
 
   it("Custom schema", () => {
     // Given
+    // const CustomColorSchema = Schema.String
+    // const CustomPlayerSchema = Schema.Struct({})
+    // const CustomTeamSchema = Schema.Struct({})
+
     // When
+
     // Then
+
+    // expectTypeOf(CustomColorSchema.Type).toEqualTypeOf(ColorSchema.Type)
+    // expectTypeOf(typeof CustomPlayerSchema.Type["role"]).toEqualTypeOf(typeof PlayerSchema.Type["role"])
+    // expectTypeOf(typeof CustomTeamSchema.Type["name"]).toEqualTypeOf(typeof TeamSchema.Type["name"])
+    // expectTypeOf(typeof CustomTeamSchema.Type["color"]).toEqualTypeOf(typeof TeamSchema.Type["color"])
+    // expectTypeOf(typeof CustomTeamSchema.Type["score"]).toEqualTypeOf(typeof TeamSchema.Type["score"])
+    // expectTypeOf(typeof CustomTeamSchema.Type["teamMates"]).toEqualTypeOf(typeof Array<typeof PlayerSchema.Type>)
   })
 
   it("Encode/Decode", () => {

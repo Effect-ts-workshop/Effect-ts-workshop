@@ -1,4 +1,4 @@
-import { Data, Effect, pipe } from "effect"
+import { Data, Effect, pipe, Schema } from "effect"
 import type { Response } from "undici"
 import { fetch as baseFetch } from "undici"
 
@@ -31,3 +31,18 @@ export const getJoke = () =>
     Effect.flatMap((a) => Effect.tryPromise(() => a.json())),
     Effect.map((a) => String((a as any).value))
   )
+
+export const ColorSchema = Schema.Literal("attack", "defend", "heal")
+
+export const PlayerSchema = Schema.Struct({
+  name: Schema.String
+})
+
+export const TeamSchema = Schema.Struct({
+  name: Schema.String,
+  color: ColorSchema,
+  score: Schema.Number,
+  teamMates: Schema.Array(PlayerSchema)
+})
+
+export type Team = typeof TeamSchema.Type

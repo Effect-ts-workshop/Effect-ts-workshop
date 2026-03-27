@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
 import { Array, Effect } from "effect"
 import type { InventoryItemId, InventoryItemSchema } from "shared/item"
-import { Database, DatabaseLive } from "../database"
+import { Database, DatabaseLive } from "../database-drizzle"
 import { items } from "./item.sql"
 
 type Item = typeof InventoryItemSchema.Type

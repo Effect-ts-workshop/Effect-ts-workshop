@@ -1,7 +1,14 @@
 import { Arbitrary, FastCheck, pipe, Schema } from "effect"
 import { ParseError } from "effect/ParseResult"
-import { describe, expect, expectTypeOf, it } from "vitest"
-import { ColorSchema, PlayerSchema, type Team, TeamSchema } from "../sandbox"
+import { describe, expect, it } from "vitest"
+import { DESCRIBE_ME, validateTeam } from "../sandbox"
+
+import {
+  REPLACE_ME__DECODE_DATA,
+  REPLACE_ME__ENCODE_DATA,
+  REPLACE_ME__MAKE_ARBITRARY,
+  REPLACE_ME__MAKE_SAMPLE_FROM
+} from "../placeholder_functions"
 
 describe("Schema", () => {
   it.skip("Validate data", () => {
@@ -19,58 +26,93 @@ describe("Schema", () => {
     expect(invalidProgram).toThrow(ParseError)
   })
 
-  it("Custom schema", () => {
+  it.skip("Encode/Decode", () => {
     // Given
-    const CustomColorSchema = Schema.String
-    const CustomPlayerSchema = Schema.Struct({})
-    const CustomTeamSchema = Schema.Struct({})
+    const DateSchema = Schema.Date
+    const date = new Date("2026-04-22")
 
     // When
+    const encodedDate = pipe(
+      date,
+      REPLACE_ME__ENCODE_DATA
+    )
+    const decodedDate = pipe(
+      encodedDate,
+      REPLACE_ME__DECODE_DATA
+    )
 
     // Then
-
-    expectTypeOf(CustomColorSchema.Type).toEqualTypeOf(ColorSchema.Type)
-    expectTypeOf(typeof CustomPlayerSchema.Type["role"]).toEqualTypeOf(typeof PlayerSchema.Type["role"])
-    expectTypeOf(typeof CustomTeamSchema.Type["name"]).toEqualTypeOf(typeof TeamSchema.Type["name"])
-    expectTypeOf(typeof CustomTeamSchema.Type["color"]).toEqualTypeOf(typeof TeamSchema.Type["color"])
-    expectTypeOf(typeof CustomTeamSchema.Type["score"]).toEqualTypeOf(typeof TeamSchema.Type["score"])
-    expectTypeOf(typeof CustomTeamSchema.Type["teamMates"]).toEqualTypeOf(typeof Array<typeof PlayerSchema.Type>)
+    expect(encodedDate).toBe("2026-04-22T00:00:00.000Z")
+    expect(decodedDate).toEqual(date)
   })
 
-  it("Encode/Decode", () => {
+  it.skip("Generate arbitrary data", () => {
     // Given
-    // When
-    // Then
-  })
+    const sampleSize: number = 50
 
-  it("Generate arbitrary data", () => {
-    // Given
-    const PersonSchema = Schema.Struct({
-      name: Schema.NonEmptyString,
-      age: Schema.Int.pipe(Schema.between(1, 80))
-    })
+    const IntegerSchema = Schema.Int.pipe(Schema.between(1, 80))
 
-    type Person = typeof PersonSchema.Type
+    type Integer = typeof IntegerSchema.Type
 
-    const person = Arbitrary.make(PersonSchema)
-    console.log(person)
-
-    const isAPerson = (value: unknown): value is Person => {
-      return Schema.is(PersonSchema)(value)
+    const isAnInteger = (value: unknown): value is Integer => {
+      return Schema.is(IntegerSchema)(value)
     }
 
     // When
-    const arbitraryPerson = Arbitrary.make(PersonSchema)
-    const someArbitraryPersonsSample = FastCheck.sample(arbitraryPerson, 50)
+    const generateSampleFromArbitrary = (sampleSize: number) => <A>(arbitrary: FastCheck.Arbitrary<A>) =>
+      REPLACE_ME__MAKE_SAMPLE_FROM(sampleSize)(arbitrary)
+
+    const makeArbitraryFromSchema = <A>(_schema: Schema.Schema<A>) => REPLACE_ME__MAKE_ARBITRARY()
 
     // Then
-    expect(someArbitraryPersonsSample.every(isAPerson)).toBeTruthy()
+    expect(
+      pipe(
+        IntegerSchema,
+        makeArbitraryFromSchema,
+        generateSampleFromArbitrary(sampleSize)
+      )
+    ).toHaveLength(sampleSize)
+    expect(
+      pipe(
+        IntegerSchema,
+        makeArbitraryFromSchema,
+        generateSampleFromArbitrary(sampleSize)
+      ).every(isAnInteger)
+    ).toBeTruthy()
   })
 
-  it("Customized error output", () => {
+  it.skip("Custom schema", () => {
+    // Given
+    const sampleSize: number = 1
+
+    const MyTeamSchema = DESCRIBE_ME
+
+    // When
+    const sample = FastCheck.sample(Arbitrary.make(MyTeamSchema), sampleSize)[0]
+
+    // Then
+    expect(validateTeam(sample)).not.toThrow()
+  })
+
+  it.todo("Customized error output", () => {
     // surcharger message par défaut + identifier sur objet pour erreur plus lisible (path)
     // Given
+
+    const Person = Schema.Struct({
+      name: Schema.NonEmptyString,
+      age: Schema.Positive
+    }).annotations({ identifier: "Person" })
+
     // When
+    expect(() => Schema.decodeUnknownSync(Person)(null)).toThrow(`Expected Person, actual null`)
+    expect(() => Schema.decodeUnknownSync(Person)({}, { errors: "all" })).toThrow(`Person
+      ├─ ["name"]
+      │  └─ is missing
+      └─ ["age"]
+      └─ is missing`)
+    expect(() => Schema.decodeUnknownSync(Name)(null)).toThrow(`Expected string, actual null`)
+    expect(() => Schema.decodeUnknownSync(Age)(null)).toThrow(`Expected number, actual null`)
+    expect(() => Schema.decodeUnknownSync(Person)(null)).toThrow(`Expected Person, actual null`)
     // Then
   })
 })

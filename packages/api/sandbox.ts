@@ -32,17 +32,15 @@ export const getJoke = () =>
     Effect.map((a) => String((a as any).value))
   )
 
-export const ColorSchema = Schema.Literal("attack", "defend", "heal")
-
-export const PlayerSchema = Schema.Struct({
-  name: Schema.String
-})
-
 export const TeamSchema = Schema.Struct({
   name: Schema.String,
-  color: ColorSchema,
   score: Schema.Number,
-  teamMates: Schema.Array(PlayerSchema)
+  teamMates: Schema.Array(Schema.Struct({
+    name: Schema.String
+  })),
+  color: Schema.Literal("red", "blue", "green")
 })
 
-export type Team = typeof TeamSchema.Type
+export const DESCRIBE_ME = Schema.Struct({})
+
+export const validateTeam = (team: unknown) => pipe(team, Schema.decodeUnknownSync(TeamSchema))

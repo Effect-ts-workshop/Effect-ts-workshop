@@ -1,4 +1,4 @@
-import { Data, Effect, pipe, Schema } from "effect"
+import { Arbitrary, Data, Effect, FastCheck, pipe, Schema } from "effect"
 import type { Response } from "undici"
 import { fetch as baseFetch } from "undici"
 
@@ -44,3 +44,5 @@ export const TeamSchema = Schema.Struct({
 export const DESCRIBE_ME = Schema.Struct({})
 
 export const validateTeam = (team: unknown) => pipe(team, Schema.decodeUnknownSync(TeamSchema))
+
+export const createObjectMatching = <A>(schema: Schema.Schema<A>): A => FastCheck.sample(Arbitrary.make(schema), 0)[0]

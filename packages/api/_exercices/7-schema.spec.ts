@@ -1,7 +1,8 @@
-import { Arbitrary, FastCheck, pipe, Schema } from "effect"
+import type { FastCheck } from "effect"
+import { Arbitrary, pipe, Schema } from "effect"
 import { ParseError } from "effect/ParseResult"
 import { describe, expect, it } from "vitest"
-import { DESCRIBE_ME, validateTeam } from "../sandbox"
+import { createObjectMatching, DESCRIBE_ME, validateTeam } from "../sandbox"
 
 import {
   REPLACE_ME__DECODE_DATA,
@@ -83,12 +84,11 @@ describe("Schema", () => {
 
   it.skip("Custom schema", () => {
     // Given
-    const sampleSize: number = 1
 
     const MyTeamSchema = DESCRIBE_ME
 
     // When
-    const sample = FastCheck.sample(Arbitrary.make(MyTeamSchema), sampleSize)[0]
+    const sample = createObjectMatching(MyTeamSchema)
 
     // Then
     expect(validateTeam(sample)).not.toThrow()

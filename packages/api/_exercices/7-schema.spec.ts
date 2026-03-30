@@ -1,14 +1,15 @@
 import type { FastCheck } from "effect"
-import { Arbitrary, pipe, Schema } from "effect"
+import { pipe, Schema } from "effect"
 import { ParseError } from "effect/ParseResult"
 import { describe, expect, it } from "vitest"
-import { createObjectMatching, DESCRIBE_ME, validateTeam } from "../sandbox"
+import { BASIC_PERSON_SCHEMA__REPLACE_ME, createObjectMatching, DESCRIBE_ME, validateTeam } from "../sandbox"
 
+import type { ParseOptions } from "effect/SchemaAST"
 import {
   REPLACE_ME__DECODE_DATA,
   REPLACE_ME__ENCODE_DATA,
-  REPLACE_ME__MAKE_ARBITRARY,
-  REPLACE_ME__MAKE_SAMPLE_FROM
+  REPLACE_ME__GENERATE_SAMPLE,
+  REPLACE_ME__MAKE_ARBITRARY
 } from "../placeholder_functions"
 
 describe("Schema", () => {
@@ -47,6 +48,18 @@ describe("Schema", () => {
     expect(decodedDate).toEqual(date)
   })
 
+  it.skip("Custom schema", () => {
+    // Given
+
+    const MyTeamSchema = DESCRIBE_ME
+
+    // When
+    const sample = createObjectMatching(MyTeamSchema)
+
+    // Then
+    expect(validateTeam(sample)).not.toThrow()
+  })
+
   it.skip("Generate arbitrary data", () => {
     // Given
     const sampleSize: number = 50
@@ -61,7 +74,7 @@ describe("Schema", () => {
 
     // When
     const generateSampleFromArbitrary = (sampleSize: number) => <A>(arbitrary: FastCheck.Arbitrary<A>) =>
-      REPLACE_ME__MAKE_SAMPLE_FROM(sampleSize)(arbitrary)
+      REPLACE_ME__GENERATE_SAMPLE(sampleSize)(arbitrary)
 
     const makeArbitraryFromSchema = <A>(_schema: Schema.Schema<A>) => REPLACE_ME__MAKE_ARBITRARY()
 
@@ -82,37 +95,48 @@ describe("Schema", () => {
     ).toBeTruthy()
   })
 
-  it.skip("Custom schema", () => {
+  it.skip("Customize error output", () => {
     // Given
-
-    const MyTeamSchema = DESCRIBE_ME
+    const Person = BASIC_PERSON_SCHEMA__REPLACE_ME
 
     // When
-    const sample = createObjectMatching(MyTeamSchema)
+    const validatePerson = (input: unknown, parseOptions?: ParseOptions) =>
+      Schema.decodeUnknownSync(Person)(input, parseOptions)
 
     // Then
-    expect(validateTeam(sample)).not.toThrow()
-  })
-
-  it.todo("Customized error output", () => {
-    // surcharger message par défaut + identifier sur objet pour erreur plus lisible (path)
-    // Given
-
-    const Person = Schema.Struct({
-      name: Schema.NonEmptyString,
-      age: Schema.Positive
-    }).annotations({ identifier: "Person" })
-
-    // When
-    expect(() => Schema.decodeUnknownSync(Person)(null)).toThrow(`Expected Person, actual null`)
-    expect(() => Schema.decodeUnknownSync(Person)({}, { errors: "all" })).toThrow(`Person
-      ├─ ["name"]
-      │  └─ is missing
-      └─ ["age"]
-      └─ is missing`)
-    expect(() => Schema.decodeUnknownSync(Name)(null)).toThrow(`Expected string, actual null`)
-    expect(() => Schema.decodeUnknownSync(Age)(null)).toThrow(`Expected number, actual null`)
-    expect(() => Schema.decodeUnknownSync(Person)(null)).toThrow(`Expected Person, actual null`)
-    // Then
+    expect(() => validatePerson(null)).toThrowError(`Expected Person, actual null`)
+    expect(() => validatePerson({}, { errors: "all" })).toThrowError(
+      /Person[\s\S]*\["name"\][\s\S]*is missing\S*/
+    )
+    expect(() => validatePerson({ name: "plop" }, { errors: "all" })).toThrowError(
+      /Person[\s\S]*\["age"\][\s\S]*is missing\S*/
+    )
+    expect(() => validatePerson({ name: null, age: 23 }, { errors: "all" })).toThrowError(
+      `Expected Name, actual null`
+    )
+    expect(() => validatePerson({ name: "plop", age: null }, { errors: "all" })).toThrowError(
+      `Expected Age, actual null`
+    )
+    expect(() => validatePerson({ name: "plop", age: 10, strength: 9000, id: "" })).toThrowError(
+      /Person[\s\S]*\["id"\][\s\S]*NonEmptyString[\s\S]*Predicate refinement failure[\s\S]*Expected a non empty string, actual ""/
+    )
+    expect(() => validatePerson({ name: "plop", age: 10, strength: 9001, id: "1337" }, { errors: "all" }))
+      .toThrowError(
+        /Person[\s\S]*\["strength"\][\s\S]*└─ is over 9000 !!!\S*/
+      )
+    expect(() => validatePerson({ name: "plop", age: 10, strength: 10, id: "N00P", initials: null }, { errors: "all" }))
+      .toThrowError(
+        /Person[\s\S]*\["initials"\][\s\S]*\(string <-> maxLength\(2\)\)[\s\S]*Encoded side transformation failure[\s\S]*Expected string, actual null\S*/
+      )
+    expect(() => validatePerson({ name: "plop", age: 10, strength: 10, id: "N00P", initials: "" }, { errors: "all" }))
+      .toThrowError(
+        /Person[\s\S]*\["initials"\][\s\S]*\(string <-> maxLength\(2\)\)[\s\S]*Transformation process failure[\s\S]*Expected \(string <-> maxLength\(2\)\), actual ""\S*/
+      )
+    expect(() =>
+      validatePerson({ name: "plop", age: 10, strength: 10, id: "N00P", initials: "ACL" }, { errors: "all" })
+    )
+      .toThrowError(
+        /Person[\s\S]*\["initials"\][\s\S]*\(string <-> maxLength\(2\)\)[\s\S]*Type side transformation failure[\s\S]*maxLength\(2\)[\s\S]*Predicate refinement failure[\s\S]*Expected a string at most 2 character\(s\) long, actual "ACL"\S*/
+      )
   })
 })

@@ -1,32 +1,22 @@
-import { Effect, pipe } from "effect"
-import { fetch as baseFetch } from "undici"
-import { describe, it } from "vitest"
+import { Effect, Exit, Fiber } from "effect"
+import { describe, expect, it } from "vitest"
 
 describe("", () => {
-  it("", () => {
+  it("Aborts fetch on interrupt", async () => {
     // Given
-    class NetworkError extends Error {}
-    class HTTPResponseError extends Error {}
-
-    type Fetch = (
-      ...args: Parameters<typeof baseFetch>
-    ) => Effect.Effect<Response, NetworkError | HTTPResponseError>
-    const _fetch: Fetch = (input, init) =>
-      pipe(
-        Effect.tryPromise({
-          try: (signal) =>
-            baseFetch(input, {
-              signal,
-              ...init
-            }),
-          catch: (error) => new NetworkError(String(error))
+    const program = Effect.tryPromise({
+      try: (signal) =>
+        fetch("https://api.chucknorris.io/jokes/random", {
+          signal
         }),
-        Effect.filterOrFail(
-          (response) => response.ok,
-          (response) => new HTTPResponseError(response.statusText)
-        )
-      )
-    // When TODO
+      catch: (e) => e
+    })
+
+    // When
+    const fiber = Effect.runFork(program)
+    const exit = await Effect.runPromise(Fiber.interrupt(fiber))
+
     // Then
+    expect(Exit.isInterrupted(exit)).toBe(true)
   })
 })

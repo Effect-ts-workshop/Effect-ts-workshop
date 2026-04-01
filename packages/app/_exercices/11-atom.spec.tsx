@@ -1,5 +1,5 @@
 import { Atom, Registry, Result, useAtom, useAtomValue } from "@effect-atom/atom-react"
-import { act, render, screen, waitFor } from "@testing-library/react"
+import { act, render, screen } from "@testing-library/react"
 import { Effect, pipe } from "effect"
 import { describe, expect, it, vi } from "vitest"
 

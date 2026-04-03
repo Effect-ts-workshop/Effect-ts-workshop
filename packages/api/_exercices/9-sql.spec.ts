@@ -5,7 +5,7 @@ import { Effect, Layer, pipe, Schema } from "effect"
 import { InventoryItemId, InventoryItemIdSchema } from "shared/item"
 import { describe, expect, it } from "vitest"
 import { SqlLive } from "../database"
-import { Database, DatabaseLive, SqlDrizzleLive } from "../database-drizzle"
+import { Database, DatabaseLive } from "../database-drizzle"
 import { items } from "../db/item.sql"
 import { MigratorLive } from "../migrator"
 

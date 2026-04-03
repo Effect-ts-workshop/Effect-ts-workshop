@@ -1,6 +1,8 @@
-import { Atom, Registry, Result, useAtom, useAtomValue } from "@effect-atom/atom-react"
-import { act, render, screen } from "@testing-library/react"
+import { Atom, AtomHttpApi, Registry, Result, useAtom, useAtomValue } from "@effect-atom/atom-react"
+import { BrowserHttpClient } from "@effect/platform-browser"
+import { act, render, screen, waitFor } from "@testing-library/react"
 import { Effect, pipe } from "effect"
+import { Api } from "shared/api"
 import { describe, expect, it, vi } from "vitest"
 
 describe("Atom", () => {
@@ -103,6 +105,38 @@ describe("Atom", () => {
         screen.getByTestId("trigger").click()
       })
       expect(screen.getByTestId("value")).toHaveTextContent("1")
+    })
+
+    it("should integrate nicely with api client", async () => {
+      class DemoClient extends AtomHttpApi.Tag<DemoClient>()("DemoClient", {
+        api: Api,
+        httpClient: BrowserHttpClient.layerXMLHttpRequest, // mocked data will not work with standard FetchHttpClient
+        baseUrl: "http://vitest.mock"
+      }) {}
+
+      function TestComponent() {
+        const result = useAtomValue(DemoClient.query("items", "getAllItems", { reactivityKeys: ["items"] }))
+        return (
+          <div data-testid="value">
+            {Result.builder(result)
+              .onInitial(() => <div>Initial loading...</div>)
+              .onSuccess(({ items }) => (
+                <>
+                  <h1>Success</h1>
+                  <ul>
+                    {items.map((item) => <li key={item.id}>{item.brand} {item.model}</li>)}
+                  </ul>
+                </>
+              ))
+              .render()}
+          </div>
+        )
+      }
+
+      render(<TestComponent />)
+
+      expect(screen.getByTestId("value")).toHaveTextContent("Initial loading...")
+      await waitFor(() => expect(screen.getByTestId("value")).toHaveTextContent("Success"))
     })
   })
 })

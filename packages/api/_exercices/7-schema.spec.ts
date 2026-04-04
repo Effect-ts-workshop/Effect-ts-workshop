@@ -1,103 +1,139 @@
-import type { FastCheck } from "effect"
-import { pipe, Schema } from "effect"
-import { ParseError } from "effect/ParseResult"
-import { describe, expect, it } from "vitest"
-import { BASIC_PERSON_SCHEMA__REPLACE_ME, createObjectMatching, DESCRIBE_ME, validateTeam } from "../sandbox"
+import { Arbitrary, Brand, Either, ParseResult, pipe, Schema } from "effect"
+import { describe, expect, expectTypeOf, it } from "vitest"
 
 import type { ParseOptions } from "effect/SchemaAST"
-import {
-  REPLACE_ME__DECODE_DATA,
-  REPLACE_ME__ENCODE_DATA,
-  REPLACE_ME__GENERATE_SAMPLE,
-  REPLACE_ME__MAKE_ARBITRARY
-} from "../placeholder_functions"
+import fc from "fast-check"
 
 describe("Schema", () => {
-  it.skip("Validate data", () => {
-    // Given
-    function validateStringOne(n: unknown): number {
-      return pipe(n, Schema.decodeUnknownSync(Schema.Number))
+  it("should validate data of all sort", () => {
+    // Implement the schema to validate the data
+    const schema = Schema.Struct({
+      name: Schema.String,
+      age: Schema.Number,
+      isActive: Schema.Boolean
+    })
+
+    const rawData = {
+      name: "anyString",
+      age: 42,
+      isActive: true,
+      unknown: "stripped"
     }
+    const result = Schema.decodeUnknownSync(schema)(rawData)
 
-    // When
-    const program = () => validateStringOne("One")
-    const invalidProgram = () => validateStringOne("0ne")
-
-    // Then
-    expect(program).not.toThrow()
-    expect(invalidProgram).toThrow(ParseError)
+    expect(result).toEqual({
+      name: "anyString",
+      age: 42,
+      isActive: true
+    })
   })
 
-  it.skip("Encode/Decode", () => {
-    // Given
-    const DateSchema = Schema.Date
-    const date = new Date("2026-04-22")
+  it("should print errors for human", () => {
+    // Implement the schema to match the expected error
+    const schema = Schema.Struct({
+      user: Schema.Struct({
+        id: Schema.String,
+        name: Schema.NonEmptyString
+      })
+    })
 
-    // When
-    const encodedDate = pipe(
-      date,
-      REPLACE_ME__ENCODE_DATA
-    )
-    const decodedDate = pipe(
-      encodedDate,
-      REPLACE_ME__DECODE_DATA
-    )
+    const result = Schema.decodeUnknownEither(schema, { errors: "all" })({ user: {} })
 
-    // Then
-    expect(encodedDate).toBe("2026-04-22T00:00:00.000Z")
-    expect(decodedDate).toEqual(date)
-  })
-
-  it.skip("Custom schema", () => {
-    // Given
-
-    const MyTeamSchema = DESCRIBE_ME
-
-    // When
-    const sample = createObjectMatching(MyTeamSchema)
-
-    // Then
-    expect(validateTeam(sample)).not.toThrow()
-  })
-
-  it.skip("Generate arbitrary data", () => {
-    // Given
-    const sampleSize: number = 50
-
-    const IntegerSchema = Schema.Int.pipe(Schema.between(1, 80))
-
-    type Integer = typeof IntegerSchema.Type
-
-    const isAnInteger = (value: unknown): value is Integer => {
-      return Schema.is(IntegerSchema)(value)
+    if (!Either.isLeft(result)) {
+      throw new Error("fail test")
     }
-
-    // When
-    const generateSampleFromArbitrary = (sampleSize: number) => <A>(arbitrary: FastCheck.Arbitrary<A>) =>
-      REPLACE_ME__GENERATE_SAMPLE(sampleSize)(arbitrary)
-
-    const makeArbitraryFromSchema = <A>(_schema: Schema.Schema<A>) => REPLACE_ME__MAKE_ARBITRARY()
-
-    // Then
-    expect(
-      pipe(
-        IntegerSchema,
-        makeArbitraryFromSchema,
-        generateSampleFromArbitrary(sampleSize)
-      )
-    ).toHaveLength(sampleSize)
-    expect(
-      pipe(
-        IntegerSchema,
-        makeArbitraryFromSchema,
-        generateSampleFromArbitrary(sampleSize)
-      ).every(isAnInteger)
-    ).toBeTruthy()
+    expect(result.left.toString()).toEqual(`
+{ readonly user: { readonly id: string; readonly name: NonEmptyString } }
+└─ ["user"]
+   └─ { readonly id: string; readonly name: NonEmptyString }
+      ├─ ["id"]
+      │  └─ is missing
+      └─ ["name"]
+         └─ is missing
+`.trim())
   })
 
-  it.skip("Customize error output", () => {
-    // Given
-    const Person = BASIC_PERSON_SCHEMA__REPLACE_ME
+  it("should format errors as array", () => {
+    const schema = Schema.Struct({
+      user: Schema.Struct({
+        id: Schema.String
+      })
+    })
+    const result = Schema.decodeUnknownEither(schema)({ user: {} })
+
+    // Format errors as array
+    const errors = Either.isLeft(result) ? ParseResult.ArrayFormatter.formatErrorSync(result.left) : []
+
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toMatchObject({
+      "path": ["user", "id"],
+      message: "is missing"
+    })
+  })
+
+  it("can encode and decode value", () => {
+    const DataSchema = Schema.Struct({ createdAt: Schema.Date })
+    const originalData = { createdAt: new Date("2026-04-22") }
+
+    // Encode originalData with our schema
+    const dataDto = Schema.encodeSync(DataSchema)(originalData)
+    const decodedData = Schema.decodeSync(DataSchema)(dataDto)
+
+    expect(dataDto).toEqual({ createdAt: "2026-04-22T00:00:00.000Z" })
+    expect(decodedData).toEqual(originalData)
+  })
+
+  it("can easily create arbitrary data for your tests", () => {
+    const DataSchema = Schema.Struct({ createdAt: Schema.DateFromString, name: Schema.NonEmptyTrimmedString })
+
+    // Generate arbitrary data (aka random generator) from the schema
+    const arbitrary = Arbitrary.make(DataSchema)
+
+    fc.assert(
+      fc.property(arbitrary, (originalData) => {
+        const dataDto = Schema.encodeSync(DataSchema)(originalData)
+        const decodedData = Schema.decodeSync(DataSchema)(dataDto)
+
+        expect(originalData).toEqual(decodedData)
+      })
+    )
+  })
+
+  it("can create your own schema", () => {
+    type Email = string & Brand.Brand<"email">
+    const Email = Brand.nominal<Email>()
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+    // Construct an Email schema using pattern + brand
+    const EmailSchema = pipe(
+      Schema.String,
+      Schema.pattern(emailPattern),
+      Schema.fromBrand(Email)
+    )
+
+    const data = Schema.decodeUnknownSync(EmailSchema)("user@example.com")
+    const failureResult = Schema.decodeUnknownEither(EmailSchema)("user@example")
+
+    expect(data).toEqual("user@example.com")
+    expectTypeOf(data).toExtend<Email>()
+    expect(Either.isLeft(failureResult)).toBeTruthy()
+  })
+
+  //
+  /**
+   * TODO
+   * - Split in multiple tests
+   * - Use ArrayFormatter to avoid rely on regexp
+   */
+  it.todo("Customize error output", () => {
+    const Person = Schema.Struct({
+      name: Schema.String.annotations({ identifier: "Name" }),
+      age: Schema.Number.annotations({ identifier: "Age" }),
+      id: Schema.NonEmptyString,
+      strength: Schema.Number.pipe(Schema.lessThanOrEqualTo(9000, { message: () => "is over 9000 !!!" })),
+      initials: Schema.String.pipe(Schema.maxLength(2))
+    })
+      .annotations({ identifier: "Person" })
 
     // When
     const validatePerson = (input: unknown, parseOptions?: ParseOptions) =>

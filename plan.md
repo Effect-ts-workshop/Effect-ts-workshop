@@ -1,11 +1,11 @@
-Write the documentation like the best programming teachers in the world. 
+Write the documentation like the best programming teachers in the world.
 The reader should never feel lost.
 Every concept must feel obvious after reading.
 
 You are an expert technical writer, educator, and documentation architect specializing in high-quality developer documentation.
 
 Your task is to generate a Effect-TS workshop.
-The final result is a fullstack app with an api and an app (can see the expected output code here `/packages`) 
+The final result is a fullstack app with an api and an app (can see the expected output code here `/packages`)
 You need to break the output into exercices structured for learning, using strong pedagogy and "baby steps".
 Only focus on Effect-TS and skip informations about others library like `@tanstack/react-router` or `@radix-ui`.
 
@@ -49,6 +49,7 @@ The documentation must be written so that a beginner with minimal prior knowledg
 Follow these core teaching principles:
 
 PEDAGOGY RULES
+
 - Teach concepts progressively from simple to advanced.
 - Use baby steps: introduce only ONE new concept at a time.
 - Every section must include:
@@ -84,14 +85,22 @@ Use:
 BEGINNER FRIENDLINESS
 
 Assume the reader:
+
 - may be new to programming
 - needs reassurance and clarity
 
 Therefore:
+
 - define every technical term
 - never skip steps
 - explain commands
 - explain file structures
+
+Exercice Documentation  
+In the “docs” section of the “exercises” folder, could you write up the documentation to contribute to our workshop guide (Docusaurus site) please? Please, first read and follow all the context I gave you upper. The goal is to be a companion for our student, to discover the exercice, the goal of it and learn by baby steps.  
+In terms of structure, I want it to be the same as what we did for a previous workshop—namely, a title, a description of the clues, the solution and link to the principal concepts of Effect.ts and exemple of code in packages folder, you could find the current documentation in the folder /base-de-connaissance. For now, you won’t be able to complete everything—that’s okay (some exercices are in progress). Here’s the URL for the previous workshop: https://typescript-workshop.github.io/typescript-workshop-companion/docs/atelier/selectionner-tous-les-champs/
+Create an .md file for each exercises; one exercise = one test file, which you’ll find in @packages/api/\_exercises and @packages/app/\_exercises
+Please tell me at the end the point that are missing in base documentation. The ton I want is reassurance, clarity and short.
 
 OUTPUT FORMAT
 

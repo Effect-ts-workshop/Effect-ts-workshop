@@ -1,32 +1,32 @@
-import { Effect, pipe } from "effect"
-import { UnknownException } from "effect/Cause"
+import { Data, Effect, pipe } from "effect"
 import type { Response } from "undici"
 import { fetch as baseFetch } from "undici"
 import { describe, expect, expectTypeOf, it } from "vitest"
-import { getJoke, HTTPResponseError, NetworkError } from "../sandbox"
+
+const TODO: any = {}
 
 describe("Effect basics - Errors", () => {
-  it("should track error explicitly", () => {
-    // Given
+  it("should return failure explicitely", () => {
     function racineCarrée(n: number): Effect.Effect<number, Error> {
       if (n < 0) {
-        return Effect.fail(new Error("toto"))
+        // #start
+        return TODO(new Error("toto"))
+        // #solution
+        // return Effect.fail(new Error("toto"))
+        // #end
       }
 
       return Effect.succeed(Math.sqrt(n))
     }
 
-    // When
     const program = racineCarrée(16)
     const invalidProgram = racineCarrée(-4)
 
-    // Then
     expect(Effect.runSync(program)).toEqual(4)
     expect(() => Effect.runSync(invalidProgram)).toThrow()
   })
 
-  it("should track every possible errors", async () => {
-    // Given
+  it("should return multiple errors", async () => {
     class NetworkError extends Error {}
     class HTTPResponseError extends Error {}
 
@@ -36,111 +36,126 @@ describe("Effect basics - Errors", () => {
     const fetch: Fetch = (input, init) =>
       pipe(
         Effect.tryPromise({
-          try: (signal) =>
-            baseFetch(input, {
-              signal,
-              ...init
-            }),
-          catch: (error) => new NetworkError(String(error))
+          try: () => baseFetch(input, init),
+          catch: (error) => {
+            // #start
+            return TODO
+            // #solution
+            // return new NetworkError(String(error))
+            // #end
+          }
         }),
         Effect.filterOrFail(
           (response) => response.ok,
-          (response) => new HTTPResponseError(response.statusText)
+          (response) => {
+            // #start
+            return TODO
+            // #solution
+            // return new HTTPResponseError(response.statusText)
+            // #end
+          }
         )
       )
 
-    // When
     const program = fetch("https://api.chucknorris.io/jokes/random")
     const invalidProgram = fetch("https://fail")
 
-    // Then
     await expect(Effect.runPromise(program)).resolves.toMatchObject({ status: 200 })
     await expect(Effect.runPromise(invalidProgram)).rejects.toThrow()
   })
 
   it("should create tagged errors", async () => {
+    // #start
+    const NetworkError = TODO
+    // #solution
+    // class NetworkError extends Data.TaggedError("NetworkError")<{ error: unknown }> {}
+    // #end
     const netError = new NetworkError({ error: "unknown" })
     expect(netError._tag).toBe("NetworkError")
 
+    // #start
+    const HTTPResponseError = TODO
+    // #solution
+    // class HTTPResponseError extends Data.TaggedError("HTTPResponseError")<{ response: Response }> {}
+    // #end
     const httpError = new HTTPResponseError({ response: "fake" as any })
     expect(httpError).toMatchObject({ "_tag": "HTTPResponseError" })
   })
 
   it("should catch single error", async () => {
-    // Given
+    type HTTPResponseError = { readonly _tag: "HTTPResponseError" }
+    type NetworkError = { readonly _tag: "NetworkError" }
+    const getJoke = (): Effect.Effect<string, HTTPResponseError | NetworkError, never> =>
+      Effect.fail({ _tag: "HTTPResponseError" })
 
-    // When
     const program = pipe(
       getJoke(),
-      // catch here
-      Effect.catchTag("HTTPResponseError", () => Effect.succeed("COUCOU"))
+      // #start
+      TODO
+      // #solution
+      // Effect.catchTag("HTTPResponseError", () => Effect.succeed("Fallback joke"))
+      // #end
     )
 
-    expectTypeOf(program).toExtend<Effect.Effect<string, UnknownException | NetworkError, never>>()
+    expectTypeOf(program).toExtend<Effect.Effect<string, NetworkError, never>>()
+    expect(Effect.runSync(program)).toEqual("Fallback joke")
   })
 
-  it("should some errors", async () => {
-    // Given
+  it.each([["NetworkError"], ["HTTPResponseError"]] as const)("should catch multiple errors", async (tag) => {
+    type UnknownException = { readonly _tag: "UnknownException" }
+    type HTTPResponseError = { readonly _tag: "HTTPResponseError" }
+    type NetworkError = { readonly _tag: "NetworkError" }
+    const getJoke = (): Effect.Effect<string, UnknownException | HTTPResponseError | NetworkError, never> =>
+      Effect.fail({ _tag: tag })
 
-    // When
     const program = pipe(
       getJoke(),
-      // catch here
-      Effect.catchTags({
-        HTTPResponseError: () => Effect.succeed("COUCOU"),
-        NetworkError: () => Effect.succeed("COUCOU")
-      })
+      // #start
+      TODO
+      // #solution
+      // Effect.catchTags({
+      //   HTTPResponseError: () => Effect.succeed("Fallback joke"),
+      //   NetworkError: () => Effect.succeed("Fallback joke")
+      // })
+      // #end
     )
 
     expectTypeOf(program).toExtend<Effect.Effect<string, UnknownException, never>>()
+    expect(Effect.runSync(program)).toEqual("Fallback joke")
   })
 
-  it("should always get a joke", async () => {
-    // Given
+  it("should all errors and always get a joke", async () => {
+    type UnknownException = { readonly _tag: "UnknownException" }
+    type HTTPResponseError = { readonly _tag: "HTTPResponseError" }
+    type NetworkError = { readonly _tag: "NetworkError" }
+    const getJoke = (): Effect.Effect<string, UnknownException | HTTPResponseError | NetworkError, never> =>
+      Effect.fail({ _tag: "NetworkError" })
 
-    // When
     const program = pipe(
       getJoke(),
-      // catch here
-      Effect.catchAll(() => Effect.succeed("COUCOU"))
+      // #start
+      TODO
+      // #solution
+      // Effect.catchAll(() => Effect.succeed("Fallback joke"))
+      // #end
     )
 
     expectTypeOf(program).toExtend<Effect.Effect<string, never, never>>()
-  })
-
-  it("CatchTags: ideal for precise errors VS CatchAll secure nest for the rest", async () => {
-    // catchTags to handle precisely errors
-    const catchTagsResult = pipe(
-      Effect.fail(new UnknownException("panic")),
-      Effect.catchTags({
-        // Your errors
-      })
-    )
-
-    // catchAll = catch everything
-    const catchAllResult = pipe(
-      Effect.fail(new UnknownException("panic")),
-      Effect.catchAll(() => Effect.succeed("ok"))
-    )
-
-    expectTypeOf(catchTagsResult).toEqualTypeOf<Effect.Effect<never, UnknownException, never>>()
-    expectTypeOf(catchAllResult).toEqualTypeOf<Effect.Effect<string, never, never>>()
-
-    await expect(Effect.runPromise(catchTagsResult)).rejects.toThrow()
-    await expect(Effect.runPromise(catchAllResult)).resolves.toBe("ok")
+    expect(Effect.runSync(program)).toEqual("Fallback joke")
   })
 })
 
 describe("Effect defect", () => {
   it("should handle unexpected error (defect)", async () => {
-    // Given
     const trustMe = () => Effect.dieMessage("You are too naive")
 
-    // When
     const program = pipe(
       trustMe(),
-      // catch here
-      Effect.catchAllDefect(() => Effect.succeed("I'm alive"))
+      // #start
+      TODO
+      // #solution
+      // Effect.catchAllDefect(() => Effect.succeed("I'm alive"))
+      // #end
     )
 
     await expect(Effect.runPromise(program)).resolves.toEqual("I'm alive")

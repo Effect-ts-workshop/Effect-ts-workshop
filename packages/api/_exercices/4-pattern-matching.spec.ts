@@ -1,9 +1,10 @@
 import { Array, Match, Option, pipe } from "effect"
 import { describe, expect, it } from "vitest"
 
+const TODO: any = {}
+
 describe("Pattern matching", () => {
   it("should handle all possible values", () => {
-    // Given
     type NumberField = { type: "number"; value: number }
     type TextField = { type: "text"; value: string }
     type SelectField = { type: "select"; multiple: false; value: string }
@@ -14,18 +15,20 @@ describe("Pattern matching", () => {
       | SelectField
       | MultipleSelectField
 
-    // When
-    const getValue = (field: AnyField): string =>
+    const getValue = (field: AnyField) =>
       pipe(
         Match.value(field),
-        Match.when({ type: "number" }, (field) => String(field.value)),
-        Match.when({ type: "text" }, (field) => field.value),
-        Match.when({ type: "select", multiple: true }, (field) => field.value.join(", ")),
-        Match.when({ type: "select", multiple: false }, (field) => field.value),
+        // #start
+        TODO,
+        // #solution
+        // Match.when({ type: "number" }, (field) => String(field.value)),
+        // Match.when({ type: "text" }, (field) => field.value),
+        // Match.when({ type: "select", multiple: true }, (field) => field.value.join(", ")),
+        // Match.when({ type: "select", multiple: false }, (field) => field.value),
+        // #end
         Match.exhaustive
       )
 
-    // Then
     expect(getValue({ type: "number", value: 42 })).toEqual("42")
     expect(getValue({ type: "text", value: "awesome" })).toEqual("awesome")
     expect(getValue({ type: "select", multiple: false, value: "selected" })).toEqual("selected")
@@ -33,41 +36,43 @@ describe("Pattern matching", () => {
   })
 
   it("should handle optional value", () => {
-    // Given
     const allValues = ["you got me"]
 
-    // When
     const getValueAt = (index: number) =>
       pipe(
         allValues,
         Array.get(index),
-        // match here
-        Option.match({
-          onSome: (v) => v.toUpperCase(),
-          onNone: () => `DEFAULT`
-        })
+        // #start
+        TODO
+        // #solution
+        // Option.match({
+        //   onSome: (v) => v.toUpperCase(),
+        //   onNone: () => `DEFAULT`
+        // })
+        // #end
       )
 
-    // Then
     expect(getValueAt(0)).toEqual("YOU GOT ME")
     expect(getValueAt(42)).toEqual("DEFAULT")
   })
+
   it("should wrap result in Option with Match.option (product availability)", () => {
-    // Given — stock d'un produit
     type StockStatus =
       | { status: "in_stock"; quantity: number }
       | { status: "out_of_stock" }
       | { status: "discontinued" }
 
-    // When — renvoie le délai de livraison estimé seulement si disponible
     const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
       pipe(
         Match.value(stock),
-        Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
-        Match.option
+        // #start
+        TODO
+        // #solution
+        // Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
+        // Match.option
+        // #end
       )
 
-    // Then
     expect(getDeliveryDays({ status: "in_stock", quantity: 50 })).toEqual(Option.some(2))
     expect(getDeliveryDays({ status: "in_stock", quantity: 3 })).toEqual(Option.some(5))
     expect(getDeliveryDays({ status: "out_of_stock" })).toEqual(Option.none())
@@ -75,23 +80,24 @@ describe("Pattern matching", () => {
   })
 
   it("should match on _tag discriminated union (notifications)", () => {
-    // Given — un système de notifications avec des canaux différents
     type EmailNotification = { _tag: "Email"; to: string; subject: string }
     type SmsNotification = { _tag: "Sms"; phone: string; body: string }
     type PushNotification = { _tag: "Push"; deviceId: string; title: string }
     type Notification = EmailNotification | SmsNotification | PushNotification
 
-    // When
-    const describe = (notif: Notification): string =>
+    const describe = (notif: Notification) =>
       pipe(
         Match.value(notif),
-        Match.tag("Email", (n) => `Email to ${n.to}: ${n.subject}`),
-        Match.tag("Sms", (n) => `SMS to ${n.phone}: ${n.body}`),
-        Match.tag("Push", (n) => `Push on ${n.deviceId}: ${n.title}`),
+        // #start
+        TODO,
+        // #solution
+        // Match.tag("Email", (n) => `Email to ${n.to}: ${n.subject}`),
+        // Match.tag("Sms", (n) => `SMS to ${n.phone}: ${n.body}`),
+        // Match.tag("Push", (n) => `Push on ${n.deviceId}: ${n.title}`),
+        // #end
         Match.exhaustive
       )
 
-    // Then
     expect(describe({ _tag: "Email", to: "alice@example.com", subject: "Hello" })).toEqual(
       "Email to alice@example.com: Hello"
     )
@@ -104,20 +110,21 @@ describe("Pattern matching", () => {
   })
 
   it("should use orElse as a fallback for unmatched cases (payment methods)", () => {
-    // Given — méthodes de paiement connues, avec fallback pour les inconnues
     type PaymentMethod = "card" | "paypal" | "crypto" | "check" | string
 
-    // When
     const getProcessingFee = (method: PaymentMethod): string =>
       pipe(
         Match.value(method),
-        Match.when("card", () => "1.5%"),
-        Match.when("paypal", () => "2.9%"),
-        Match.when("crypto", () => "0%"),
-        Match.orElse(() => "unknown method, default fee: 3%")
+        // #start
+        TODO
+        // #solution
+        // Match.when("card", () => "1.5%"),
+        // Match.when("paypal", () => "2.9%"),
+        // Match.when("crypto", () => "0%"),
+        // Match.orElse(() => "unknown method, default fee: 3%")
+        // #end
       )
 
-    // Then
     expect(getProcessingFee("card")).toEqual("1.5%")
     expect(getProcessingFee("paypal")).toEqual("2.9%")
     expect(getProcessingFee("crypto")).toEqual("0%")
@@ -125,18 +132,19 @@ describe("Pattern matching", () => {
   })
 
   it("should exclude a specific case with Match.not (order status)", () => {
-    // Given — statuts d'une commande
     type OrderStatus = "pending" | "processing" | "shipped" | "cancelled"
 
-    // When — tout ce qui n'est pas annulé peut être tracké
-    const isTrackable = (status: OrderStatus): boolean =>
+    const isTrackable = (status: OrderStatus) =>
       pipe(
         Match.value(status),
-        Match.not("cancelled", () => true),
+        // #start
+        TODO,
+        // #solution
+        // Match.not("cancelled", () => true),
+        // #end
         Match.orElse(() => false)
       )
 
-    // Then
     expect(isTrackable("pending")).toEqual(true)
     expect(isTrackable("processing")).toEqual(true)
     expect(isTrackable("shipped")).toEqual(true)
@@ -144,18 +152,19 @@ describe("Pattern matching", () => {
   })
 
   it("should match multiple conditions with whenOr (user roles)", () => {
-    // Given — rôles utilisateurs avec accès au back-office
     type Role = "viewer" | "editor" | "admin" | "superAdmin"
 
-    // When — admin et superAdmin ont accès au dashboard
-    const canAccessDashboard = (role: Role): boolean =>
+    const canAccessDashboard = (role: Role) =>
       pipe(
         Match.value(role),
-        Match.whenOr("admin", "superAdmin", () => true),
+        // #start
+        TODO,
+        // #solution
+        // Match.whenOr("admin", "superAdmin", () => true),
+        // #end
         Match.orElse(() => false)
       )
 
-    // Then
     expect(canAccessDashboard("viewer")).toEqual(false)
     expect(canAccessDashboard("editor")).toEqual(false)
     expect(canAccessDashboard("admin")).toEqual(true)
@@ -163,21 +172,22 @@ describe("Pattern matching", () => {
   })
 
   it("should use built-in predicates to match on primitive types (form field validation)", () => {
-    // Given — une valeur de champ de formulaire de type inconnu
     type FieldValue = string | number | boolean | null
 
-    // When
-    const formatForDisplay = (value: FieldValue): string =>
+    const formatForDisplay = (value: FieldValue) =>
       pipe(
         Match.value(value),
-        Match.when(Match.null, () => "—"),
-        Match.when(Match.boolean, (b) => (b ? "Oui" : "Non")),
-        Match.when(Match.number, (n) => n.toLocaleString("fr-FR")),
-        Match.when(Match.string, (s) => s),
+        // #start
+        TODO,
+        // #solution
+        // Match.when(Match.null, () => "—"),
+        // Match.when(Match.boolean, (b) => (b ? "Oui" : "Non")),
+        // Match.when(Match.number, (n) => n.toLocaleString("fr-FR")),
+        // Match.when(Match.string, (s) => s),
+        // #end
         Match.exhaustive
       )
 
-    // Then
     expect(formatForDisplay(null)).toEqual("—")
     expect(formatForDisplay(true)).toEqual("Oui")
     expect(formatForDisplay(false)).toEqual("Non")

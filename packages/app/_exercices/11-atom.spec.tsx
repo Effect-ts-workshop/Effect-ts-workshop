@@ -1,7 +1,8 @@
 import { Atom, AtomHttpApi, Registry, Result } from "@effect-atom/atom-react"
-import { BrowserHttpClient } from "@effect/platform-browser"
+import { HttpClient, HttpClientResponse } from "@effect/platform"
 import { act, render, screen, waitFor } from "@testing-library/react"
-import { Effect } from "effect"
+import { Duration, Effect, Layer, pipe } from "effect"
+import { randomUUID } from "node:crypto"
 import { Api } from "shared/api"
 import { describe, expect, it, vi } from "vitest"
 
@@ -168,10 +169,28 @@ describe("Atom", () => {
     })
 
     it("should integrate nicely with api client", async () => {
+      const mockClient = HttpClient.make((request) =>
+        pipe(
+          Effect.sleep(Duration.millis(100)),
+          Effect.map(() =>
+            HttpClientResponse.fromWeb(
+              request,
+              new Response(
+                JSON.stringify({ items: [{ id: randomUUID(), brand: "Mock Brand", model: "Mock Model" }] }),
+                {
+                  status: 200,
+                  headers: { "content-type": "application/json" }
+                }
+              )
+            )
+          )
+        )
+      )
+      const MockedHttpClient = Layer.succeed(HttpClient.HttpClient, mockClient)
       class DemoClient extends AtomHttpApi.Tag<DemoClient>()("DemoClient", {
         api: Api,
-        httpClient: BrowserHttpClient.layerXMLHttpRequest, // mocked data will not work with standard FetchHttpClient
-        baseUrl: "http://vitest.mock"
+        httpClient: MockedHttpClient,
+        baseUrl: "http://my-url.mock"
       }) {}
 
       function TestComponent() {

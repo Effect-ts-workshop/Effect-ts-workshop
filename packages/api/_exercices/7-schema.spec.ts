@@ -162,10 +162,10 @@ describe("Schema", () => {
    * - Split in multiple tests
    * - Use ArrayFormatter to avoid rely on regexp
    */
-  it.skip("Customize error output", () => {
+  it.skip("can annotate errors", () => {
     // Identify invalid data
     // #start
-    const Person = TODO
+    const Person = Schema.Struct({}).annotations(TODO)
     // #solution
     // const Person = Schema.Struct({})
     //   .annotations({ identifier: "Person" })
@@ -187,7 +187,7 @@ describe("Schema", () => {
       message: "Expected Person, actual null"
     })
   })
-  it.skip("Customize error output", () => {
+  it.skip("can provide paths to invalid data", () => {
     // #start
     // Identify invalid paths
     const Person = Schema.Struct(TODO)
@@ -218,27 +218,29 @@ describe("Schema", () => {
       message: "Expected Age, actual \"42\""
     })
   })
-  it.skip("Customize error output", () => {
+  it.skip("can indicate refinement errors", () => {
     // #start
+    // Use a refinement that will fail
     const Person = Schema.Struct({
-      id: TODO
+      age: TODO
     })
       .annotations({ identifier: "Person" })
     // #solution
     // const Person = Schema.Struct({
-    //   id: Schema.NonEmptyString
+    //   age: Schema.Positive
     // })
     //   .annotations({ identifier: "Person" })
     // #end
 
-    expect(() => pipe({ id: "" }, Schema.decodeUnknownSync(Person))).toThrowError(`Person
-└─ ["id"]
-   └─ NonEmptyString
+    expect(() => pipe({ id: "", age: -2 }, Schema.decodeUnknownSync(Person))).toThrowError(`Person
+└─ ["age"]
+   └─ Positive
       └─ Predicate refinement failure
-         └─ Expected a non empty string, actual ""`.trim())
+         └─ Expected a positive number, actual -2`)
   })
-  it.skip("Customize error output", () => {
+  it.skip("can customize error message", () => {
     // #start
+    // Validate with custom message if invalid
     const Person = Schema.Struct({
       strength: TODO
     })
@@ -254,42 +256,55 @@ describe("Schema", () => {
 └─ ["strength"]
    └─ is over 9000 !!!`.trim())
   })
-  it.skip("Customize error output", () => {
+  it("Customize error output", () => {
     // #start
     const Person = Schema.Struct({
-      initials: TODO
+      initials: Schema.transformOrFail(
+        Schema.String,
+        Schema.String.pipe(Schema.maxLength(TODO)),
+        TODO
+      )
     })
       .annotations({ identifier: "Person" })
     // #solution
     // const Person = Schema.Struct({
-    //   initials: pipe(Schema.NonEmptyString, Schema.maxLength(2))
+    //   initials: Schema.transformOrFail(
+    //     Schema.String,
+    //     Schema.String.pipe(Schema.maxLength(2)),
+    //     {
+    //       strict: true,
+    //       decode: (s, _, ast) =>
+    //         s.length > 0
+    //           ? ParseResult.succeed(s)
+    //           : ParseResult.fail(new ParseResult.Type(ast, s)),
+    //       encode: ParseResult.succeed
+    //     }
+    //   )
     // })
-    // .annotations({ identifier: "Person" })
+    //   .annotations({ identifier: "Person" })
     // #end
 
     expect(() => pipe({ initials: null }, Schema.decodeUnknownSync(Person)))
       .toThrowError(`Person
 └─ ["initials"]
-   └─ NonEmptyString & maxLength(2)
-      └─ From side refinement failure
-         └─ NonEmptyString
-            └─ From side refinement failure
-               └─ Expected string, actual null`)
+   └─ (string <-> maxLength(2))
+      └─ Encoded side transformation failure
+         └─ Expected string, actual null`)
 
     expect(() => pipe({ initials: "" }, Schema.decodeUnknownSync(Person)))
       .toThrowError(`Person
 └─ ["initials"]
-   └─ NonEmptyString & maxLength(2)
-      └─ From side refinement failure
-         └─ NonEmptyString
-            └─ Predicate refinement failure
-               └─ Expected a non empty string, actual ""`)
+   └─ (string <-> maxLength(2))
+      └─ Transformation process failure
+         └─ Expected (string <-> maxLength(2)), actual ""`)
 
     expect(() => pipe({ initials: "ACL" }, Schema.decodeUnknownSync(Person)))
       .toThrowError(`Person
 └─ ["initials"]
-   └─ NonEmptyString & maxLength(2)
-      └─ Predicate refinement failure
-         └─ Expected a string at most 2 character(s) long, actual "ACL"`)
+   └─ (string <-> maxLength(2))
+      └─ Type side transformation failure
+         └─ maxLength(2)
+            └─ Predicate refinement failure
+               └─ Expected a string at most 2 character(s) long, actual "ACL"`)
   })
 })

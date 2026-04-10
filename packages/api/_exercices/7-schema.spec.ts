@@ -269,30 +269,30 @@ describe("Schema", () => {
       .annotations({ identifier: "Person" })
 
     // #start
-    const failsOnEncondedSide = TODO
-    const failsOnTransformation = TODO
-    const failsOnTypeSide = TODO
+    const personFailingOnEncodedSide = TODO
+    const personFailingOnTransformation = TODO
+    const personFailingOnTypeSide = TODO
     // #solution
     // const failsOnEncondedSide = { initials: null }
     // const failsOnTransformation = { initials: "" }
     // const failsOnTypeSide = { initials: "ACL" }
     // #end
 
-    expect(() => pipe(failsOnEncondedSide, Schema.decodeUnknownSync(Person)))
+    expect(() => pipe(personFailingOnEncodedSide, Schema.decodeUnknownSync(Person)))
       .toThrowError(`Person
 └─ ["initials"]
    └─ (string <-> maxLength(2))
       └─ Encoded side transformation failure
          └─ Expected string, actual null`)
 
-    expect(() => pipe(failsOnTransformation, Schema.decodeUnknownSync(Person)))
+    expect(() => pipe(personFailingOnTransformation, Schema.decodeUnknownSync(Person)))
       .toThrowError(`Person
 └─ ["initials"]
    └─ (string <-> maxLength(2))
       └─ Transformation process failure
          └─ Expected (string <-> maxLength(2)), actual ""`)
 
-    expect(() => pipe(failsOnTypeSide, Schema.decodeUnknownSync(Person)))
+    expect(() => pipe(personFailingOnTypeSide, Schema.decodeUnknownSync(Person)))
       .toThrowError(`Person
 └─ ["initials"]
    └─ (string <-> maxLength(2))

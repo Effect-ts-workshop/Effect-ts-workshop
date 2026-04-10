@@ -61,7 +61,7 @@ Les exercices se trouvent dans les dossiers `_exercices/` de chaque package :
 
 ## Documentation
 
-La documentation ici [Effect ts Companion](https://effect-ts-workshop.github.io/effect-ts-workshop)
+La documentation ici [Effect ts Companion](https://effect-ts-workshop.github.io/Effect-ts-workshop/)
 
 ## Outils inclus
 

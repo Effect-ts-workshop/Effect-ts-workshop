@@ -64,6 +64,7 @@ describe("Schema", () => {
   })
 
   it.skip("should format errors as array", () => {
+    // Format errors as array
     const schema = Schema.Struct({
       user: Schema.Struct({
         id: Schema.String
@@ -71,7 +72,6 @@ describe("Schema", () => {
     })
     const result = Schema.decodeUnknownEither(schema)({ user: {} })
 
-    // Format errors as array
     // #start
     const errors = pipe(
       result,
@@ -96,10 +96,10 @@ describe("Schema", () => {
   })
 
   it.skip("can encode and decode value", () => {
+    // Encode originalData with our schema
     const DataSchema = Schema.Struct({ createdAt: Schema.Date })
     const originalData = { createdAt: new Date("2026-04-22") }
 
-    // Encode originalData with our schema
     // #start
     const dataDto = pipe(originalData, TODO(DataSchema))
     const decodedData = pipe(dataDto, TODO(DataSchema))
@@ -113,9 +113,9 @@ describe("Schema", () => {
   })
 
   it.skip("can easily create arbitrary data for your tests", () => {
-    // const DataSchema = Schema.Struct({ createdAt: Schema.DateFromString, name: Schema.NonEmptyTrimmedString })
-
     // Generate arbitrary data (aka random generator) from the schema
+    const DataSchema = Schema.Struct({ createdAt: Schema.DateFromString, name: Schema.NonEmptyTrimmedString })
+
     // #start
     const arbitrary = TODO
     // #solution
@@ -133,11 +133,11 @@ describe("Schema", () => {
   })
 
   it.skip("can create your own schema", () => {
+    // Construct an Email schema using pattern + brand
     type Email = string & Brand.Brand<"email">
     const Email = Brand.nominal<Email>()
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-    // Construct an Email schema using pattern + brand
     // #start
     const EmailSchema = TODO
     // #solution
@@ -155,15 +155,8 @@ describe("Schema", () => {
     expectTypeOf(data).toExtend<Email>()
     expect(Either.isLeft(failureResult)).toBeTruthy()
   })
-
-  //
-  /**
-   * TODO
-   * - Split in multiple tests
-   * - Use ArrayFormatter to avoid rely on regexp
-   */
-  it.skip("can annotate errors", () => {
-    // Identify invalid data
+  it.skip("can enhance clarity in error messages", () => {
+    // Annotate schema with an identifier
     // #start
     const Person = Schema.Struct({}).annotations(TODO)
     // #solution
@@ -188,8 +181,8 @@ describe("Schema", () => {
     })
   })
   it.skip("can provide paths to invalid data", () => {
+    // Annotate schema's paths with identifiers
     // #start
-    // Identify invalid paths
     const Person = Schema.Struct(TODO)
       .annotations({ identifier: "Person" })
     // #solution
@@ -219,8 +212,9 @@ describe("Schema", () => {
     })
   })
   it.skip("can indicate refinement errors", () => {
+    // Define a refinement schema that will fail
+    const notAPerson = { id: "", age: -2 }
     // #start
-    // Use a refinement that will fail
     const Person = Schema.Struct({
       age: TODO
     })
@@ -232,15 +226,15 @@ describe("Schema", () => {
     //   .annotations({ identifier: "Person" })
     // #end
 
-    expect(() => pipe({ id: "", age: -2 }, Schema.decodeUnknownSync(Person))).toThrowError(`Person
+    expect(() => pipe(notAPerson, Schema.decodeUnknownSync(Person))).toThrowError(`Person
 └─ ["age"]
    └─ Positive
       └─ Predicate refinement failure
          └─ Expected a positive number, actual -2`)
   })
   it.skip("can customize error message", () => {
-    // #start
     // Validate with custom message if invalid
+    // #start
     const Person = Schema.Struct({
       strength: TODO
     })
@@ -256,7 +250,7 @@ describe("Schema", () => {
 └─ ["strength"]
    └─ is over 9000 !!!`.trim())
   })
-  it("Customize error output", () => {
+  it.skip("can track encoded side, transformation process and type side failures", () => {
     // #start
     const Person = Schema.Struct({
       initials: Schema.transformOrFail(

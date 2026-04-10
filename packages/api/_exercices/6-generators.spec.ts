@@ -1,7 +1,10 @@
 import { HttpClient } from "@effect/platform"
 import { NodeHttpClient } from "@effect/platform-node"
-import { Effect, pipe } from "effect"
-import { describe, expect, it } from "vitest"
+import { Array, Data, Effect, pipe } from "effect"
+import { UnknownException } from "effect/Cause"
+import { TaggedError } from "effect/Data"
+import { randomUUID } from "node:crypto"
+import { describe, expect, expectTypeOf, it, vi } from "vitest"
 
 const TODO: any = {}
 
@@ -236,7 +239,69 @@ describe("Effect context", () => {
     expect((await Effect.runPromise(program)).data).toEqual((await Effect.runPromise(programGen)).data)
   })
 
-  it.todo("Imperative control flow", () => {})
-  it.todo("dual API", () => {})
-  it.todo("yield error/either/option", () => {})
+  it("can use imperative control flow inside generator", () => {
+    const buildUser = () => Effect.succeed({ id: randomUUID() })
+    const buildUsers = Effect.fn(function*(count: number) {
+      const users = []
+
+      // #start
+      TODO()
+      // #solution
+      // for (let index = 0; index < count; index++) {
+      //   const user = yield* buildUser()
+      //   users.push(user)
+      // }
+      // #end
+
+      return users
+    })
+
+    expect(Effect.runSync(buildUsers(10))).toHaveLength(10)
+  })
+
+  it("should catch error inside generator to go to the end", () => {
+    class ThirdPartyError extends Data.TaggedError("ThirdPartyError")<{ message: string }> {}
+
+    const getUserById = (id: string) => Effect.succeed({ id, firstName: "Martin", lastName: "Pecheur" })
+    const getUserFriends = vi.fn((_: string) => Effect.fail(new ThirdPartyError({ message: "Network error" })))
+
+    const getUser = Effect.fn(function*(id: string) {
+      const user = yield* getUserById(id)
+
+      // #start
+      const friends = TODO
+      // #solution
+      // const friends = yield* Effect.orElse(
+      //   getUserFriends(id),
+      //   () => Effect.succeed([])
+      // )
+      // #end
+
+      return { ...user, friends }
+    })
+
+    expect(Effect.runSync(getUser(randomUUID()))).toMatchObject({ friends: [] })
+    expect(getUserFriends).toHaveBeenCalled()
+  })
+
+  it("interop with other data types", async () => {
+    class MyDomainError extends Data.TaggedError("MyDomainError")<{ error: unknown }> {}
+
+    type User = { id: string }
+    const users: Array<User> = [{ id: randomUUID() }, { id: randomUUID() }, { id: randomUUID() }]
+    const findUser = Effect.fn("findUser")(function*(id: string) {
+      const foundUser = Array.findFirst(users, (user) => user.id === id)
+
+      // #start
+      const user = TODO
+      // #solution
+      // const user = yield* Effect.catchAll(foundUser, (error) => new MyDomainError({ error }))
+      // #end
+
+      return user
+    })
+
+    expectTypeOf(findUser).toExtend<(id: string) => Effect.Effect<User, MyDomainError>>()
+    await expect(Effect.runPromise(findUser("not-found"))).rejects.toThrow()
+  })
 })

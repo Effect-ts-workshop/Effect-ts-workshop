@@ -42,7 +42,8 @@ const program = Effect.tryPromise({
 
 :::tip Ressources
 
-- [Erreurs et défauts](../base-de-connaissance/02-erreurs-et-defauts.md)
+- [Fibers et Concurrence](../base-de-connaissance/13-fibers-concurrence.md)
+- [Scope et Ressources](../base-de-connaissance/08-scope-et-ressources.md)
 
 :::
 

@@ -66,31 +66,34 @@ console.log(erreur._tag);    // "ErreurAvecMessage"
 ### `Effect.catchTag` — une erreur spécifique
 
 ```typescript
-const sûr = monEffect.pipe(
+const sûr = pipe(
+  monEffect,
   Effect.catchTag("ArticleNonTrouvé", (erreur) => {
     // erreur.id est disponible (type sûr !)
-    return Effect.succeed(null);
+    return Effect.succeed(null)
   })
-);
+)
 ```
 
 ### `Effect.catchTags` — plusieurs erreurs
 
 ```typescript
-const sûr = monEffect.pipe(
+const sûr = pipe(
+  monEffect,
   Effect.catchTags({
     ArticleNonTrouvé: (e) => Effect.succeed(null),
-    ErreurRéseau: (e) => Effect.fail(new ErreurServeur()),
+    ErreurRéseau: (e) => Effect.fail(new ErreurServeur())
   })
-);
+)
 ```
 
 ### `Effect.catchAll` — toutes les erreurs
 
 ```typescript
-const sûr = monEffect.pipe(
+const sûr = pipe(
+  monEffect,
   Effect.catchAll((_erreur) => Effect.succeed(valeurParDéfaut))
-);
+)
 ```
 
 :::warning

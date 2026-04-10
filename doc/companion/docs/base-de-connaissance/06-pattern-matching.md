@@ -9,13 +9,14 @@ sidebar_position: 6
 Le module `Match` d'Effect permet une correspondance de motifs **exhaustive** sur des valeurs :
 
 ```typescript
-import { Match } from "effect";
+import { Match, pipe } from "effect"
 
-const résultat = Match.value(uneValeur).pipe(
+const résultat = pipe(
+  Match.value(uneValeur),
   Match.when(condition1, gestionnaire1),
   Match.when(condition2, gestionnaire2),
   Match.exhaustive // force la couverture de tous les cas
-);
+)
 ```
 
 ## Types de conditions
@@ -23,7 +24,8 @@ const résultat = Match.value(uneValeur).pipe(
 ### Valeurs littérales
 
 ```typescript
-Match.value("chargement").pipe(
+pipe(
+  Match.value("chargement"),
   Match.when("chargement", () => "⏳"),
   Match.when("succès", () => "✅"),
   Match.when("erreur", () => "❌"),
@@ -37,9 +39,10 @@ Match.value("chargement").pipe(
 type État =
   | { type: "vide" }
   | { type: "données"; items: Item[] }
-  | { type: "erreur"; message: string };
+  | { type: "erreur"; message: string }
 
-Match.value(état).pipe(
+pipe(
+  Match.value(état),
   Match.when({ type: "vide" }, () => "Rien à afficher"),
   Match.when({ type: "données" }, ({ items }) => `${items.length} items`),
   Match.when({ type: "erreur" }, ({ message }) => `Erreur : ${message}`),
@@ -47,15 +50,72 @@ Match.value(état).pipe(
 )
 ```
 
-### Gardes de type (`Match.is`)
+### `Match.tag` — unions avec `_tag`
+
+Quand les variantes d'une union utilisent `_tag` comme discriminant, `Match.tag` est plus concis que `Match.when({ _tag: "..." })` :
 
 ```typescript
-import { Match } from "effect";
+type Notification =
+  | { _tag: "Email"; to: string }
+  | { _tag: "Sms"; phone: string }
+  | { _tag: "Push"; deviceId: string }
 
-Match.value(valeur).pipe(
+pipe(
+  Match.value(notification),
+  Match.tag("Email", (n) => `Email to ${n.to}`),
+  Match.tag("Sms", (n) => `SMS to ${n.phone}`),
+  Match.tag("Push", (n) => `Push on ${n.deviceId}`),
+  Match.exhaustive
+)
+```
+
+### `Match.not` — exclure un cas
+
+```typescript
+// Tout sauf "cancelled"
+pipe(
+  Match.value(status),
+  Match.not("cancelled", () => true),
+  Match.orElse(() => false)
+)
+```
+
+### `Match.whenOr` — plusieurs valeurs, même branche
+
+```typescript
+// Évite d'écrire deux Match.when identiques
+pipe(
+  Match.value(role),
+  Match.whenOr("admin", "superAdmin", () => true),
+  Match.orElse(() => false)
+)
+```
+
+### `Match.option` — résultat en `Option`
+
+`Match.option` clôt le match en enveloppant le résultat dans un `Option`. Si aucun cas ne correspond : `Option.none()`.
+
+```typescript
+const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
+  pipe(
+    Match.value(stock),
+    Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
+    Match.option
+    // Option.some(2|5) si "in_stock"
+    // Option.none() pour "out_of_stock" et "discontinued"
+  )
+```
+
+### Gardes de type — `Match.null`, `Match.boolean`, `Match.number`, `Match.string`
+
+```typescript
+pipe(
+  Match.value(valeur),
+  Match.when(Match.null, () => "—"),
+  Match.when(Match.boolean, (b) => (b ? "Oui" : "Non")),
   Match.when(Match.number, (n) => `Nombre : ${n}`),
   Match.when(Match.string, (s) => `Chaîne : ${s}`),
-  Match.orElse(() => "Autre type")
+  Match.exhaustive
 )
 ```
 
@@ -63,14 +123,16 @@ Match.value(valeur).pipe(
 
 ```typescript
 // Match.exhaustive — compile seulement si tous les cas sont couverts
-Match.value(état).pipe(
+pipe(
+  Match.value(état),
   Match.when("a", () => 1),
   // ❌ Ne compile pas si "b" n'est pas géré
   Match.exhaustive
 )
 
 // Match.orElse — fournit un cas par défaut
-Match.value(état).pipe(
+pipe(
+  Match.value(état),
   Match.when("a", () => 1),
   Match.orElse(() => 0) // ✅ Gère tous les autres cas
 )

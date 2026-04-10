@@ -27,11 +27,12 @@ Quand vous chaînez des Effects, Effect gère automatiquement l'aiguillage.
 Si un Effect est sur la voie d'erreur, les transformations suivantes sont **ignorées** :
 
 ```typescript
-const résultat = diviser(10, 0).pipe(  // ❌ Erreur → DivisionParZéro
-  Effect.map((n) => n * 100),          // Ignoré — on est sur la voie erreur
-  Effect.map((n) => n + 1),            // Ignoré — idem
-  Effect.map((n) => String(n))         // Ignoré — idem
-);
+const résultat = pipe(
+  diviser(10, 0), // ❌ Erreur → DivisionParZéro
+  Effect.map((n) => n * 100), // Ignoré — on est sur la voie erreur
+  Effect.map((n) => n + 1),   // Ignoré — idem
+  Effect.map((n) => String(n)) // Ignoré — idem
+)
 // L'erreur DivisionParZéro est propagée jusqu'à la fin
 ```
 
@@ -68,7 +69,8 @@ diviser(10, 2)
 diviser(10, 0)
    ❌ → DivisionParZéro
 
-diviser(10, 0).pipe(
+pipe(
+  diviser(10, 0),
   Effect.catchTag("DivisionParZéro", () => Effect.succeed(0))
 )
    ❌ → DivisionParZéro
@@ -89,16 +91,17 @@ Le Railway Pattern rend la gestion d'erreurs **composable** et **prévisible** :
 ```typescript
 // Code Effect — logique principale et erreurs bien séparées
 const créerCommande = (userId: string, articleId: string) =>
-  Effect.gen(function* () {
-    const utilisateur = yield* getUtilisateur(userId);  // peut échouer
-    const article = yield* getArticle(articleId);        // peut échouer
-    const commande = yield* validerCommande(utilisateur, article); // peut échouer
-    return yield* sauvegarderCommande(commande);
-  }).pipe(
+  pipe(
+    Effect.gen(function*() {
+      const utilisateur = yield* getUtilisateur(userId)  // peut échouer
+      const article = yield* getArticle(articleId)        // peut échouer
+      const commande = yield* validerCommande(utilisateur, article) // peut échouer
+      return yield* sauvegarderCommande(commande)
+    }),
     Effect.catchTags({
       UtilisateurNonTrouvé: () => Effect.fail(new CommandeImpossible("Utilisateur inconnu")),
       ArticleNonTrouvé: () => Effect.fail(new CommandeImpossible("Article indisponible")),
-      StockInsuffisant: () => Effect.fail(new CommandeImpossible("Stock épuisé")),
+      StockInsuffisant: () => Effect.fail(new CommandeImpossible("Stock épuisé"))
     })
-  );
+  )
 ```

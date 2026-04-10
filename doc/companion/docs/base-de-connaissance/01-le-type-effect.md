@@ -54,6 +54,25 @@ const calcul = Effect.sync(() => Math.random());
 // Type : Effect<number>
 ```
 
+### Calculs synchrones
+
+```typescript
+// Calcul synchrone sans risque d'erreur
+const calcul = Effect.sync(() => Math.random())
+// Type : Effect<number>
+// La fonction est évaluée de façon lazy — pas immédiatement
+
+// Calcul synchrone qui peut lancer une exception
+const parse = Effect.try({
+  try: () => JSON.parse(input),
+  catch: (e) => new ParseError({ message: String(e) })
+})
+// Type : Effect<unknown, ParseError>
+// Les exceptions deviennent des erreurs typées
+```
+
+`Effect.sync` est l'équivalent de `Effect.succeed` pour un calcul (pas une valeur déjà calculée). `Effect.try` est l'équivalent de `Effect.tryPromise` pour le code synchrone.
+
 ### À partir de Promises
 
 ```typescript
@@ -116,3 +135,56 @@ Effect.tap(fn)
 // Logger la valeur (pratique pour déboguer)
 Effect.tap(Effect.log)
 ```
+
+### Récupération sur échec
+
+```typescript
+// Fallback si l'Effect échoue — remplacer par un autre Effect
+pipe(
+  fetchJoke(),
+  Effect.orElse(() => Effect.succeed("Blague par défaut"))
+)
+// Si fetchJoke() échoue → "Blague par défaut"
+// Si fetchJoke() réussit → sa valeur originale
+
+// Fallback avec une valeur simple (raccourci)
+pipe(
+  fetchJoke(),
+  Effect.orElseSucceed(() => "Blague par défaut")
+)
+```
+
+`Effect.orElse` est différent de `Effect.catchAll` : il remplace l'Effect entier sans inspecter l'erreur. `Effect.catchAll` reçoit l'erreur en argument et permet de la traiter.
+
+## Combiner des Effects
+
+### `Effect.all` — plusieurs Effects en parallèle
+
+```typescript
+import { Effect, pipe } from "effect"
+
+// Objet — structure préservée dans le résultat
+const program = pipe(
+  Effect.all({
+    users: fetchUsers(),
+    config: loadConfig()
+  })
+  // → { users: User[], config: Config }
+)
+
+// Tableau
+const results = yield* Effect.all([effect1, effect2, effect3])
+// → [résultat1, résultat2, résultat3]
+```
+
+Par défaut, les Effects s'exécutent en parallèle. Si l'un échoue, les autres sont interrompus.
+
+```typescript
+// Séquentiel (un par un)
+yield* Effect.all(effects, { concurrency: 1 })
+
+// Parallèle limité
+yield* Effect.all(effects, { concurrency: 3 })
+```
+
+Voir la fiche [Fibers et Concurrence](./13-fibers-concurrence.md) pour les détails sur la concurrence.

@@ -73,15 +73,16 @@ const DatabaseLayer = Layer.scoped(
 
 ```typescript
 // Avant : dépendance non résolue
-const programme: Effect<Items, Err, HttpClient.HttpClient> = fetchItems;
+const programme: Effect<Items, Err, HttpClient.HttpClient> = fetchItems
 
 // Après : dépendance résolue
-const résolu: Effect<Items, Err> = programme.pipe(
+const résolu: Effect<Items, Err> = pipe(
+  programme,
   Effect.provide(FetchHttpClient.layer)
-);
+)
 
 // Exécution possible !
-Effect.runPromise(résolu);
+Effect.runPromise(résolu)
 ```
 
 ## Composer des Layers
@@ -92,9 +93,10 @@ Les Layers peuvent se composer pour former des Layers plus complexes.
 
 ```typescript
 // ItemRepositoryHttp a besoin de HttpClient
-const AppLayer = ItemRepositoryHttp.pipe(
+const AppLayer = pipe(
+  ItemRepositoryHttp,
   Layer.provide(FetchHttpClient.layer)
-);
+)
 // Type : Layer<ItemRepository> — plus de dépendance HttpClient !
 ```
 
@@ -125,16 +127,17 @@ Dans `packages/api/server.ts`, toute la composition de l'application :
 
 ```typescript
 // packages/api/server.ts (simplifié)
-const ApiLive = HttpRouter.serve(router).pipe(
+const ApiLive = pipe(
+  HttpRouter.serve(router),
   HttpServer.withLogAddress,
   Layer.provide(ItemRepositoryDrizzle.Default), // Layer du repository
   Layer.provide(DatabaseLive),                   // Layer de la BDD
   Layer.provide(MigratorLive),                   // Layer des migrations
   Layer.provide(NodeHttpServer.layer({ port: 3000 }))
-);
+)
 
 // Démarrer l'application
-Layer.launch(ApiLive);
+Layer.launch(ApiLive)
 ```
 
 Chaque `Layer.provide(...)` résout une couche de dépendances. Effect valide que tout est fourni **à la compilation** avant même d'exécuter.

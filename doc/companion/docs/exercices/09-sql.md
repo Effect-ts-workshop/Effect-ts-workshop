@@ -43,7 +43,7 @@ const getAll = Effect.fn("getAll")(function*() {
 
 :::tip Ressources
 
-- [SQL](../base-de-connaissance/09-http-api.md)
+- [SQL avec @effect/sql](../base-de-connaissance/14-sql.md)
 
 :::
 

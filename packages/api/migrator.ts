@@ -8,9 +8,7 @@ export const MigratorLive = pipe(
   PgMigrator.layer({
     loader: PgMigrator.fromFileSystem(
       fileURLToPath(new URL("migrations", import.meta.url))
-    ),
-    // Where to put the `_schema.sql` file
-    schemaDirectory: "src/migrations"
+    )
   }),
   Layer.provide(SqlLive),
   Layer.provide(NodeContext.layer)

@@ -1,40 +1,60 @@
 import { Model, SqlClient } from "@effect/sql"
+import { eq } from "drizzle-orm"
 import type { InferInsertModel } from "drizzle-orm"
-import { Effect, Layer, pipe, Schema } from "effect"
+import { ConfigProvider, Effect, Layer, pipe, Schema } from "effect"
 import { InventoryItemId, InventoryItemIdSchema } from "shared/item"
-import { describe, expect, it } from "vitest"
+import { GenericContainer, Wait } from "testcontainers"
+import { describe, expect, it as itBase } from "vitest"
 import { SqlLive } from "../database"
 import { Database, DatabaseLive } from "../database-drizzle"
-import type { items } from "../db/item.sql"
+import { items } from "../db/item.sql"
 import { MigratorLive } from "../migrator"
 
-const TODO: any = {}
+const it = itBase.extend("pgConfig", async ({}, { onCleanup }) => {
+  const container = await new GenericContainer("postgres:18.1")
+    .withEnvironment({
+      POSTGRES_USER: "test",
+      POSTGRES_PASSWORD: "test",
+      POSTGRES_DB: "test"
+    })
+    .withExposedPorts(5432)
+    .withWaitStrategy(Wait.forLogMessage("database system is ready to accept connections", 2))
+    .start()
 
-/**
- * Key points to document:
- * - run `docker compose up -d`
- * TODO : add testcontainer
- */
+  onCleanup(async () => {
+    await container.stop()
+  })
+
+  return ConfigProvider.fromMap(
+    new Map([
+      ["DB_HOST", container.getHost()],
+      ["DB_PORT", String(container.getMappedPort(5432))],
+      ["DB_NAME", "test"],
+      ["DB_USER", "test"],
+      ["DB_PASSWORD", "test"]
+    ])
+  )
+})
 
 describe("Native effect module", () => {
   const databaseLayer = Layer.mergeAll(SqlLive, MigratorLive)
 
-  it("Should run raw sql", async () => {
+  it("Should run raw sql", { timeout: 5_000 }, async ({ pgConfig }) => {
     const getAll = Effect.fn("getAll")(function*() {
       const sql = yield* SqlClient.SqlClient
       // #start
-      const items = TODO
+      // const items = TODO
       // #solution
-      // const items = yield* sql`
-      //     SELECT *
-      //     FROM items
-      //     ORDER BY id
-      //   `
+      const items = yield* sql`
+          SELECT *
+          FROM items
+          ORDER BY id
+        `
       // #end
       return items
     })
 
-    const program = pipe(getAll(), Effect.provide(databaseLayer))
+    const program = pipe(getAll(), Effect.provide(databaseLayer.pipe(Layer.provide(Layer.setConfigProvider(pgConfig)))))
 
     const result = await Effect.runPromise(program)
     expect(result.length).toBeGreaterThanOrEqual(1)
@@ -45,7 +65,7 @@ describe("Native effect module", () => {
     }))
   })
 
-  it("Should operate CRUD easily", async () => {
+  it("Should operate CRUD easily", { timeout: 5_000 }, async ({ pgConfig }) => {
     class DbItem extends Model.Class<DbItem>("DbItem")({
       id: InventoryItemIdSchema,
       brand: Schema.String,
@@ -56,15 +76,15 @@ describe("Native effect module", () => {
 
     const getCrud = Effect.fn("getCrud")(function*() {
       // #start
-      const repository = TODO
+      // const repository = TODO
       // #solution
-      // const repoConfig = {
-      //   tableName: "items",
-      //   idColumn: "id" as const,
-      //   spanPrefix: "ItemRepository"
-      // }
+      const repoConfig = {
+        tableName: "items",
+        idColumn: "id" as const,
+        spanPrefix: "ItemRepository"
+      }
 
-      // const repository = yield* Model.makeRepository(DbItem, repoConfig)
+      const repository = yield* Model.makeRepository(DbItem, repoConfig)
       // #end
 
       return repository
@@ -86,7 +106,7 @@ describe("Native effect module", () => {
 
         return { insertValue, readValue }
       }),
-      Effect.provide(databaseLayer)
+      Effect.provide(databaseLayer.pipe(Layer.provide(Layer.setConfigProvider(pgConfig))))
     )
 
     const result = await Effect.runPromise(program)
@@ -95,14 +115,19 @@ describe("Native effect module", () => {
 })
 
 describe("Drizzle effect integration", () => {
-  it("Simplify with query builder", async () => {
+  it("Simplify with query builder", { timeout: 5_000 }, async ({ pgConfig }) => {
+    const testDatabaseLayer = Layer.mergeAll(
+      DatabaseLive,
+      Layer.mergeAll(SqlLive, MigratorLive)
+    ).pipe(Layer.provide(Layer.setConfigProvider(pgConfig)))
+
     const add = Effect.fn("add")(function*(item: InferInsertModel<typeof items>) {
       const db = yield* Database
 
       // #start
-      return TODO
+      // return TODO
       // #solution
-      // return yield* db.insert(items).values(item)
+      return yield* db.insert(items).values(item)
       // #end
     })
 
@@ -110,9 +135,9 @@ describe("Drizzle effect integration", () => {
       const db = yield* Database
 
       // #start
-      return TODO
+      // return TODO
       // #solution
-      // return yield* db.select().from(items).where(eq(items.brand, brand))
+      return yield* db.select().from(items).where(eq(items.brand, brand))
       // #end
     })
 
@@ -126,7 +151,7 @@ describe("Drizzle effect integration", () => {
           })
           return yield* findByBrand("NEW BRAND")
         }),
-        Effect.provide(DatabaseLive)
+        Effect.provide(testDatabaseLayer)
       )
 
     const newId = InventoryItemId(crypto.randomUUID())

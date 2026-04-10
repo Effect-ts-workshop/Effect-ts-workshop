@@ -1,0 +1,8 @@
+{
+  "label": "Partie 9 — SQL",
+  "position": 9,
+  "link": {
+    "type": "generated-index",
+    "description": "Accédez à une base de données PostgreSQL avec @effect/sql et intégrez Drizzle ORM dans l'écosystème Effect."
+  }
+}

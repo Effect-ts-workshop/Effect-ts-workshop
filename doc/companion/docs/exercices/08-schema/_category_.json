@@ -1,0 +1,8 @@
+{
+  "label": "Partie 7 — Schema",
+  "position": 8,
+  "link": {
+    "type": "generated-index",
+    "description": "Apprenez à valider, encoder, décoder et générer des données avec le module Schema d'Effect."
+  }
+}

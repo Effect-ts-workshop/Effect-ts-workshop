@@ -251,49 +251,48 @@ describe("Schema", () => {
    └─ is over 9000 !!!`.trim())
   })
   it.skip("can track encoded side, transformation process and type side failures", () => {
-    // Define a transform that can fail at each step
-    // #start
+    // Define persons that will fail at different transformation steps
     const Person = Schema.Struct({
       initials: Schema.transformOrFail(
         Schema.String,
-        Schema.String.pipe(Schema.maxLength(TODO)),
-        TODO
+        Schema.String.pipe(Schema.maxLength(2)),
+        {
+          strict: true,
+          decode: (s, _, ast) =>
+            s.length > 0
+              ? ParseResult.succeed(s)
+              : ParseResult.fail(new ParseResult.Type(ast, s)),
+          encode: ParseResult.succeed
+        }
       )
     })
       .annotations({ identifier: "Person" })
+
+    // #start
+    const failsOnEncondedSide = TODO
+    const failsOnTransformation = TODO
+    const failsOnTypeSide = TODO
     // #solution
-    // const Person = Schema.Struct({
-    //   initials: Schema.transformOrFail(
-    //     Schema.String,
-    //     Schema.String.pipe(Schema.maxLength(2)),
-    //     {
-    //       strict: true,
-    //       decode: (s, _, ast) =>
-    //         s.length > 0
-    //           ? ParseResult.succeed(s)
-    //           : ParseResult.fail(new ParseResult.Type(ast, s)),
-    //       encode: ParseResult.succeed
-    //     }
-    //   )
-    // })
-    //   .annotations({ identifier: "Person" })
+    // const failsOnEncondedSide = { initials: null }
+    // const failsOnTransformation = { initials: "" }
+    // const failsOnTypeSide = { initials: "ACL" }
     // #end
 
-    expect(() => pipe({ initials: null }, Schema.decodeUnknownSync(Person)))
+    expect(() => pipe(failsOnEncondedSide, Schema.decodeUnknownSync(Person)))
       .toThrowError(`Person
 └─ ["initials"]
    └─ (string <-> maxLength(2))
       └─ Encoded side transformation failure
          └─ Expected string, actual null`)
 
-    expect(() => pipe({ initials: "" }, Schema.decodeUnknownSync(Person)))
+    expect(() => pipe(failsOnTransformation, Schema.decodeUnknownSync(Person)))
       .toThrowError(`Person
 └─ ["initials"]
    └─ (string <-> maxLength(2))
       └─ Transformation process failure
          └─ Expected (string <-> maxLength(2)), actual ""`)
 
-    expect(() => pipe({ initials: "ACL" }, Schema.decodeUnknownSync(Person)))
+    expect(() => pipe(failsOnTypeSide, Schema.decodeUnknownSync(Person)))
       .toThrowError(`Person
 └─ ["initials"]
    └─ (string <-> maxLength(2))

@@ -1,22 +1,25 @@
-import { themes as prismThemes } from "prism-react-renderer";
-import type { Config } from "@docusaurus/types";
-import type * as Preset from "@docusaurus/preset-classic";
+import type * as Preset from "@docusaurus/preset-classic"
+import type { Config } from "@docusaurus/types"
+import { themes as prismThemes } from "prism-react-renderer"
 
 const config: Config = {
   title: "Effect-TS Workshop Companion",
   tagline: "Maîtrise Effect-TS par la pratique",
   favicon: "img/favicon.ico",
 
-  url: "https://effect-workshop.github.io",
+  url: "https://effect-ts-workshop.github.io",
   trailingSlash: true,
-  baseUrl: "/",
+  baseUrl: "/Effect-ts-workshop/",
+
+  organizationName: "Effect-ts-workshop",
+  projectName: "Effect-ts-workshop",
 
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
 
   i18n: {
     defaultLocale: "fr",
-    locales: ["fr"],
+    locales: ["fr"]
   },
 
   presets: [
@@ -25,14 +28,14 @@ const config: Config = {
       {
         docs: {
           sidebarPath: "./sidebars.ts",
-          routeBasePath: "/",
+          routeBasePath: "/"
         },
         blog: false,
         theme: {
-          customCss: "./src/css/custom.css",
-        },
-      } satisfies Preset.Options,
-    ],
+          customCss: "./src/css/custom.css"
+        }
+      } satisfies Preset.Options
+    ]
   ],
 
   themeConfig: {
@@ -43,16 +46,16 @@ const config: Config = {
           type: "docSidebar",
           sidebarId: "tutorialSidebar",
           position: "left",
-          label: "Workshop",
-        },
-      ],
+          label: "Workshop"
+        }
+      ]
     },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
-      additionalLanguages: ["typescript"],
-    },
-  } satisfies Preset.ThemeConfig,
-};
+      additionalLanguages: ["typescript"]
+    }
+  } satisfies Preset.ThemeConfig
+}
 
-export default config;
+export default config

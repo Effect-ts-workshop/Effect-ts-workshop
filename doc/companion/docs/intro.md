@@ -1,6 +1,5 @@
 ---
 sidebar_position: 1
-slug: /
 ---
 
 # Bienvenue dans l'atelier Effect-TS
@@ -30,13 +29,13 @@ L'atelier est divisé en **3 grandes sections** :
 
 Cinq parties, chacune introduisant un nouveau concept Effect-TS :
 
-| Partie | Thème | Concepts |
-|--------|-------|---------|
-| 1 | Premiers pas | `Effect.succeed`, `Effect.sleep`, `Effect.runSync` |
-| 2 | Erreurs | `Data.TaggedError`, `Effect.fail`, `Effect.catchTag` |
-| 3 | Contexte | Services, `Layer`, injection de dépendances |
-| 4 | Pattern Matching | `Match`, `Option` |
-| 5 | Générateurs | `pipe`, `Effect.gen`, `Effect.fn` |
+| Partie | Thème            | Concepts                                             |
+| ------ | ---------------- | ---------------------------------------------------- |
+| 1      | Premiers pas     | `Effect.succeed`, `Effect.sleep`, `Effect.runSync`   |
+| 2      | Erreurs          | `Data.TaggedError`, `Effect.fail`, `Effect.catchTag` |
+| 3      | Contexte         | Services, `Layer`, injection de dépendances          |
+| 4      | Pattern Matching | `Match`, `Option`                                    |
+| 5      | Générateurs      | `pipe`, `Effect.gen`, `Effect.fn`                    |
 
 ### 2. La Base de Connaissance
 
@@ -64,11 +63,12 @@ npm run dev            # Lance l'API et l'app
 ```
 
 :::info Services disponibles
+
 - API : http://localhost:3000
 - App : http://localhost:5173
 - Documentation API : http://localhost:3000/docs
 - Traces : http://localhost:9999 (admin@signoz.local / admin123)
-:::
+  :::
 
 ## Conseils avant de commencer
 
@@ -87,10 +87,10 @@ Exactement comme une recette de cuisine n'est pas le plat. La recette décrit ce
 
 ```typescript
 // Ceci ne fait rien — c'est juste une description
-const monEffect = Effect.succeed(42)
+const monEffect = Effect.succeed(42);
 
 // Ceci exécute la description et produit le résultat
-const résultat = Effect.runSync(monEffect) // 42
+const résultat = Effect.runSync(monEffect); // 42
 ```
 
 Cette distinction est fondamentale. Elle permet à Effect de composer des programmes complexes avant de les exécuter.

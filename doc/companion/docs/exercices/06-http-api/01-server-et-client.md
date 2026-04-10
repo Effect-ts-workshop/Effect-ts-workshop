@@ -2,42 +2,48 @@
 sidebar_position: 1
 ---
 
-# Exercices 8 & 11 — HTTP API : serveur et client
+# Exercice 8 — Construire une HTTP API
 
-Ces deux exercices forment une paire. L'exercice 8 vit dans `packages/api` (Node.js), l'exercice 11 dans `packages/app` (navigateur). Ensemble, ils couvrent le cycle complet d'une API Effect : définir, implémenter, tester, puis consommer.
+## Le problème des APIs non-typées
 
-## L'architecture du projet en trois packages
-
-```
-packages/
-├── shared/       ← le contrat (types + schémas + déclaration des endpoints)
-├── api/          ← le serveur Node.js (implémentation des handlers)
-└── app/          ← le client React/Vite (consommation de l'API)
-```
-
-Le package `shared` est la clé de voûte. Il contient la définition `Api` que le serveur et le navigateur importent tous les deux. Changer un endpoint dans `shared` provoque immédiatement une erreur de compilation des deux côtés — c'est le **contrat partagé typé**.
+Dans une API Express classique, le contrat entre le serveur et le client n'existe nulle part dans le code :
 
 ```typescript
-// packages/shared/api.ts
-export const Api = HttpApi.make("Api").add(
-  HttpApiGroup.make("items")
-    .add(HttpApiEndpoint.get("getAllItems", "/items").addSuccess(getAllItemsResponseSchema))
-    .add(HttpApiEndpoint.post("addItem", "/items").setPayload(InventoryItemSchema))
-    // ...
-)
+// Côté serveur — Express
+app.get("/hello", (req, res) => {
+  res.json("Hello, World!")
+})
+
+// Côté client — aucun lien avec le serveur
+const response = await fetch("/hello")
+const data = await response.json() // type : unknown
 ```
 
-## Exercice 8 — côté serveur
+Si le serveur renomme la route ou change le type de retour, le client ne le saura qu'à l'exécution. Pas d'erreur de compilation, pas d'alerte.
 
-### Ce qu'on fait
+## La solution : un contrat partagé
 
-L'exercice 8 est entièrement dans `packages/api`. Il couvre les trois étapes de construction d'une API Effect :
+Effect Platform repose sur une idée simple : **définir l'API une seule fois, s'en servir des deux côtés**.
 
-**Étape 1 — Déclarer le contrat**
+```
+Contrat (HttpApi)
+    ↓             ↓
+Serveur       Client typé
+(handlers)    (HttpApiClient)
+```
 
-Le contrat décrit _ce que l'API expose_, sans aucune logique. C'est un simple objet déclaratif :
+La construction d'une API Effect se fait en **3 étapes**.
+
+---
+
+## Étape 1 — Déclarer le contrat
+
+Le contrat décrit ce que l'API expose. C'est un objet purement déclaratif, sans logique :
 
 ```typescript
+import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform"
+import { Schema } from "effect"
+
 const MyApi = HttpApi.make("MyApi").add(
   HttpApiGroup.make("greet").add(
     HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)
@@ -45,13 +51,26 @@ const MyApi = HttpApi.make("MyApi").add(
 )
 ```
 
-Ce contrat est un **type pur** : il ne fait rien tout seul. Son rôle est de servir de référence partagée entre l'implémentation et le client.
+Décortiquons :
+- `HttpApi.make("MyApi")` — crée l'API nommée `"MyApi"`
+- `HttpApiGroup.make("greet")` — groupe d'endpoints nommé `"greet"`
+- `HttpApiEndpoint.get("sayHello", "/hello")` — endpoint `GET /hello` nommé `"sayHello"`
+- `.addSuccess(Schema.String)` — le type de retour en cas de succès
 
-**Étape 2 — Implémenter les handlers**
+:::info Aucune logique ici
+Le contrat ne fait rien. Il décrit. C'est intentionnel : la séparation entre description et implémentation est le cœur du pattern.
+:::
 
-`HttpApiBuilder.group` relie un groupe d'endpoints à des Effects :
+---
+
+## Étape 2 — Implémenter les handlers
+
+`HttpApiBuilder.group` relie le contrat à des Effects :
 
 ```typescript
+import { HttpApiBuilder } from "@effect/platform"
+import { Effect } from "effect"
+
 const MyApiLive = HttpApiBuilder.group(
   MyApi,
   "greet",
@@ -59,142 +78,251 @@ const MyApiLive = HttpApiBuilder.group(
 )
 ```
 
-Chaque handler est un Effect classique. Il peut `yield*` des services depuis le contexte, retourner des erreurs typées, utiliser des générateurs — toutes les mécaniques vues dans les exercices précédents s'appliquent ici.
+Chaque handler est un Effect classique. Il peut utiliser des services depuis le contexte, retourner des erreurs typées, utiliser des générateurs — toutes les mécaniques des exercices précédents s'appliquent ici.
 
-**Étape 3 — Brancher sur un routeur**
+---
+
+## Étape 3 — Brancher sur un routeur
+
+On assemble tout avec `Layer.provide`, exactement comme dans l'exercice 5 :
 
 ```typescript
+import { HttpLayerRouter } from "@effect/platform"
+import { Layer, pipe } from "effect"
+
 const apiLayer = pipe(
   HttpLayerRouter.addHttpApi(MyApi),
   Layer.provide(MyApiLive)
 )
 ```
 
-On assemble le tout avec `Layer.provide`, exactement comme dans l'exercice 5. L'API devient un `Layer` comme un autre.
+L'API devient un `Layer` comme un autre. Pas encore de serveur démarré — juste une composition déclarative.
 
-### Pourquoi tester sans vrai serveur HTTP ?
+---
 
-`HttpLayerRouter.toWebHandler` transforme le Layer en un simple handler `(Request) => Response` :
+## Tester sans démarrer de serveur
+
+`HttpLayerRouter.toWebHandler` transforme le layer en un simple handler `Request => Response` en mémoire :
 
 ```typescript
-const { handler } = HttpLayerRouter.toWebHandler(apiLayer)
+const { handler, dispose } = HttpLayerRouter.toWebHandler(apiLayer, { disableLogger: true })
+
 const response = await handler(new Request("http://localhost/hello"))
+const body = await response.json()
+// body : "Hello, World!"
 ```
 
-Pas de port à ouvrir, pas de processus à démarrer, pas de race condition dans les tests. Le handler est une fonction pure en mémoire. C'est une technique centrale dans Effect Platform : **les tests unitaires d'API ne nécessitent pas de réseau**.
+Pas de port à ouvrir, pas de processus à démarrer, pas de race condition.
 
-### Pourquoi `HttpApiClient` apparaît déjà dans l'exercice 8 ?
-
-Le deuxième test de l'exercice 8 introduit `HttpApiClient.make` :
+:::info `dispose()` — libérer les ressources
+`toWebHandler` initialise le Layer et acquiert ses ressources. `dispose()` les libère proprement à la fin du test.
 
 ```typescript
+await dispose()
+```
+
+Sans `dispose()`, le process peut rester suspendu et les tests s'interférer entre eux. C'est l'équivalent Effect de "fermer le serveur" — et il est asynchrone, d'où le `await`.
+:::
+
+---
+
+## Vérifier le contrat de bout en bout avec `HttpApiClient`
+
+`HttpApiClient.make` génère automatiquement un client typé à partir du même contrat :
+
+```typescript
+import { FetchHttpClient, HttpApiClient } from "@effect/platform"
+import { Effect, Layer, pipe } from "effect"
+
+// On redirige fetch vers notre handler en mémoire
+const TestHttpClient = FetchHttpClient.layer.pipe(
+  Layer.provide(Layer.succeed(FetchHttpClient.Fetch, (input, init) =>
+    handler(new Request(input as string, init))
+  ))
+)
+
 const program = pipe(
   HttpApiClient.make(MyApi, { baseUrl: "http://localhost" }),
   Effect.flatMap((client) => client.greet.sayHello()),
   Effect.provide(TestHttpClient)
 )
+
+const result = await Effect.runPromise(program)
+// result : "Hello, World!"
 ```
 
-Ce n'est pas encore "le client côté navigateur" — c'est un **test d'intégration qui vérifie que le contrat est cohérent de bout en bout**. On génère un client à partir du même contrat que le serveur, et on vérifie que l'appel retourne bien ce que le handler produit.
+La structure du client reflète le contrat : `client.greet.sayHello()`. Si vous renommez l'endpoint dans `MyApi`, le compilateur signale l'erreur ici **et** côté serveur.
 
-L'objectif est de faire sentir que le contrat `MyApi` est la source de vérité pour les deux côtés, avant de séparer les deux dans des packages distincts.
+:::tip Le contrat = source de vérité unique
+Le même `MyApi` est utilisé pour implémenter les handlers ET pour générer le client. Changer le contrat casse les deux côtés en même temps — c'est la garantie du typage partagé.
+:::
 
 ---
 
-## Exercice 11 — côté client
+## Lien avec l'application finale
 
-### Ce qu'on fait
-
-L'exercice 11 est dans `packages/app`. Le contrat `Api` est maintenant importé depuis `shared` — on ne le redéfinit plus.
-
-**Partie 1 — `HttpApiClient` avec un `FetchHttpClient` mocké**
-
-Le pattern est identique à celui du test 2 de l'exercice 8, mais avec le vrai contrat partagé et un mock `fetch` qui simule les réponses :
+Dans `packages/api/http.ts`, les handlers réels suivent exactement la même structure :
 
 ```typescript
-import { Api } from "shared/api"
+// packages/api/http.ts (simplifié)
+export const itemRoutesLive = HttpApiBuilder.group(Api, "items", (handlers) =>
+  handlers
+    .handle("getAllItems", Effect.fn(function* () {
+      const repo = yield* ItemRepository
+      const items = yield* repo.getAll()
+      return { items }
+    }))
+    // ...
+)
+```
 
-const mockFetch = async (input: RequestInfo | URL): Promise<Response> => {
-  if (input.toString().endsWith("/items")) {
-    return new Response(JSON.stringify({ items: fakeItems }), { status: 200, ... })
-  }
-  // ...
-}
+Le contrat `Api` est défini dans `packages/shared/api.ts` et importé à la fois par le serveur (`packages/api`) et par le client (`packages/app`). Changer un endpoint dans `shared/api.ts` provoque immédiatement une erreur de compilation des deux côtés.
+
+---
+
+## Exercice
+
+Le fichier `packages/api/_exercices/8-api.spec.ts` contient les tests à faire passer.
+
+**Objectif :**
+1. Déclarer un contrat `MyApi` avec un endpoint `GET /hello` qui retourne une `string`.
+2. Implémenter le handler qui retourne `"Hello, World!"`.
+3. Brancher l'implémentation avec `HttpLayerRouter` et `Layer.provide`.
+4. Faire passer le premier test en appelant `handler(new Request(...))`.
+5. Faire passer le second test en utilisant `HttpApiClient.make` avec un `TestHttpClient` mocké.
+
+:::tip Ressources
+
+- [Contexte et Services](../../base-de-connaissance/04-contexte-et-services.md)
+- [Layers](../../base-de-connaissance/05-layers.md)
+
+:::
+
+---
+
+## Indice 1
+
+<details>
+  <summary>La structure du contrat</summary>
+
+```typescript
+import { HttpApi, HttpApiEndpoint, HttpApiGroup } from "@effect/platform"
+import { Schema } from "effect"
+
+const MyApi = HttpApi.make("MyApi").add(
+  HttpApiGroup.make("greet").add(
+    HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)
+  )
+)
+```
+
+</details>
+
+## Indice 2
+
+<details>
+  <summary>L'implémentation avec HttpApiBuilder</summary>
+
+```typescript
+import { HttpApiBuilder } from "@effect/platform"
+import { Effect } from "effect"
+
+const MyApiLive = HttpApiBuilder.group(
+  MyApi,
+  "greet",
+  (handlers) => handlers.handle("sayHello", () => Effect.succeed("Hello, World!"))
+)
+```
+
+Le nom du groupe (`"greet"`) et le nom du handler (`"sayHello"`) doivent correspondre exactement à ce qui est déclaré dans le contrat.
+
+</details>
+
+## Indice 3
+
+<details>
+  <summary>Construire le TestHttpClient</summary>
+
+```typescript
+import { FetchHttpClient } from "@effect/platform"
+import { Layer } from "effect"
 
 const TestHttpClient = FetchHttpClient.layer.pipe(
-  Layer.provide(Layer.succeed(FetchHttpClient.Fetch, mockFetch))
+  Layer.provide(
+    Layer.succeed(
+      FetchHttpClient.Fetch,
+      (input, init) => handler(new Request(input as string, init))
+    )
+  )
+)
+```
+
+Ce layer remplace la fonction `fetch` native par une fonction qui redirige les requêtes vers le `handler` en mémoire.
+
+</details>
+
+## Solution
+
+<details>
+  <summary>Avant de déplier, essayez encore ! Les indices sont là pour vous aider.</summary>
+
+```typescript
+import {
+  FetchHttpClient,
+  HttpApi,
+  HttpApiBuilder,
+  HttpApiClient,
+  HttpApiEndpoint,
+  HttpApiGroup,
+  HttpLayerRouter,
+} from "@effect/platform"
+import { Effect, Layer, pipe, Schema } from "effect"
+
+// 1. Le contrat
+const MyApi = HttpApi.make("MyApi").add(
+  HttpApiGroup.make("greet").add(
+    HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)
+  )
+)
+
+// 2. L'implémentation
+const MyApiLive = HttpApiBuilder.group(
+  MyApi,
+  "greet",
+  (handlers) => handlers.handle("sayHello", () => Effect.succeed("Hello, World!"))
+)
+
+// 3. Le layer de routes
+const apiLayer = pipe(
+  HttpLayerRouter.addHttpApi(MyApi),
+  Layer.provide(MyApiLive)
+) as Layer.Layer<never>
+
+// Test 1 — appel direct via Request
+const { dispose, handler } = HttpLayerRouter.toWebHandler(apiLayer, { disableLogger: true })
+const response = await handler(new Request("http://localhost/hello"))
+const body = await response.json()
+// body === "Hello, World!"
+await dispose()
+
+// Test 2 — client typé via HttpApiClient
+const { dispose: dispose2, handler: handler2 } = HttpLayerRouter.toWebHandler(apiLayer, { disableLogger: true })
+
+const TestHttpClient = FetchHttpClient.layer.pipe(
+  Layer.provide(Layer.succeed(FetchHttpClient.Fetch, (input, init) =>
+    handler2(new Request(input as string, init))
+  ))
 )
 
 const program = pipe(
-  HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
-  Effect.flatMap((client) => client.items.getAllItems()),
+  HttpApiClient.make(MyApi, { baseUrl: "http://localhost" }),
+  Effect.flatMap((client) => client.greet.sayHello()),
   Effect.provide(TestHttpClient)
 )
+
+const result = await Effect.runPromise(program)
+// result === "Hello, World!"
+await dispose2()
 ```
 
-La structure du client reflète celle du contrat : `client.items.getAllItems()`, `client.items.addItem(...)`. Si on renomme un endpoint dans `shared/api.ts`, le compilateur signale l'erreur ici.
-
-**Partie 2 — `AtomHttpApi.Tag`**
-
-Dans l'appli réelle, on n'appelle pas `HttpApiClient.make` directement dans les composants. La librairie `@effect-atom/atom-react` fournit `AtomHttpApi.Tag` qui encapsule le client dans un **Atom réactif** :
-
-```typescript
-// packages/app/src/lib/client.ts
-export class ApiClient extends AtomHttpApi.Tag<ApiClient>()("ApiClient", {
-  api: Api,
-  httpClient: FetchHttpClient.layer,
-  baseUrl: "http://localhost:5173/api"
-}) {}
-```
-
-Ce Tag expose deux méthodes dans les composants React :
-
-```typescript
-// Lecture réactive — se met à jour quand les données changent
-const result = useAtomValue(ApiClient.query("items", "getAllItems", { reactivityKeys: ["items"] }))
-
-// Écriture — déclenche une mutation et invalide les queries avec la même reactivityKey
-const removeItem = useAtomSet(ApiClient.mutation("items", "removeItemById"))
-```
-
-C'est exactement ce qu'on voit dans `packages/app/src/routes/items/index.tsx`.
-
-### Pourquoi cette séparation en deux parties ?
-
-La partie 1 isole la mécanique pure de `HttpApiClient` : on apprend à construire un client typé, à fournir un transport (`FetchHttpClient`), à intercepter les appels dans les tests. Pas de React, pas d'Atom — juste un Effect.
-
-La partie 2 montre comment cette mécanique s'intègre dans une interface React. `AtomHttpApi.Tag` n'est pas une abstraction magique : c'est exactement `HttpApiClient` + un Atom de `@effect-atom/atom-react` qui gère le cycle de vie (loading, success, error, invalidation).
-
----
-
-## Pourquoi ces deux exercices sont séparés dans le temps
-
-On aurait pu tout mettre dans un seul exercice. On ne l'a pas fait pour trois raisons :
-
-**1. Les contextes d'exécution sont différents.**
-L'exercice 8 tourne dans Node.js (`packages/api`). L'exercice 11 tourne dans `jsdom` (`packages/app`, environnement de test navigateur). Les outils de test, les imports, les comportements par défaut diffèrent. Les mélanger dans le même fichier crée de la confusion.
-
-**2. La progression pédagogique.**
-Entre les exercices 8 et 11, il y a les exercices 9 (SQL/Drizzle) et 10 (Atom). L'exercice 11 réutilise ce qu'on a appris dans ces deux exercices : le repository pattern (exercice 9) alimente les données retournées par l'API, et `useAtomValue` (exercice 10) est le hook qu'on utilise pour consommer le client.
-
-**3. Refléter la réalité d'un projet.**
-Dans un vrai projet Effect fullstack, l'équipe backend et l'équipe frontend n'écrivent pas le même code en même temps. Le contrat dans `shared` est le point de synchronisation. Faire les exercices dans deux packages différents — avec un import `from "shared/api"` au milieu — reproduit cette dynamique.
-
----
-
-## Récapitulatif
-
-| | Exercice 8 | Exercice 11 |
-|---|---|---|
-| Package | `packages/api` | `packages/app` |
-| Environnement | Node.js | Navigateur (jsdom) |
-| Contrat | Défini localement (`MyApi`) | Importé depuis `shared/api` |
-| Rôle | Définir + implémenter + tester le serveur | Consommer l'API depuis le front |
-| Abstraction testée | `HttpLayerRouter.toWebHandler` | `HttpApiClient` + `AtomHttpApi.Tag` |
-| Lien avec l'appli | `packages/api/http.ts` | `packages/app/src/lib/client.ts` |
-
-:::tip Le fil conducteur
-`HttpApi` → `HttpApiBuilder` → `HttpLayerRouter` (exercice 8) sont des briques serveur.
-`HttpApiClient` → `AtomHttpApi.Tag` (exercice 11) sont des briques client.
-Le contrat dans `shared/api.ts` est la colle qui garantit que les deux parlent le même langage.
-:::
+</details>

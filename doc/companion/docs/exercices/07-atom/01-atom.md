@@ -4,7 +4,23 @@ sidebar_position: 1
 
 # Exercice 11 — Atom
 
-## Pourquoi Atom ?
+## Le problème du state partagé
+
+Dans une application React, `useState` gère l'état local d'un composant. Mais que se passe-t-il quand deux composants ont besoin du même état ?
+
+```typescript
+// Composant A
+const [count, setCount] = useState(0)
+
+// Composant B — aucun lien avec A
+const [count, setCount] = useState(0) // copie indépendante !
+```
+
+On remonte l'état au parent commun ("lifting state up"), ce qui crée du prop drilling. Et pour les données asynchrones (requête API, base de données), `useState` ne gère pas les états `loading / success / error` proprement — on finit avec trois variables séparées et des `useEffect` fragiles.
+
+## La solution : les Atoms
+
+Un **Atom** est une unité de state réactive indépendante des composants. N'importe quel composant peut lire ou modifier un Atom, et tous les abonnés se mettent à jour automatiquement.
 
 Dans l'exercice 10, vous avez utilisé `ApiClient.query(...)` et lu le résultat avec `useAtomValue`. Sous le capot, `ApiClient` crée automatiquement des **Atoms** pour chaque endpoint.
 

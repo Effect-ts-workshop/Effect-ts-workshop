@@ -14,7 +14,32 @@ docker compose up -d
 
 :::
 
-## L'approche Effect pour les bases de données
+## Le problème de l'accès SQL classique
+
+Voici une requête typique sans Effect :
+
+```typescript
+import { Pool } from "pg"
+
+const pool = new Pool({ connectionString: "..." })
+
+async function getAllItems() {
+  const client = await pool.connect()
+  try {
+    const result = await client.query("SELECT * FROM items")
+    return result.rows // type : any[]
+  } finally {
+    client.release() // facile à oublier → fuite de connexion
+  }
+}
+```
+
+Trois problèmes :
+- Le `client.release()` est **facile à oublier** — une fuite de connexion silencieuse
+- Le type de retour est `any[]` — aucun typage des colonnes, aucune garantie à la compilation
+- Les erreurs sont des exceptions non typées, impossibles à distinguer avec `catchTag`
+
+## La solution : SQL comme un Effect
 
 Effect propose deux niveaux d'abstraction pour accéder à une base de données SQL :
 

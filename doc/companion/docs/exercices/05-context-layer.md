@@ -1,0 +1,337 @@
+---
+sidebar_position: 5
+---
+
+# Exercice 5 — Context et Layer
+
+Une fonction qui fait une requête HTTP dépend d'un client HTTP. En TypeScript classique, cette dépendance est soit une variable globale (difficile à tester), soit un paramètre en plus (bruyant à propager).
+
+Effect résout ça avec le troisième paramètre de type : le `Context`. Une fonction déclare ce dont elle a besoin, Effect le fournit automatiquement.
+
+Fichier à compléter : `packages/api/_exercices/5-context-layer.spec.ts`
+
+---
+
+## Utiliser un service depuis le contexte
+
+`HttpClient.HttpClient` est un service fourni par Effect. Pour l'utiliser, il suffit de le "demander" dans un `pipe` :
+
+```typescript
+pipe(
+  HttpClient.HttpClient,               // demande le service
+  Effect.flatMap((client) =>           // reçoit le client
+    client.get("https://...")          // l'utilise
+  )
+)
+// Type : Effect<Response, ..., HttpClient.HttpClient>
+//                                     ^
+//               HttpClient est dans les requirements
+```
+
+Le type `Effect<Response, ..., HttpClient.HttpClient>` signifie : _"pour s'exécuter, ce programme a besoin d'un HttpClient"_.
+
+On fournit le service au moment de l'exécution :
+
+```typescript
+pipe(fetchJoke(), Effect.provide(NodeHttpClient.layer))
+// Effect<Joke, never, never> ← requirement satisfait
+```
+
+### Exercice
+
+Complétez `fetchJoke` pour récupérer une blague depuis `https://api.chucknorris.io/jokes/random` :
+
+```typescript
+const fetchJoke = () =>
+  pipe(
+    ???, // À compléter : demander HttpClient, appeler .get(), parser le JSON, caster en Joke
+    Effect.orElseSucceed((): Joke => ({ url: "http://fake.fr", value: "No jokes today" }))
+  )
+```
+
+À vous de jouer !
+
+:::tip Ressources
+
+- [Contexte et Services](../base-de-connaissance/04-contexte-et-services.md)
+- [Layers](../base-de-connaissance/05-layers.md)
+
+:::
+
+#### Indice 1
+
+<details>
+  <summary>Enchaîner les étapes avec `flatMap`</summary>
+
+Chaque étape renvoie un `Effect`. Il faut les enchaîner :
+
+1. `HttpClient.HttpClient` → le client
+2. `client.get(url)` → la response
+3. `response.json` → le JSON parsé
+4. `Effect.map` pour caster en `Joke`
+
+</details>
+
+#### Indice 2
+
+<details>
+  <summary>Squelette complet</summary>
+
+```typescript
+pipe(
+  HttpClient.HttpClient,
+  Effect.flatMap((client) => client.get("https://api.chucknorris.io/jokes/random")),
+  Effect.flatMap((response) => response.json),
+  Effect.map((joke) => joke as Joke),
+  Effect.orElseSucceed((): Joke => ({ url: "http://fake.fr", value: "No jokes today" }))
+)
+```
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+```typescript
+const fetchJoke = () =>
+  pipe(
+    HttpClient.HttpClient,
+    Effect.flatMap((client) => client.get("https://api.chucknorris.io/jokes/random")),
+    Effect.flatMap((response) => response.json),
+    Effect.map((joke) => joke as Joke),
+    Effect.orElseSucceed((): Joke => ({ url: "http://fake.fr", value: "No jokes today" }))
+  )
+```
+
+</details>
+
+---
+
+## `Context.GenericTag` — créer son propre service
+
+Pour définir un service maison, on crée un `Tag` — un identifiant unique qui permet à Effect de trouver l'implémentation dans le contexte :
+
+```typescript
+type JokeService = {
+  getRandom: () => Effect.Effect<string>
+}
+
+const JokeService = Context.GenericTag<JokeService>("JokeService")
+```
+
+On fournit ensuite une implémentation avec `Layer.succeed` :
+
+```typescript
+const JokeServiceLive = Layer.succeed(JokeService, {
+  getRandom: () => Effect.succeed("Une blague du serveur")
+})
+
+const JokeServiceTest = Layer.succeed(JokeService, {
+  getRandom: () => Effect.succeed("Une blague de test prévisible")
+})
+```
+
+Et on utilise le service comme n'importe quel service Effect :
+
+```typescript
+pipe(JokeService, Effect.flatMap((jokes) => jokes.getRandom()))
+```
+
+### Exercice
+
+Créez `JokeService`, `JokeServiceTest` et `JokeServiceLive` :
+
+```typescript
+type JokeService = { getRandom: () => Effect.Effect<string> }
+
+const JokeService = ??? // À compléter
+
+const JokeServiceTest = Layer.succeed(
+  JokeService,
+  ??? // À compléter : renvoie "Not really random for tests"
+)
+
+const JokeServiceLive = Layer.succeed(
+  JokeService,
+  ??? // À compléter : renvoie "Amazing joke from server"
+)
+```
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>La signature de `Context.GenericTag`</summary>
+
+```typescript
+Context.GenericTag<TypeDuService>("IdentifiantUnique")
+```
+
+L'identifiant est une string unique dans l'application — par convention, le nom du service.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+```typescript
+const JokeService = Context.GenericTag<JokeService>("JokeService")
+
+const JokeServiceTest = Layer.succeed(JokeService, {
+  getRandom: () => Effect.succeed("Not really random for tests")
+})
+
+const JokeServiceLive = Layer.succeed(JokeService, {
+  getRandom: () => Effect.succeed("Amazing joke from server")
+})
+```
+
+</details>
+
+---
+
+## `Effect.Service` — la forme simplifiée
+
+`Context.GenericTag` + `Layer.succeed` fonctionne, mais c'est verbeux. `Effect.Service` est la forme moderne qui regroupe tout en une classe :
+
+```typescript
+class JokeService extends Effect.Service<JokeService>()("JokeService", {
+  effect: pipe(
+    HttpClient.HttpClient,
+    Effect.map((client) => ({
+      getRandom: () =>
+        pipe(
+          client.get("https://api.chucknorris.io/jokes/random"),
+          Effect.flatMap((r) => r.json),
+          Effect.map((joke) => (joke as { value: string }).value),
+          Effect.orElseSucceed(() => "No jokes for today")
+        )
+    }))
+  ),
+  dependencies: [NodeHttpClient.layer]
+}) {}
+```
+
+`JokeService.Default` est un `Layer` prêt à l'emploi.
+
+### Exercice
+
+Réécrivez `JokeService` avec `Effect.Service` :
+
+```typescript
+const JokeService = ??? // À compléter avec Effect.Service
+```
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>La structure `Effect.Service`</summary>
+
+```typescript
+class MonService extends Effect.Service<MonService>()("MonService", {
+  effect: pipe(
+    // les dépendances dont l'implémentation a besoin
+    AutreService,
+    Effect.map((dep) => ({
+      methode: () => dep.faireTruc()
+    }))
+  ),
+  dependencies: [AutreService.Default]
+}) {}
+```
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+```typescript
+class JokeService extends Effect.Service<JokeService>()("JokeService", {
+  effect: pipe(
+    HttpClient.HttpClient,
+    Effect.map((client) => ({
+      getRandom: () =>
+        pipe(
+          client.get("https://api.chucknorris.io/jokes/random"),
+          Effect.flatMap((response) => response.json),
+          Effect.map((joke) => (joke as { value: string }).value),
+          Effect.orElseSucceed(() => "No jokes for today")
+        )
+    }))
+  ),
+  dependencies: [NodeHttpClient.layer]
+}) {}
+```
+
+</details>
+
+---
+
+## `Layer.mock` — tester sans dépendances réelles
+
+Pour tester un service qui dépend d'un autre, `Layer.mock` permet de remplacer une dépendance par un double de test — sans modifier l'implémentation :
+
+```typescript
+const ClientTest = Layer.mock(
+  HttpClient.HttpClient,
+  {
+    get: () => Effect.fail(undefined) // simule une erreur réseau
+  } as any
+)
+
+// On fournit le mock à la couche qui en dépend
+const JokeServiceTest = pipe(
+  JokeService.DefaultWithoutDependencies,
+  Layer.provide(ClientTest)
+)
+```
+
+`DefaultWithoutDependencies` est la version du layer _sans_ ses dépendances déclarées — utile pour les substituer manuellement en tests.
+
+### Exercice
+
+Créez `JokeServiceTest` avec un `HttpClient` qui échoue toujours — le `orElseSucceed` de `JokeService` devra renvoyer `"No jokes for today"` :
+
+```typescript
+const JokeServiceTest = ??? // À compléter
+```
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>Deux étapes</summary>
+
+1. Créez un `ClientTest` avec `Layer.mock(HttpClient.HttpClient, { get: () => Effect.fail(undefined) } as any)`
+2. Combinez-le avec `JokeService.DefaultWithoutDependencies` via `Layer.provide`
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+```typescript
+const ClientTest = Layer.mock(
+  HttpClient.HttpClient,
+  { get: () => Effect.fail(undefined) } as any
+)
+
+const JokeServiceTest = pipe(
+  JokeService.DefaultWithoutDependencies,
+  Layer.provide(ClientTest)
+)
+```
+
+</details>

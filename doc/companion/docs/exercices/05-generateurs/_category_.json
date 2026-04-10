@@ -1,8 +1,0 @@
-{
-  "label": "Partie 5 — Générateurs",
-  "position": 5,
-  "link": {
-    "type": "generated-index",
-    "description": "Maîtrisez pipe, Effect.gen et Effect.fn pour écrire du code Effect lisible et composable."
-  }
-}

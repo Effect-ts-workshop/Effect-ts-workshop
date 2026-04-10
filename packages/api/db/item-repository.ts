@@ -47,7 +47,8 @@ export class ItemRepository extends Effect.Service<ItemRepository>()("app/ItemRe
 // })
 
 // const totot = (): Effect.Effect<S["Type"], never, S["Context"] | S["insert"]["Context"]> =>
-//   findAllSchema({}).pipe(
+//   pipe(
+//     findAllSchema({}),
 //     Effect.orDie,
 //     Effect.withSpan(`${options.spanPrefix}.insert`, {
 //       captureStackTrace: false,

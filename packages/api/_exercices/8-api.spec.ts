@@ -1,5 +1,4 @@
 import {
-  // FetchHttpClient,
   HttpApi,
   HttpApiBuilder,
   HttpApiClient,
@@ -9,6 +8,8 @@ import {
 } from "@effect/platform"
 import { Effect, Layer, pipe, Schema } from "effect"
 import { describe, expect, it } from "vitest"
+
+const TODO: any = {}
 
 describe("Api  Effect - serveur", () => {
   // 1. Le contrat : une route GET /hello qui retourne une string
@@ -32,15 +33,17 @@ describe("Api  Effect - serveur", () => {
   ) as Layer.Layer<never>
 
   it("HttpApiClient pour appeler l'API de façon typée", async () => {
-    // #start
     const { dispose, handler } = HttpLayerRouter.toWebHandler(apiLayer, { disableLogger: true })
 
+    // #start
     const TestHttpClient = TODO
     // #solution
-    // const TestHttpClient = FetchHttpClient.layer.pipe(
+    // const TestHttpClient = pipe(
+    //   FetchHttpClient.layer,
     //   Layer.provide(Layer.succeed(FetchHttpClient.Fetch, (input, init) => handler(new Request(input as string, init))))
     // )
     // #end
+
     const program = pipe(
       HttpApiClient.make(MyApi, { baseUrl: "http://localhost" }),
       Effect.flatMap((client) => client.greet.sayHello()),

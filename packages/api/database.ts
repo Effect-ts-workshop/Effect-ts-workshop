@@ -1,22 +1,12 @@
 import { PgClient } from "@effect/sql-pg"
-import { Config, Redacted, String } from "effect"
+import { Config, pipe, Redacted, String } from "effect"
 
 export const pgConfig = {
-  host: Config.string("DB_HOST").pipe(
-    Config.withDefault("localhost")
-  ),
-  port: Config.number("DB_PORT").pipe(
-    Config.withDefault(5433)
-  ),
-  database: Config.string("DB_NAME").pipe(
-    Config.withDefault("effect-workshop")
-  ),
-  username: Config.string("DB_USER").pipe(
-    Config.withDefault("effect-workshop")
-  ),
-  password: Config.redacted("DB_PASSWORD").pipe(
-    Config.withDefault(Redacted.make("effect-workshop"))
-  ),
+  host: pipe(Config.string("DB_HOST"), Config.withDefault("localhost")),
+  port: pipe(Config.number("DB_PORT"), Config.withDefault(5433)),
+  database: pipe(Config.string("DB_NAME"), Config.withDefault("effect-workshop")),
+  username: pipe(Config.string("DB_USER"), Config.withDefault("effect-workshop")),
+  password: pipe(Config.redacted("DB_PASSWORD"), Config.withDefault(Redacted.make("effect-workshop"))),
   transformQueryNames: Config.succeed(String.camelToSnake),
   transformResultNames: Config.succeed(String.snakeToCamel)
 }

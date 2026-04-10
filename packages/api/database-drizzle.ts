@@ -21,7 +21,8 @@ export const SqlDrizzleLive = PgClient.layerConfig({
 })
 
 // Create the DB effect with default services
-const dbEffect = PgDrizzle.make({ casing: "snake_case", relations: defineRelations({ items }) }).pipe(
+const dbEffect = pipe(
+  PgDrizzle.make({ casing: "snake_case", relations: defineRelations({ items }) }),
   Effect.provide(PgDrizzle.DefaultServices)
 )
 

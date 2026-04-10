@@ -241,7 +241,10 @@ describe("Schema", () => {
       .annotations({ identifier: "Person" })
     // #solution
     // const Person = Schema.Struct({
-    //   strength: Schema.Number.pipe(Schema.lessThanOrEqualTo(9000, { message: () => "is over 9000 !!!" }))
+    //   strength: pipe(
+    //     Schema.Number,
+    //     Schema.lessThanOrEqualTo(9000, { message: () => "is over 9000 !!!" })
+    //   )
     // })
     //   .annotations({ identifier: "Person" })
     // #end

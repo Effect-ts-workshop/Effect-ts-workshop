@@ -51,9 +51,7 @@ const mockFetch = async (input: RequestInfo | URL): Promise<Response> => {
 }
 
 // Même mécanique que dans l'exercice 8 (test 2), mais ici on est côté navigateur.
-const TestHttpClient = FetchHttpClient.layer.pipe(
-  Layer.provide(Layer.succeed(FetchHttpClient.Fetch, mockFetch))
-)
+const TestHttpClient = pipe(FetchHttpClient.layer, Layer.provide(Layer.succeed(FetchHttpClient.Fetch, mockFetch)))
 
 // ─── Partie 1 : HttpApiClient ─────────────────────────────────────────────────
 //

@@ -3,7 +3,8 @@ import { Brand, pipe, Schema } from "effect"
 export type InventoryItemId = string & Brand.Brand<"inventory_item_id">
 export const InventoryItemId = Brand.nominal<InventoryItemId>()
 
-export const InventoryItemIdSchema = Schema.UUID.pipe(
+export const InventoryItemIdSchema = pipe(
+  Schema.UUID,
   Schema.fromBrand(InventoryItemId, {
     jsonSchema: {
       format: "uuid"

@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest"
 const TODO: any = {}
 
 describe("Api  Effect - serveur", () => {
-  // 1. Le contrat : une route GET /hello qui retourne une string
+  // 1. Le contrat : une route GET /hello qui retourne une string À créer en test
   const MyApi = HttpApi.make("MyApi").add(
     HttpApiGroup.make("greet").add(
       HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)

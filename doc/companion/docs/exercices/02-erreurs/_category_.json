@@ -1,8 +1,0 @@
-{
-  "label": "Partie 2 — Erreurs",
-  "position": 2,
-  "link": {
-    "type": "generated-index",
-    "description": "Apprenez à modéliser, propager et récupérer des erreurs de façon typée avec le Railway Pattern."
-  }
-}

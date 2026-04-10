@@ -1,115 +1,440 @@
-Write the documentation like the best programming teachers in the world.
-The reader should never feel lost.
-Every concept must feel obvious after reading.
+# Plan — Effect-ts Workshop Companion
 
-You are an expert technical writer, educator, and documentation architect specializing in high-quality developer documentation.
+> Document de référence pour la rédaction du companion. À consulter avant d'écrire chaque page d'exercice.
 
-Your task is to generate a Effect-TS workshop.
-The final result is a fullstack app with an api and an app (can see the expected output code here `/packages`)
-You need to break the output into exercices structured for learning, using strong pedagogy and "baby steps".
-Only focus on Effect-TS and skip informations about others library like `@tanstack/react-router` or `@radix-ui`.
+---
 
-You can start from this plan
+## 1. Vision du workshop
 
+**Public cible** : développeurs TypeScript ayant les bases du langage, curieux de découvrir Effect-ts.
+
+**Promesse** : à la fin de ce workshop, les participants savent modéliser des programmes asynchrones, faillibles et testables avec Effect. Ils ne repartent pas avec une liste d'API mémorisées — ils repartent avec un _modèle mental_.
+
+**Fil conducteur** : chaque exercice construit sur le précédent. On ne fait jamais un saut sans avoir posé les marches.
+
+---
+
+## 2. Règles d'écriture — à respecter absolument
+
+### Langue
+
+- Le companion est **en français**.
+- Les termes techniques anglais ne se traduisent **jamais** : `pipe`, `curried function`, `Effect`, `map`, `flatMap`, `promise`, `generator`, `schema`, `layer`, `context`, `fiber`…
+- On ne dit pas "tuyau" pour `pipe`. On dit `pipe`.
+
+### Syntaxe de code
+
+- **Toujours** `pipe(value, fn1, fn2)` — jamais `value.pipe(fn1, fn2)`.
+- Les imports sont toujours montrés quand ils éclairent le lecteur.
+- Les `TODO` dans les spec sont le point de départ, pas à copier-coller dans la doc.
+
+### Ton
+
+- **Conversationnel et bienveillant.** On parle à un collègue curieux, pas à un étudiant qui doit mémoriser.
+- On pose la question que le lecteur se pose avant qu'il la pose.
+- On montre le problème _avant_ la solution. Le lecteur doit ressentir la douleur avant d'apprécier le remède.
+- Phrases courtes. Pas de jargon gratuit.
+- "À vous de jouer !" pour lancer l'exercice — jamais plus tôt.
+
+### Pédagogie
+
+- **Concept d'abord, API ensuite.** On n'introduit pas `Effect.flatMap` sans avoir expliqué pourquoi `Effect.map` ne suffit pas.
+- Les indices sont **progressifs** : chaque indice donne un petit pas, pas la solution complète.
+- La solution est toujours dans un `<details>` avec l'invite de solliciter un formateur d'abord.
+- On ne donne jamais plus d'une notion par exercice. Si un exercice couvre deux notions, on les sépare en deux sections claires.
+
+---
+
+## 3. Structure type d'un exercice
+
+```markdown
+---
+sidebar_position: N
+---
+
+# Exercice N — [Titre court]
+
+[1-2 phrases qui remettent en contexte : d'où on vient, où on va.]
+
+## [Titre du concept]
+
+[Explication du problème que ce concept résout — avec un exemple concret qui fait "ah oui, j'ai déjà eu ce problème".]
+
+```ts
+// exemple minimal qui montre le problème
 ```
-# Exercices
 
-1.  La syntaxe / S’entrainer au passage de TypeScript classique vers Effect.ts
+[Explication de la solution conceptuelle en 2-3 phrases.]
 
-### Bases
-
-1. On n’utilise pas les erreurs et le contexte TS
-    - Sync => Add
-    - Async => Delay
-    - Pourquoi ?
-        - Combinaison pour afficher traces
-2. Erreurs (Railway pattern)
-    - Sync => Divide
-    - Async => Fetch
-    - CatchTag / CatchTags
-    - promise() instead of tryPromise() ⇒ CatchAll
-        - Permet d’introduire error vs defect
-3. Contexte
-    - Use interface HttpClient.HttpClient
-    - Provide implementation
-4. Pattern Matching
-5. Generators
-    - pipe (become a plumber / Image de Mario)
-    - curry 🇮🇳
-    - dual API
-    - Do notation
-    - Effect fn/gen
-        - yield errors ⇒ Data.Error
+```ts
+// exemple minimal qui montre la solution
 ```
 
-The ultimate goal is to reuse the ouput of previous exercices to grow in complexity until the end with a fully functional fullstack app
+## Exercice
 
-The documentation must be written so that a beginner with minimal prior knowledge can progressively learn the topic.
+[Ce qu'on attend du participant — fichier(s) à modifier, résultat attendu.]
 
-Follow these core teaching principles:
+À vous de jouer !
 
-PEDAGOGY RULES
+:::tip Ressources
 
-- Teach concepts progressively from simple to advanced.
-- Use baby steps: introduce only ONE new concept at a time.
-- Every section must include:
-  - Concept explanation
-  - Why it matters
-  - Visual mental model or analogy when possible
-  - Step-by-step instructions
-  - Small working example
-  - Expected result
-- Avoid knowledge jumps.
-- Assume the reader forgets everything quickly and needs repetition and reinforcement.
+- [Lien vers doc Effect pertinente]
 
-TEACHING STYLE
+:::
 
-Read all the content from the folder `/doc/example-companion` and keep the teaching style
+## Indice 1
 
-Mandatory rules :
+<details>
+  <summary>[Question / titre qui oriente sans spoiler]</summary>
 
-1. 3 sections (Intro / Exercices / Knowledge base)
-2. Each exercice is clearly explain with link to knowledge base
-3. Each exercice as hidden solution a the end + some hint before to avoid open solution
+  [Texte + éventuellement un extrait de code qui met sur la piste]
 
-CONTENT STYLE
+</details>
 
-Use:
+## Indice 2 (si nécessaire)
 
-- french language
-- short paragraphs
-- numbered steps
-- callout blocks (tip, warning, info)
-- progressive difficulty
+<details>
+  <summary>[...]</summary>
 
-BEGINNER FRIENDLINESS
+  [...]
 
-Assume the reader:
+</details>
 
-- may be new to programming
-- needs reassurance and clarity
+## Solution
 
-Therefore:
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
-- define every technical term
-- never skip steps
-- explain commands
-- explain file structures
+```ts
+// solution complète et commentée si nécessaire
+```
 
-Exercice Documentation  
-In the “docs” section of the “exercises” folder, could you write up the documentation to contribute to our workshop guide (Docusaurus site) please? Please, first read and follow all the context I gave you upper. The goal is to be a companion for our student, to discover the exercice, the goal of it and learn by baby steps.  
-In terms of structure, I want it to be the same as what we did for a previous workshop—namely, a title, a description of the clues, the solution and link to the principal concepts of Effect.ts and exemple of code in packages folder, you could find the current documentation in the folder /base-de-connaissance. For now, you won’t be able to complete everything—that’s okay (some exercices are in progress). Here’s the URL for the previous workshop: https://typescript-workshop.github.io/typescript-workshop-companion/docs/atelier/selectionner-tous-les-champs/
-Create an .md file for each exercises; one exercise = one test file, which you’ll find in @packages/api/\_exercises and @packages/app/\_exercises
-Please tell me at the end the point that are missing in base documentation. The ton I want is reassurance, clarity and short.
+</details>
+```
 
-OUTPUT FORMAT
+---
 
-Return:
+## 4. Plan de contenu — Exercice 1 : Les bases
 
-1. Output dir `/doc/companion`
-2. Markdown files to be used in Docusaurus
-3. Clear progression between pages
+> Fichier source : `packages/api/_exercices/1-base.spec.ts`
 
-The documentation must feel like a guided course rather than a reference manual.
+Cet exercice est la fondation de tout le reste. On y introduit deux idées indépendantes : la composition de fonctions avec `pipe`, et la représentation d'effets avec `Effect`. Ces deux idées s'assemblent dès l'exercice suivant — il faut donc que les deux soient solides à la fin.
 
-Make it extremely clear, structured, and beginner friendly.
+---
+
+### Section A — FP utils
+
+#### A1 · `pipe`
+
+**Concept à expliquer :**
+
+Le problème classique de l'imbrication de fonctions qui se lit de droite à gauche :
+
+```ts
+// Difficile à lire : on lit de droite à gauche
+const result = multiply(add(4, 6), 4)
+```
+
+`pipe` permet d'écrire la même chose dans l'ordre de lecture naturel :
+
+```ts
+const result = pipe(
+  add(4, 6),
+  (a) => multiply(a, 4)
+)
+```
+
+**Ce que le participant doit faire :**
+
+Compléter le `pipe` en ajoutant la transformation `multiply(a, 4)` sur le résultat de `add(4, 6)`.
+
+**Indice 1** — *Que fait-on du résultat de `add(4, 6)` ?*
+`pipe` passe le résultat de chaque étape à la suivante. La première étape produit `10`. Il faut une fonction qui prend `10` et renvoie `40`.
+
+**Solution :**
+```ts
+const result = pipe(
+  add(4, 6),
+  (a) => multiply(a, 4)
+)
+```
+
+---
+
+#### A2 · `pipe` avec des curried functions
+
+**Concept à expliquer :**
+
+Une `curried function` est une fonction qui, au lieu de prendre tous ses arguments d'un coup, les prend un par un et renvoie une fonction intermédiaire :
+
+```ts
+// Fonction normale
+const add = (a: number, b: number) => a + b
+
+// Curried
+const add = (a: number) => (b: number) => a + b
+```
+
+L'intérêt : `add(6)` renvoie une fonction `(b: number) => 6 + b` — une fonction qu'on peut passer directement à `pipe`.
+
+```ts
+const result = pipe(
+  4,
+  add(6),   // (b) => 6 + b  →  renvoie 10
+  multiply(4) // (b) => 4 * b  →  renvoie 40
+)
+```
+
+**Ce que le participant doit faire :**
+
+Compléter le `pipe` en ajoutant `multiply(4)` après `add(6)`.
+
+**Indice 1** — *`add(6)` est une fonction, pas un nombre*
+`add(6)` renvoie une fonction. `pipe` va l'appeler avec le résultat de l'étape précédente (`10`). Il suffit de faire la même chose avec `multiply`.
+
+**Solution :**
+```ts
+const result = pipe(
+  4,
+  add(6),
+  multiply(4)
+)
+```
+
+---
+
+### Section B — Effect basics
+
+**Intro de section à écrire :**
+
+Avant de coder, une minute pour comprendre _pourquoi_ Effect existe.
+
+En JavaScript, une fonction peut :
+- renvoyer une valeur
+- lancer une exception
+- déclencher une opération asynchrone
+- avoir des effets de bord
+
+Le problème : rien dans la signature de la fonction ne le dit. Une fonction `async` qui peut lancer une erreur est typée `Promise<T>` — l'erreur est invisible.
+
+Effect résout ça en rendant tout explicite dans le type :
+
+```ts
+Effect<Value, Error, Requirements>
+//       ^       ^          ^
+//   ce qu'on   ce qui    ce dont on
+//   obtient    peut      a besoin
+//              rater
+```
+
+Un `Effect` est une **description** d'un programme. Il ne s'exécute pas tout seul — on le lance explicitement avec `Effect.runSync`, `Effect.runPromise`, etc.
+
+---
+
+#### B1 · `Effect.succeed`
+
+**Concept à expliquer :**
+
+La brique de base : envelopper une valeur dans un `Effect` pour qu'elle entre dans le monde Effect.
+
+```ts
+const result: Effect.Effect<number> = Effect.succeed(42)
+```
+
+Ce n'est pas "juste un wrapper" — c'est la façon de dire "ce programme, quand il s'exécute, produit 42 sans risque d'erreur".
+
+**Ce que le participant doit faire :**
+
+La fonction `add` renvoie la somme, mais la signature attend un `Effect.Effect<number>`. Il faut envelopper le résultat avec `Effect.succeed`.
+
+**Indice 1** — *Quand une fonction renvoie un `Effect`*
+`Effect.succeed` prend une valeur et renvoie un `Effect` qui contient cette valeur. C'est l'équivalent de `Promise.resolve` mais pour Effect.
+
+**Solution :**
+```ts
+const add = (a: number, b: number): Effect.Effect<number> => {
+  const result = a + b
+  return Effect.succeed(result)
+}
+```
+
+---
+
+#### B2 · `Effect.map`
+
+**Concept à expliquer :**
+
+On a un `Effect<number>` et on veut transformer la valeur à l'intérieur sans "sortir" de l'Effect. C'est exactement ce que fait `map`.
+
+```ts
+// Sans Effect
+const double = (n: number) => n * 2
+double(5) // 10
+
+// Avec Effect
+pipe(
+  Effect.succeed(5),
+  Effect.map((n) => n * 2)
+) // Effect.Effect<number> qui contient 10
+```
+
+`Effect.map` ne déclenche pas l'exécution. Il construit une nouvelle description.
+
+**Ce que le participant doit faire :**
+
+Transformer l'`Effect.succeed(2)` avec `add(8)` en utilisant `Effect.map`.
+
+**Indice 1** — *`add` est déjà une curried function*
+`add(8)` renvoie une fonction `(b: number) => 8 + b`. C'est exactement ce qu'attend `Effect.map` : une fonction qui transforme la valeur.
+
+**Solution :**
+```ts
+const result = pipe(
+  Effect.succeed(2),
+  Effect.map(add(8))
+)
+```
+
+---
+
+#### B3 · `Effect.flatMap`
+
+**Concept à expliquer :**
+
+Que se passe-t-il si la fonction de transformation renvoie elle-même un `Effect` ?
+
+```ts
+const add = (a: number) => (b: number) => Effect.succeed(a + b)
+
+pipe(
+  Effect.succeed(2),
+  Effect.map(add(8)) // ← renvoie Effect.Effect<Effect.Effect<number>> !
+)
+```
+
+On se retrouve avec un `Effect` imbriqué dans un autre `Effect`. `flatMap` règle ça : il applique la transformation _et_ aplatit le résultat.
+
+```ts
+pipe(
+  Effect.succeed(2),
+  Effect.flatMap(add(8)) // ← Effect.Effect<number> ✓
+)
+```
+
+Règle mnémotechnique : si la fonction passée renvoie un `Effect`, utilise `flatMap`. Si elle renvoie une valeur simple, utilise `map`.
+
+**Ce que le participant doit faire :**
+
+Remplacer `map` par `flatMap` puisque `add` renvoie maintenant un `Effect.succeed`.
+
+**Indice 1** — *Regarder le type de retour de `add`*
+`add` renvoie `Effect.succeed(a + b)`, donc un `Effect`. Si on utilise `map`, on obtient `Effect<Effect<number>>`. Il faut "aplatir".
+
+**Solution :**
+```ts
+const result = pipe(
+  Effect.succeed(2),
+  Effect.flatMap(add(8))
+)
+```
+
+---
+
+#### B4 · `Effect.promise`
+
+**Concept à expliquer :**
+
+Pour intégrer du code asynchrone existant (une `Promise`) dans Effect, on utilise `Effect.promise`. Il faut passer une _fonction_ qui renvoie la `Promise` — pas la `Promise` directement — pour que l'exécution reste lazy.
+
+```ts
+// ❌ La Promise démarre immédiatement
+Effect.promise(fetch("https://api.example.com"))
+
+// ✓ La Promise ne démarre que quand Effect est exécuté
+Effect.promise(() => fetch("https://api.example.com"))
+```
+
+**Ce que le participant doit faire :**
+
+Envelopper l'appel `add(a, b)` (qui renvoie une `Promise`) dans `Effect.promise`.
+
+**Indice 1** — *Une fonction qui renvoie une Promise*
+`Effect.promise` attend `() => Promise<T>`. Donc `() => add(a, b)` est exactement ce qu'il faut.
+
+**Solution :**
+```ts
+const addWithDelay = (a: number, b: number): Effect.Effect<number> => {
+  return Effect.promise(() => add(a, b))
+}
+```
+
+---
+
+#### B5 · `Effect.tryPromise`
+
+**Concept à expliquer :**
+
+`Effect.promise` suppose que la `Promise` ne peut pas rejeter. Mais dans la réalité, un `fetch` peut échouer.
+
+`Effect.tryPromise` permet de modéliser cette faillibilité. Il prend deux fonctions : `try` (la `Promise`) et `catch` (comment transformer l'erreur en une valeur typée).
+
+```ts
+Effect.tryPromise({
+  try: () => fetch(url),
+  catch: (error) => new Error("La requête a échoué")
+})
+// Effect.Effect<Response, Error>
+//                          ^
+//                    l'erreur est visible dans le type
+```
+
+C'est la différence fondamentale avec `Promise` : l'erreur n'est plus un "throw" invisible — elle fait partie du contrat.
+
+**Ce que le participant doit faire :**
+
+Implémenter `fetch` en utilisant `Effect.tryPromise`, avec `baseFetch` pour la `Promise` et une `new Error("meh")` pour le catch.
+
+**Indice 1** — *La structure de `tryPromise`*
+```ts
+Effect.tryPromise({
+  try: () => /* ta Promise ici */,
+  catch: (_error) => /* ton erreur typée ici */
+})
+```
+
+**Indice 2** — *Quel `fetch` appeler ?*
+`baseFetch` est importé de `undici`. C'est lui qui doit être appelé dans `try`, avec les arguments `input` et `init` déjà disponibles dans la closure.
+
+**Solution :**
+```ts
+const fetch: Fetch = (input, init) => {
+  return Effect.tryPromise({
+    try: () => baseFetch(input, init),
+    catch: (_error) => new Error("meh")
+  })
+}
+```
+
+---
+
+## 5. Conventions de fichiers
+
+| Fichier doc | Fichier spec de référence |
+|---|---|
+| `exercices/01-base.md` | `packages/api/_exercices/1-base.spec.ts` |
+| `exercices/02-*.md` | `packages/api/_exercices/2-*.spec.ts` |
+| … | … |
+
+Chaque page doc correspond à **un seul fichier spec**. On ne mélange pas deux spec dans une même page.
+
+---
+
+## 6. Checklist avant publication d'une page
+
+- [ ] Le concept est expliqué avec un problème concret avant l'API
+- [ ] Le code utilise `pipe(...)` et jamais `xxx.pipe(...)`
+- [ ] Les termes anglais techniques ne sont pas traduits
+- [ ] Les indices sont progressifs (pas la solution au premier indice)
+- [ ] La solution est dans un `<details>`
+- [ ] Le `sidebar_position` est correct
+- [ ] Le code compile (vérifier mentalement les types)

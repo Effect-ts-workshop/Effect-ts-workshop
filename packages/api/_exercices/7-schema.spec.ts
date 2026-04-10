@@ -251,6 +251,7 @@ describe("Schema", () => {
    └─ is over 9000 !!!`.trim())
   })
   it.skip("can track encoded side, transformation process and type side failures", () => {
+    // Define a transform that can fail at each step
     // #start
     const Person = Schema.Struct({
       initials: Schema.transformOrFail(

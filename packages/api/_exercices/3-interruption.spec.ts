@@ -37,7 +37,7 @@ describe("Interruption", () => {
 })
 
 describe("addFinalizer — connexion base de données", () => {
-  it("ferme la connexion même si une erreur survient", async () => {
+  it.skip("ferme la connexion même si une erreur survient", async () => {
     // On simule une connexion avec un flag pour savoir si elle est ouverte
     const makeConnection = (log: Array<string>) => ({
       query: () => Effect.fail(new Error("requête échouée")),
@@ -47,13 +47,15 @@ describe("addFinalizer — connexion base de données", () => {
     const closedLog: Array<string> = []
 
     const program = Effect.gen(function*() {
-      const conn = makeConnection(closedLog)
-
+      const connection = makeConnection(closedLog)
+      // #start
       // Le finalizer enregistre le cleanup — sera exécuté quoi qu'il arrive
-      yield* Effect.addFinalizer(() => Effect.sync(() => conn.close()))
-
+      yield* TODO
+      // #solution
+      // yield* Effect.addFinalizer(() => Effect.sync(() => connection.close()))
+      // #end
       // Cette requête va échouer
-      return yield* conn.query()
+      return yield* connection.query()
     })
 
     // scoped() crée un Scope et le ferme à la fin du programme
@@ -87,8 +89,12 @@ describe("addFinalizer — lock distribué (multi-pods)", () => {
           return
         }
 
+        // #start
         // Lock obtenu → on enregistre le cleanup immédiatement
-        yield* Effect.addFinalizer(() => releaseLock("job:send-emails"))
+        yield* TODO
+        // #solution
+        // yield* Effect.addFinalizer(() => releaseLock("job:send-emails"))
+        // #end
 
         log.push(`${podName}:running`)
         // ... exécution du job ...
@@ -119,7 +125,12 @@ describe("addFinalizer — lock distribué (multi-pods)", () => {
     const longJob = Effect.gen(function*() {
       sharedRedis.locks.add("job:send-emails")
 
-      yield* Effect.addFinalizer(() => releaseLock("job:send-emails"))
+      // #start
+      // Lock obtenu → on enregistre le cleanup immédiatement
+      yield* TODO
+      // #solution
+      // yield* Effect.addFinalizer(() => releaseLock("job:send-emails"))
+      // #end
 
       // Simule un job long (jamais terminé dans ce test)
       yield* Effect.never
@@ -149,7 +160,11 @@ describe("addFinalizer — fichier temporaire", () => {
     const program = Effect.gen(function*() {
       const path = yield* createTempFile("upload-12345.tmp")
 
-      yield* Effect.addFinalizer(() => deleteTempFile(path))
+      // #start
+      yield* TODO
+      // #solution
+      // yield* Effect.addFinalizer(() => deleteTempFile(path))
+      // #end
 
       // Simule un traitement du fichier
       return path.replace(".tmp", ".processed")
@@ -159,24 +174,6 @@ describe("addFinalizer — fichier temporaire", () => {
 
     expect(result).toBe("upload-12345.processed") // traitement ok
     expect(filesystem.has("upload-12345.tmp")).toBe(false) // fichier supprimé
-  })
-
-  it("supprime le fichier même si le traitement échoue", async () => {
-    const filesystem = new Set<string>()
-
-    const program = Effect.gen(function*() {
-      filesystem.add("report.tmp")
-
-      yield* Effect.addFinalizer(() => Effect.sync(() => filesystem.delete("report.tmp")))
-
-      // Le traitement échoue
-      return yield* Effect.fail(new Error("export échoué"))
-    })
-
-    await Effect.runPromise(Effect.scoped(program)).catch(() => {})
-
-    // Fichier supprimé même après échec → pas de fichiers tmp orphelins
-    expect(filesystem.has("report.tmp")).toBe(false)
   })
 })
 
@@ -191,10 +188,13 @@ describe("acquireRelease — garantie du release", () => {
     const log: Array<string> = []
 
     // acquireRelease couple explicitement l'ouverture et la fermeture
-    const resource = Effect.acquireRelease(
-      Effect.sync(() => makeConnection(log)), // acquire : ouvre la connexion
-      (conn) => Effect.sync(() => conn.close()) // release : toujours exécuté
-    )
+    // #start
+    const resource = TODO
+    // #solution
+    //   const resource = Effect.acquireRelease(
+    // Effect.sync(() => makeConnection(log)), // acquire : ouvre la connexion
+    //  (conn) => Effect.sync(() => conn.close()) // release : toujours exécuté)
+    // #end
 
     const program = Effect.gen(function*() {
       const conn = yield* resource
@@ -210,13 +210,17 @@ describe("acquireRelease — garantie du release", () => {
   it("exécute le release même si une erreur survient", async () => {
     const log: Array<string> = []
 
-    const resource = Effect.acquireRelease(
-      Effect.sync(() => ({
-        ...makeConnection(log),
-        query: () => Effect.fail(new Error("timeout"))
-      })),
-      (conn) => Effect.sync(() => conn.close())
-    )
+    // #start
+    const resource = TODO
+    // #solution
+    //  const resource = Effect.acquireRelease(
+    //   Effect.sync(() => ({
+    //     ...makeConnection(log),
+    //     query: () => Effect.fail(new Error("timeout"))
+    //   })),
+    //   (conn) => Effect.sync(() => conn.close())
+    // )
+    // #end
 
     const program = Effect.gen(function*() {
       const conn = yield* resource
@@ -243,7 +247,12 @@ describe("acquireRelease — garantie du release", () => {
     })
 
     const fiber = Effect.runFork(Effect.scoped(program))
-    await Effect.runPromise(Fiber.interrupt(fiber))
+
+    // #start
+    await Effect.runPromise(TODO)
+    // #solution
+    // await Effect.runPromise(Fiber.interrupt(fiber))
+    // #end
 
     // release appelé malgré l'interruption → connexion proprement fermée
     expect(log).toContain("connection:closed")

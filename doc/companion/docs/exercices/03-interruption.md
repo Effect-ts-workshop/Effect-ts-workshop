@@ -101,15 +101,64 @@ Il faut envelopper ce programme dans `Effect.scoped` pour définir la portée du
 Effect.runPromise(Effect.scoped(program))
 ```
 
-### Exemples à lire
+### Exercice
 
-Les tests suivants illustrent trois cas d'usage courants — ils sont déjà implémentés, lisez-les pour vous approprier le pattern :
+Implémentez `Effect.addFinalizer` dans chacun des tests suivants :
 
-**Connexion base de données** : le finalizer ferme la connexion même si la requête échoue.
+- **Connexion base de données** (`it.skip`) : retirez le `.skip` pour activer le test, puis enregistrez la fermeture de la connexion comme finalizer.
+- **Lock distribué** (deux tests) : dans `runJobIfAvailable` et dans `longJob`, libérez le lock via `releaseLock` dès que l'acquisition réussit.
+- **Fichier temporaire** : supprimez le fichier temporaire à la fin du scope via `deleteTempFile`.
 
-**Lock distribué** : le lock est libéré dès que le program sort du scope — qu'il ait réussi ou pas. Un deuxième pod qui tente d'acquérir le même lock est proprement bloqué.
+Dans chaque cas, la structure est la même :
 
-**Fichier temporaire** : le fichier `.tmp` est supprimé après traitement, même si le traitement échoue — pas de fichiers orphelins.
+```typescript
+yield* Effect.addFinalizer(() => /* l'action de nettoyage */)
+```
+
+À vous de jouer !
+
+:::tip Ressources
+
+- [Scope et Ressources](../base-de-connaissance/08-scope-et-ressources.md)
+
+:::
+
+#### Indice 1
+
+<details>
+  <summary>Quel type doit renvoyer le finalizer ?</summary>
+
+`Effect.addFinalizer` attend une fonction `() => Effect<void>`. Pour envelopper une opération synchrone, utilisez `Effect.sync` :
+
+```typescript
+yield* Effect.addFinalizer(() => Effect.sync(() => conn.close()))
+```
+
+Certains helpers comme `releaseLock` ou `deleteTempFile` renvoient déjà un `Effect` — pas besoin de les envelopper.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+**Connexion base de données**
+```typescript
+yield* Effect.addFinalizer(() => Effect.sync(() => connection.close()))
+```
+
+**Lock distribué** (même solution pour les deux tests)
+```typescript
+yield* Effect.addFinalizer(() => releaseLock("job:send-emails"))
+```
+
+**Fichier temporaire**
+```typescript
+yield* Effect.addFinalizer(() => deleteTempFile(path))
+```
+
+</details>
 
 ---
 
@@ -140,17 +189,95 @@ Effect.runPromise(Effect.scoped(program))
 
 La différence avec `addFinalizer` : le `release` est défini au même endroit que le `acquire` — le couplage est explicite et la ressource est plus facilement réutilisable.
 
-### Exemples à lire
+### Exercice
 
-Trois tests illustrent la garantie de `acquireRelease` :
+**Tests `"exécute le release après un succès"` et `"exécute le release même si une erreur survient"`**
 
-**Succès** : la connexion est ouverte, la requête aboutit, la connexion est fermée.
+Définissez `resource` avec `Effect.acquireRelease`. Dans le second test, la `query` doit échouer avec `new Error("timeout")` — pensez à étendre `makeConnection` en remplaçant uniquement cette méthode.
 
-**Échec** : la requête échoue (timeout), la connexion est fermée quand même — pas de connexion qui reste ouverte indéfiniment.
+```typescript
+const resource = ??? // À compléter
+```
 
-**Interruption** : le fiber est interrompu en cours de traitement, la connexion est fermée malgré tout.
+---
 
-Ces trois cas sont couverts _automatiquement_ par `Effect.scoped`. Vous n'avez rien à faire de spécial pour l'interruption.
+**Test `"exécute le release si le fiber est interrompu"`**
+
+La ressource est déjà fournie. Il reste à déclencher l'interruption du fiber :
+
+```typescript
+await Effect.runPromise(???) // À compléter
+```
+
+À vous de jouer !
+
+:::tip Ressources
+
+- [Scope et Ressources](../base-de-connaissance/08-scope-et-ressources.md)
+- [Fibers et Concurrence](../base-de-connaissance/13-fibers-concurrence.md)
+
+:::
+
+#### Indice 1
+
+<details>
+  <summary>Structure de `acquireRelease`</summary>
+
+```typescript
+Effect.acquireRelease(
+  Effect.sync(() => /* ouvrir la ressource */), // acquire
+  (resource) => Effect.sync(() => /* fermer la ressource */) // release
+)
+```
+
+</details>
+
+#### Indice 2
+
+<details>
+  <summary>Comment surcharger `query` dans le test "erreur" ?</summary>
+
+Étendez `makeConnection` avec un spread et remplacez uniquement `query` :
+
+```typescript
+Effect.sync(() => ({
+  ...makeConnection(log),
+  query: () => Effect.fail(new Error("timeout"))
+}))
+```
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+**Succès**
+```typescript
+const resource = Effect.acquireRelease(
+  Effect.sync(() => makeConnection(log)),
+  (conn) => Effect.sync(() => conn.close())
+)
+```
+
+**Erreur**
+```typescript
+const resource = Effect.acquireRelease(
+  Effect.sync(() => ({
+    ...makeConnection(log),
+    query: () => Effect.fail(new Error("timeout"))
+  })),
+  (conn) => Effect.sync(() => conn.close())
+)
+```
+
+**Interruption**
+```typescript
+await Effect.runPromise(Fiber.interrupt(fiber))
+```
+
+</details>
 
 ---
 
@@ -159,6 +286,6 @@ Ces trois cas sont couverts _automatiquement_ par `Effect.scoped`. Vous n'avez r
 - `Effect.addFinalizer` → nettoyage en fin de scope, peu importe comment le programme se termine
 - `Effect.acquireRelease` → couple `acquire` et `release`, pour les ressources avec un cycle de vie explicite
 - `Effect.scoped` → délimite le scope dans lequel les finalizers s'exécutent
-- Les trois garantis : succès, erreur, **et interruption**
+- Les trois garanties : succès, erreur, **et interruption**
 
 :::

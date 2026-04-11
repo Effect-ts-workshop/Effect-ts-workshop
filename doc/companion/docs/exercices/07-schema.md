@@ -16,17 +16,17 @@ Fichier à compléter : `packages/api/_exercices/7-schema.spec.ts`
 
 <!-- prettier-ignore -->
 ```typescript
-const PersonSchema = Schema.Struct({
-  name: Schema.String,
-  age: Schema.Number,
-  isActive: Schema.Boolean
+const ProductSchema = Schema.Struct({
+  model: Schema.String,
+  price: Schema.Number,
+  available: Schema.Boolean
 })
 
-type Person = typeof PersonSchema.Type
-// { name: string; age: number; isActive: boolean }
+type Product = typeof ProductSchema.Type
+// { model: string; price: number; available: boolean }
 ```
 
-`Schema.decodeUnknownSync` valide les données et renvoie la valeur typée — ou lève une exception si la validation échoue.
+`Schema.decodeUnknownSync` prend en paramètre un schéma et retourne une fonction qui valide les données et renvoie la valeur typée — ou lève une exception si la validation échoue.
 
 ### Exercice
 
@@ -70,13 +70,13 @@ Les champs non déclarés (`unknown`) sont automatiquement éliminés à la vali
 
 ## Erreurs lisibles
 
-Les erreurs de validation de `Schema` sont structurées. Pour les afficher proprement, on utilise `decodeUnknownEither` + `ParseResult.ArrayFormatter` :
+Les erreurs de validation de `Schema` sont structurées. Pour les afficher d'une façon plus lisible on utilise par exemple `ParseResult.ArrayFormatter` qui renverra un tableau d'erreurs le cas échéant :
 
 <!-- prettier-ignore -->
 ```typescript
 const result = Schema.decodeUnknownEither(schema, { errors: "all" })(data)
 
-if (Either.isLeft(result)) {
+if (Either.isLeft(result)) { // si la validation a échoué, result.left contient les erreurs formatées
   const errors = ParseResult.ArrayFormatter.formatErrorSync(result.left)
   // [ { path: ["user", "id"], message: "is missing" }, ... ]
 }
@@ -121,20 +121,20 @@ const errors = pipe(
 
 ## Encode et decode — aller-retour de sérialisation
 
-Un `Schema` peut encoder (TypeScript → JSON) et décoder (JSON → TypeScript) :
+Un même `Schema` peut encoder de TypeScript vers JSON et décoder de JSON vers TypeScript. La cohérence entre ce qu'envoie le _serializer_ au _deserializer_ est garantir par construction. 
 
 <!-- prettier-ignore -->
 ```typescript
-const DataSchema = Schema.Struct({ createdAt: Schema.Date })
-const originalData = { createdAt: new Date("2026-04-22") }
+const EventSchema = Schema.Struct({ occurredAt: Schema.Date })
+const event = { occurredAt: new Date("2025-01-15") }
 
 // Encode : Date → string ISO
-const dto = pipe(originalData, Schema.encodeSync(DataSchema))
-// { createdAt: "2026-04-22T00:00:00.000Z" }
+const eventDto = pipe(event, Schema.encodeSync(EventSchema))
+// { occurredAt: "2025-01-15T00:00:00.000Z" }
 
 // Decode : string ISO → Date
-const back = pipe(dto, Schema.decodeSync(DataSchema))
-// { createdAt: Date }
+const decoded = pipe(eventDto, Schema.decodeSync(EventSchema))
+// { occurredAt: Date }
 ```
 
 ### Exercice
@@ -166,18 +166,18 @@ const decodedData = pipe(dataDto, Schema.decodeSync(DataSchema))
 
 ## `Arbitrary.make` — générer des données de test
 
-Pour les tests property-based, `Arbitrary.make` génère automatiquement des données aléatoires conformes à un schema :
+Pour les tests property-based, `Arbitrary.make` génère automatiquement des données aléatoires conformes à un schema qui lui est fourni. On peut tester que l'on récupère bien des valeurs de même validité que les originales après sérialisation et désérialisation :
 
 <!-- prettier-ignore -->
 ```typescript
-const arbitrary = Arbitrary.make(DataSchema)
+const arbitrary = Arbitrary.make(EventSchema)
 
 fc.assert(
-  fc.property(arbitrary, (data) => {
-    // data est valide selon DataSchema — garanti par la génération
-    const dto = pipe(data, Schema.encodeSync(DataSchema))
-    const back = pipe(dto, Schema.decodeSync(DataSchema))
-    expect(data).toEqual(back)
+  fc.property(arbitrary, (event) => {
+    // event est valide selon EventSchema — garanti par la génération
+    const dto = pipe(event, Schema.encodeSync(EventSchema))
+    const back = pipe(dto, Schema.decodeSync(EventSchema))
+    expect(event).toEqual(back)
   })
 )
 ```
@@ -213,18 +213,17 @@ Pour valider une email, un UUID, un numéro de téléphone, on combine `Schema.p
 
 <!-- prettier-ignore -->
 ```typescript
-type Email = string & Brand.Brand<"email">
-const Email = Brand.nominal<Email>()
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+type Port = number & Brand.Brand<"Port">
+const Port = Brand.nominal<Port>()
 
-const EmailSchema = pipe(
-  Schema.String,
-  Schema.pattern(emailPattern),  // vérifie le format
-  Schema.fromBrand(Email)        // retourne un type Email (opaque)
+const PortSchema = pipe(
+  Schema.Int,                      // entier uniquement
+  Schema.between(1, 65535),        // plage valide
+  Schema.fromBrand(Port)           // retourne un type Port (opaque)
 )
 ```
 
-`Schema.fromBrand` garantit qu'un `Email` ne peut être créé qu'en passant par la validation.
+`Schema.fromBrand` garantit qu'un `Port` ne peut être créé qu'à partit d'un numéro valide'.
 
 ### Exercice
 
@@ -261,14 +260,14 @@ Les annotations enrichissent les messages d'erreur pour les rendre exploitables 
 
 <!-- prettier-ignore -->
 ```typescript
-const Person = Schema.Struct({
-  name: Schema.String.annotations({ identifier: "Name" }),
-  age: Schema.Number.annotations({ identifier: "Age" })
-}).annotations({ identifier: "Person" })
+const Product = Schema.Struct({
+  title: Schema.String.annotations({ identifier: "Title" }),
+  price: Schema.Number.annotations({ identifier: "Price" })
+}).annotations({ identifier: "Product" })
 ```
 
 Sans annotations : `"Expected string, actual undefined"`
-Avec annotations : `"Expected Name, actual undefined"` dans le contexte `Person`
+Avec annotations : `"Expected Title, actual undefined"` dans le contexte `Product`
 
 ### Exercice A — Annoter le type
 
@@ -293,6 +292,33 @@ const Person = Schema.Struct({
 
 À vous de jouer !
 
+#### Indice 1
+
+<details>
+  <summary>L'ordre de déclaration des propriétés influe sur l'ordre des clés  erreurs</summary>
+
+```typescript
+const badProduct = { price: '10€'}
+
+const Product = Schema.Struct({
+  title: Schema.String.annotations({ identifier: "Title" }), // [0]
+  price: Schema.Number.annotations({ identifier: "Price" })  // [1]
+}).annotations({ identifier: "Product" })
+
+// Formatted errors
+// [
+//   {
+//     "path": ["title"],
+//    ...
+//   },
+//   {
+//     "path": ["price"],
+//    ...
+//   }
+// ]
+```
+</details>
+
 #### Solution A
 
 <details>
@@ -306,6 +332,12 @@ const Person = Schema.Struct({}).annotations({ identifier: "Person" })
 </details>
 
 #### Solution B
+<details>
+  <summary>L'ordre des cas compte</summary>
+
+Placez `Match.when(Match.null, ...)` avant `Match.when(Match.string, ...)` — `null` pourrait autrement être absorbé par un cas trop large.
+
+</details>
 
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
@@ -322,19 +354,19 @@ const Person = Schema.Struct({
 
 ---
 
-## Raffinements — `Schema.Positive` et messages personnalisés
+## Raffinements et messages personnalisés
 
 Les raffinements ajoutent des contraintes au-delà du type :
 
 <!-- prettier-ignore -->
 ```typescript
-// Schema.Positive = nombre > 0
-const AgeSchema = Schema.Positive
+// Schema.NonEmptyString :  string != ''
+const Name = Schema.NonEmptyString
 
 // Message personnalisé
-const StrengthSchema = pipe(
+const NormalizedRange = pipe(
   Schema.Number,
-  Schema.lessThanOrEqualTo(9000, { message: () => "is over 9000 !!!" })
+  Schema.between((-1, 1), { message: () => "out of range" })
 )
 ```
 
@@ -351,7 +383,7 @@ const Person = Schema.Struct({
 
 ### Exercice B
 
-Créez `Person` avec un champ `strength` limité à 9000, avec le message `"is over 9000 !!!"` :
+Créez `Person` avec un champ `strength` limité à 9000 et personnalisez la sortie du validateur si `strength` est supérieur à 9000 :
 
 <!-- prettier-ignore -->
 ```typescript

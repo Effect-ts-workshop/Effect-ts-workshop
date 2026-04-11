@@ -202,13 +202,13 @@ describe("Schema", () => {
     )
 
     expect(errors).toHaveLength(2)
-    expect(errors[0]).toMatchObject({
-      "path": ["name"],
-      message: "is missing"
-    })
     expect(errors[1]).toMatchObject({
       "path": ["age"],
       message: "Expected Age, actual \"42\""
+    })
+    expect(errors[0]).toMatchObject({
+      "path": ["name"],
+      message: "is missing"
     })
   })
   it.skip("can indicate refinement errors", () => {

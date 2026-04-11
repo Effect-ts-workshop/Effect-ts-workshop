@@ -8,6 +8,7 @@ sidebar_position: 8
 
 Quand un programme acquiert une ressource (connexion, fichier, lock…), il doit la libérer — même si une erreur survient. En TypeScript classique, on utilise `try/finally` :
 
+<!-- prettier-ignore -->
 ```typescript
 const conn = db.connect();
 try {
@@ -39,6 +40,7 @@ Scope fermé (succès / erreur / interruption)
 
 `Effect.addFinalizer` ajoute une action au Scope courant. Elle reçoit en option un `exit` qui décrit comment le programme s'est terminé.
 
+<!-- prettier-ignore -->
 ```typescript
 import { Effect, Exit } from "effect";
 
@@ -63,6 +65,7 @@ Le `exit` permet d'adapter le cleanup selon le résultat — typiquement : commi
 
 Quand l'acquisition et le cleanup sont **logiquement liés**, `acquireRelease` est plus clair :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Effect } from "effect";
 
@@ -78,6 +81,7 @@ const program = Effect.gen(function* () {
 ```
 
 Le `release` est garanti dans **trois situations** :
+
 - ✅ Succès normal
 - ❌ Erreur (`Effect.fail`)
 - ⚡ Interruption de la Fiber
@@ -86,6 +90,7 @@ Le `release` est garanti dans **trois situations** :
 
 `Effect.scoped` crée un Scope, exécute le programme, puis le ferme automatiquement :
 
+<!-- prettier-ignore -->
 ```typescript
 await Effect.runPromise(Effect.scoped(program));
 // Le Scope est fermé ici — cleanups exécutés
@@ -97,6 +102,7 @@ Sans `Effect.scoped`, le Scope reste ouvert et doit être géré manuellement vi
 
 ### Connexion base de données
 
+<!-- prettier-ignore -->
 ```typescript
 const withConnection = Effect.acquireRelease(
   Effect.sync(() => db.connect()),
@@ -106,6 +112,7 @@ const withConnection = Effect.acquireRelease(
 
 ### Lock distribué
 
+<!-- prettier-ignore -->
 ```typescript
 const withLock = (key: string) =>
   Effect.gen(function* () {
@@ -118,6 +125,7 @@ const withLock = (key: string) =>
 
 ### Transaction SQL
 
+<!-- prettier-ignore -->
 ```typescript
 const withTransaction = Effect.acquireRelease(
   Effect.sync(() => db.beginTransaction()),
@@ -130,9 +138,9 @@ const withTransaction = Effect.acquireRelease(
 
 ## Différence entre `addFinalizer` et `acquireRelease`
 
-| | `addFinalizer` | `acquireRelease` |
-|---|---|---|
-| Style | dans un `gen`, ad-hoc | paire acquire/release explicite |
-| Lisibilité | proche de `try/finally` | modélise une ressource |
-| Accès à `exit` | oui | oui |
+|                | `addFinalizer`                             | `acquireRelease`                                  |
+| -------------- | ------------------------------------------ | ------------------------------------------------- |
+| Style          | dans un `gen`, ad-hoc                      | paire acquire/release explicite                   |
+| Lisibilité     | proche de `try/finally`                    | modélise une ressource                            |
+| Accès à `exit` | oui                                        | oui                                               |
 | Utiliser quand | cleanup conditionnel en cours de programme | ressource avec un cycle ouverture/fermeture clair |

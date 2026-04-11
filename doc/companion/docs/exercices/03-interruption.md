@@ -18,6 +18,7 @@ Les APIs Web (`fetch`, `XMLHttpRequest`) utilisent `AbortSignal` pour signaler u
 
 La `try` de `Effect.tryPromise` reçoit un `signal` en paramètre — il suffit de le passer à la `Promise` sous-jacente :
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.tryPromise({
   try: (signal) => readLargeFile("/data/export.csv", { signal }),
@@ -31,6 +32,7 @@ Quand le fiber est interrompu (`Fiber.interrupt`), Effect annule le `signal` —
 
 Complétez le `try` pour passer le `signal` à `slowFetch` :
 
+<!-- prettier-ignore -->
 ```typescript
 const program = Effect.tryPromise({
   try: () => slowFetch("https://api.chucknorris.io/jokes/random"),
@@ -54,6 +56,7 @@ const program = Effect.tryPromise({
 
 La fonction passée à `try` peut recevoir un argument optionnel — le signal d'annulation qu'Effect gère pour vous.
 
+<!-- prettier-ignore -->
 ```typescript
 try: (signal) => /* ... */
 ```
@@ -67,6 +70,7 @@ Effect crée ce signal et l'annule automatiquement si le fiber est interrompu.
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const program = Effect.tryPromise({
   try: (signal) => slowFetch("https://api.chucknorris.io/jokes/random", { signal }),
@@ -84,6 +88,7 @@ En JavaScript classique, si une exception surgit entre l'ouverture et la fermetu
 
 `Effect.addFinalizer` enregistre une action qui sera exécutée **quoi qu'il arrive** : succès, échec, ou interruption.
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.gen(function*() {
   const conn = makeConnection()
@@ -97,6 +102,7 @@ Effect.gen(function*() {
 
 Il faut envelopper ce programme dans `Effect.scoped` pour définir la portée du finalizer :
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.runPromise(Effect.scoped(program))
 ```
@@ -111,6 +117,7 @@ Implémentez `Effect.addFinalizer` dans chacun des tests suivants :
 
 Dans chaque cas, la structure est la même :
 
+<!-- prettier-ignore -->
 ```typescript
 yield* Effect.addFinalizer(() => /* l'action de nettoyage */)
 ```
@@ -130,6 +137,7 @@ yield* Effect.addFinalizer(() => /* l'action de nettoyage */)
 
 `Effect.addFinalizer` attend une fonction `() => Effect<void>`. Pour envelopper une opération synchrone, utilisez `Effect.sync` :
 
+<!-- prettier-ignore -->
 ```typescript
 yield* Effect.addFinalizer(() => Effect.sync(() => conn.close()))
 ```
@@ -144,16 +152,22 @@ Certains helpers comme `releaseLock` ou `deleteTempFile` renvoient déjà un `Ef
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
 **Connexion base de données**
+
+<!-- prettier-ignore -->
 ```typescript
 yield* Effect.addFinalizer(() => Effect.sync(() => connection.close()))
 ```
 
 **Lock distribué** (même solution pour les deux tests)
+
+<!-- prettier-ignore -->
 ```typescript
 yield* Effect.addFinalizer(() => releaseLock("job:send-emails"))
 ```
 
 **Fichier temporaire**
+
+<!-- prettier-ignore -->
 ```typescript
 yield* Effect.addFinalizer(() => deleteTempFile(path))
 ```
@@ -166,6 +180,7 @@ yield* Effect.addFinalizer(() => deleteTempFile(path))
 
 Quand une ressource a un cycle de vie clair (ouvrir / utiliser / fermer), `Effect.acquireRelease` couple explicitement les deux opérations. C'est l'équivalent Effect de `await using` (TypeScript 5.2) : dans les deux cas, l'ouverture et la fermeture sont définies au même endroit.
 
+<!-- prettier-ignore -->
 ```typescript
 // await using — fermeture couplée à l'ouverture
 await using conn = getConnection() // conn[Symbol.asyncDispose]() appelé à la sortie du bloc
@@ -173,6 +188,7 @@ await using conn = getConnection() // conn[Symbol.asyncDispose]() appelé à la 
 
 La différence : `await using` ne couvre pas l'interruption. `Effect.acquireRelease` garantit le `release` dans les trois cas — succès, échec, et interruption.
 
+<!-- prettier-ignore -->
 ```typescript
 const resource = Effect.acquireRelease(
   Effect.sync(() => makeConnection(log)), // acquire : ouvre la connexion
@@ -195,6 +211,7 @@ La différence avec `addFinalizer` : le `release` est défini au même endroit q
 
 Définissez `resource` avec `Effect.acquireRelease`. Dans le second test, la `query` doit échouer avec `new Error("timeout")` — pensez à étendre `makeConnection` en remplaçant uniquement cette méthode.
 
+<!-- prettier-ignore -->
 ```typescript
 const resource = ??? // À compléter
 ```
@@ -205,6 +222,7 @@ const resource = ??? // À compléter
 
 La ressource est déjà fournie. Il reste à déclencher l'interruption du fiber :
 
+<!-- prettier-ignore -->
 ```typescript
 await Effect.runPromise(???) // À compléter
 ```
@@ -223,6 +241,7 @@ await Effect.runPromise(???) // À compléter
 <details>
   <summary>Structure de `acquireRelease`</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.acquireRelease(
   Effect.sync(() => /* ouvrir la ressource */), // acquire
@@ -239,6 +258,7 @@ Effect.acquireRelease(
 
 Étendez `makeConnection` avec un spread et remplacez uniquement `query` :
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.sync(() => ({
   ...makeConnection(log),
@@ -254,6 +274,8 @@ Effect.sync(() => ({
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
 **Succès**
+
+<!-- prettier-ignore -->
 ```typescript
 const resource = Effect.acquireRelease(
   Effect.sync(() => makeConnection(log)),
@@ -262,6 +284,8 @@ const resource = Effect.acquireRelease(
 ```
 
 **Erreur**
+
+<!-- prettier-ignore -->
 ```typescript
 const resource = Effect.acquireRelease(
   Effect.sync(() => ({
@@ -273,6 +297,8 @@ const resource = Effect.acquireRelease(
 ```
 
 **Interruption**
+
+<!-- prettier-ignore -->
 ```typescript
 await Effect.runPromise(Fiber.interrupt(fiber))
 ```

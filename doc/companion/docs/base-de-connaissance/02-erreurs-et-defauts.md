@@ -12,6 +12,7 @@ Effect distingue deux catégories d'échecs radicalement différentes.
 
 Des échecs **attendus et typés**. Ils font partie du contrat de la fonction.
 
+<!-- prettier-ignore -->
 ```typescript
 class ArticleNonTrouvé extends Data.TaggedError("ArticleNonTrouvé")<{
   id: string;
@@ -30,6 +31,7 @@ const getArticle = (id: string): Effect.Effect<Article, ArticleNonTrouvé> =>
 
 Des bugs **inattendus et non typés**. Ils ne devraient jamais se produire.
 
+<!-- prettier-ignore -->
 ```typescript
 // NullPointerException, StackOverflow, etc.
 const monEffect = Effect.promise(() => operationQuiPeutBugger());
@@ -43,6 +45,7 @@ const monEffect = Effect.promise(() => operationQuiPeutBugger());
 
 ## Créer des erreurs typées
 
+<!-- prettier-ignore -->
 ```typescript
 import { Data } from "effect";
 
@@ -65,6 +68,7 @@ console.log(erreur._tag);    // "ErreurAvecMessage"
 
 ### `Effect.catchTag` — une erreur spécifique
 
+<!-- prettier-ignore -->
 ```typescript
 const sûr = pipe(
   monEffect,
@@ -77,6 +81,7 @@ const sûr = pipe(
 
 ### `Effect.catchTags` — plusieurs erreurs
 
+<!-- prettier-ignore -->
 ```typescript
 const sûr = pipe(
   monEffect,
@@ -89,6 +94,7 @@ const sûr = pipe(
 
 ### `Effect.catchAll` — toutes les erreurs
 
+<!-- prettier-ignore -->
 ```typescript
 const sûr = pipe(
   monEffect,
@@ -103,9 +109,11 @@ const sûr = pipe(
 ## Le tag — l'identifiant de l'erreur
 
 Le tag est la chaîne passée à `Data.TaggedError("MonTag")`. Effect l'utilise pour :
+
 1. Identifier précisément le type d'erreur dans `catchTag`
 2. Afficher un message d'erreur lisible
 
+<!-- prettier-ignore -->
 ```typescript
 class MonErreur extends Data.TaggedError("MonErreur")<{}> {}
 

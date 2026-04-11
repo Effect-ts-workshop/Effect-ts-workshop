@@ -13,6 +13,7 @@ Effect (description)  →  exécution  →  Fiber (fil actif)
 ```
 
 Une Fiber possède :
+
 - une **identité** unique
 - un **état** (en cours, suspendue, terminée)
 - un **résultat final** : `Exit<Success, Error>`
@@ -25,6 +26,7 @@ Même le code le plus simple s'exécute dans une Fiber — celle créée par `Ef
 
 `Effect.fork` démarre un Effect dans une nouvelle Fiber **sans attendre son résultat** :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Effect, Fiber } from "effect"
 
@@ -45,6 +47,7 @@ La Fiber enfant est automatiquement rattachée à la Fiber parente : si la paren
 
 Deux façons d'attendre une Fiber :
 
+<!-- prettier-ignore -->
 ```typescript
 // join — extrait directement la valeur (ou propage l'erreur)
 const value = yield* Fiber.join(fiber)
@@ -63,6 +66,7 @@ Utilisez `join` quand vous voulez le résultat directement. Utilisez `await` qua
 
 `Fiber.interrupt` arrête une Fiber proprement : les finalizers s'exécutent, les ressources sont libérées.
 
+<!-- prettier-ignore -->
 ```typescript
 import { Effect, Fiber, Exit } from "effect"
 
@@ -82,6 +86,7 @@ C'est une interruption **asynchrone** — pas du `kill` brutal. La fiber reçoit
 
 Quand une Fiber est interrompue, Effect annule automatiquement l'`AbortSignal` passé à `Effect.tryPromise` :
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.tryPromise({
   try: (signal) => fetch(url, { signal }),
@@ -99,6 +104,7 @@ La `Promise` reçoit l'événement `abort` et peut se nettoyer. Sans ça, la req
 
 `Effect.runFork` est le pendant de `Effect.runPromise` pour les Fibers :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Effect, Fiber } from "effect"
 
@@ -117,6 +123,7 @@ Utilisé dans l'exercice 3 pour démarrer puis interrompre une Fiber dans les te
 
 `Effect.all` exécute plusieurs Effects **en parallèle** et attend tous les résultats :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Effect } from "effect"
 
@@ -132,6 +139,7 @@ const program = pipe(
 
 Par défaut, tous les Effects démarrent simultanément. Si l'un échoue, les autres sont interrompus.
 
+<!-- prettier-ignore -->
 ```typescript
 // Tableau d'Effects
 const results = yield* Effect.all([effect1, effect2, effect3])
@@ -146,6 +154,7 @@ const { list, single } = yield* Effect.all({
 
 ### Concurrence contrôlée
 
+<!-- prettier-ignore -->
 ```typescript
 // Limiter à 2 en parallèle
 yield* Effect.all(effects, { concurrency: 2 })
@@ -163,6 +172,7 @@ yield* Effect.all(effects, { concurrency: 1 })
 
 `Effect.race` lance deux Effects en parallèle et renvoie le résultat du plus rapide. L'autre est immédiatement interrompu.
 
+<!-- prettier-ignore -->
 ```typescript
 const result = yield* Effect.race(
   fastPath(),
@@ -172,6 +182,7 @@ const result = yield* Effect.race(
 
 Utile pour les timeouts :
 
+<!-- prettier-ignore -->
 ```typescript
 const withTimeout = yield* Effect.race(
   fetchData(),
@@ -185,6 +196,7 @@ const withTimeout = yield* Effect.race(
 
 Par défaut, les Fibers enfants sont supervisées par leur parent. Quand la Fiber parente se termine (succès, erreur, ou interruption), toutes ses Fibers enfants sont interrompues automatiquement.
 
+<!-- prettier-ignore -->
 ```typescript
 // Fiber démon — échappe à la supervision
 const fiber = yield* Effect.forkDaemon(backgroundTask())
@@ -201,13 +213,13 @@ Si vous utilisez `forkDaemon`, assurez-vous d'avoir une stratégie pour arrêter
 
 ## Récapitulatif
 
-| API | Rôle |
-|---|---|
-| `Effect.fork(effect)` | Démarre une Fiber enfant |
-| `Effect.runFork(effect)` | Démarre une Fiber au point d'entrée |
-| `Fiber.join(fiber)` | Attend le résultat, propage les erreurs |
-| `Fiber.await(fiber)` | Attend la terminaison, retourne un `Exit` |
-| `Fiber.interrupt(fiber)` | Interrompt proprement (finalizers exécutés) |
-| `Effect.all(effects)` | Parallèle, attend tous les résultats |
-| `Effect.race(a, b)` | Le plus rapide gagne, l'autre est interrompu |
-| `Effect.forkDaemon(effect)` | Fiber non supervisée |
+| API                         | Rôle                                         |
+| --------------------------- | -------------------------------------------- |
+| `Effect.fork(effect)`       | Démarre une Fiber enfant                     |
+| `Effect.runFork(effect)`    | Démarre une Fiber au point d'entrée          |
+| `Fiber.join(fiber)`         | Attend le résultat, propage les erreurs      |
+| `Fiber.await(fiber)`        | Attend la terminaison, retourne un `Exit`    |
+| `Fiber.interrupt(fiber)`    | Interrompt proprement (finalizers exécutés)  |
+| `Effect.all(effects)`       | Parallèle, attend tous les résultats         |
+| `Effect.race(a, b)`         | Le plus rapide gagne, l'autre est interrompu |
+| `Effect.forkDaemon(effect)` | Fiber non supervisée                         |

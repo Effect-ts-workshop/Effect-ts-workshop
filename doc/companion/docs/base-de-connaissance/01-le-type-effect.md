@@ -6,6 +6,7 @@ sidebar_position: 1
 
 ## Définition
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.Effect<Succès, Erreur, Contexte>
 ```
@@ -14,16 +15,17 @@ Un `Effect` est une **description** d'un programme. Il n'exécute rien par lui-m
 
 Les trois paramètres de type décrivent tout ce que le programme peut faire :
 
-| Paramètre | Valeur par défaut | Signification |
-|-----------|-------------------|---------------|
-| `Succès` | — | Le type de la valeur produite si tout va bien |
-| `Erreur` | `never` | Les types d'erreurs **typées** qui peuvent survenir |
-| `Contexte` | `never` | Les services/dépendances dont le programme a besoin |
+| Paramètre  | Valeur par défaut | Signification                                       |
+| ---------- | ----------------- | --------------------------------------------------- |
+| `Succès`   | —                 | Le type de la valeur produite si tout va bien       |
+| `Erreur`   | `never`           | Les types d'erreurs **typées** qui peuvent survenir |
+| `Contexte` | `never`           | Les services/dépendances dont le programme a besoin |
 
 `never` signifie "jamais" — `Erreur = never` veut dire "ne peut pas échouer", `Contexte = never` veut dire "n'a pas besoin de dépendances".
 
 ## Exemples de types
 
+<!-- prettier-ignore -->
 ```typescript
 // Produit un number, ne peut pas échouer, pas de dépendances
 Effect.Effect<number>
@@ -40,6 +42,7 @@ Effect.Effect<Item, ErreurRéseau | NonTrouvé, HttpClient.HttpClient>
 
 ### Valeur simple
 
+<!-- prettier-ignore -->
 ```typescript
 // Succès immédiat
 const ok = Effect.succeed(42);
@@ -56,6 +59,7 @@ const calcul = Effect.sync(() => Math.random());
 
 ### Calculs synchrones
 
+<!-- prettier-ignore -->
 ```typescript
 // Calcul synchrone sans risque d'erreur
 const calcul = Effect.sync(() => Math.random())
@@ -75,6 +79,7 @@ const parse = Effect.try({
 
 ### À partir de Promises
 
+<!-- prettier-ignore -->
 ```typescript
 // Sans gestion d'erreur (exceptions → défauts)
 const p1 = Effect.promise(() => fetch("/api"));
@@ -90,6 +95,7 @@ const p2 = Effect.tryPromise({
 
 ### Asynchrone avec durée
 
+<!-- prettier-ignore -->
 ```typescript
 import { Duration } from "effect";
 
@@ -101,6 +107,7 @@ const attente = Effect.sleep(Duration.seconds(2));
 
 Un Effect ne fait rien jusqu'à ce qu'on l'exécute. Effect fournit plusieurs "runners" :
 
+<!-- prettier-ignore -->
 ```typescript
 // Pour les Effects entièrement synchrones
 const valeur = Effect.runSync(monEffect);
@@ -119,6 +126,7 @@ N'appelez `Effect.run*` qu'**une seule fois**, au point d'entrée de votre progr
 
 ## Transformer des Effects
 
+<!-- prettier-ignore -->
 ```typescript
 // Transformer la valeur de succès (A → B)
 Effect.map(fn)
@@ -138,6 +146,7 @@ Effect.tap(Effect.log)
 
 ### Récupération sur échec
 
+<!-- prettier-ignore -->
 ```typescript
 // Fallback si l'Effect échoue — remplacer par un autre Effect
 pipe(
@@ -160,6 +169,7 @@ pipe(
 
 ### `Effect.all` — plusieurs Effects en parallèle
 
+<!-- prettier-ignore -->
 ```typescript
 import { Effect, pipe } from "effect"
 
@@ -179,6 +189,7 @@ const results = yield* Effect.all([effect1, effect2, effect3])
 
 Par défaut, les Effects s'exécutent en parallèle. Si l'un échoue, les autres sont interrompus.
 
+<!-- prettier-ignore -->
 ```typescript
 // Séquentiel (un par un)
 yield* Effect.all(effects, { concurrency: 1 })

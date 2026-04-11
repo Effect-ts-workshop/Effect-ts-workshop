@@ -16,6 +16,7 @@ Fichier à compléter : `packages/api/_exercices/5-context-layer.spec.ts`
 
 `HttpClient.HttpClient` est un service fourni par Effect. Pour l'utiliser, il suffit de le "demander" dans un `pipe` :
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   Database, // demande le service
@@ -34,6 +35,7 @@ Le type `Effect<Row[], ..., Database>` signifie : _"pour s'exécuter, ce program
 
 On fournit le service au moment de l'exécution :
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(getUsers(), Effect.provide(Database.layer));
 // Effect<User[], never, never> ← requirement satisfait
@@ -43,6 +45,7 @@ pipe(getUsers(), Effect.provide(Database.layer));
 
 Complétez `fetchJoke` pour récupérer une blague depuis `https://api.chucknorris.io/jokes/random` :
 
+<!-- prettier-ignore -->
 ```typescript
 const fetchJoke = () =>
   pipe(
@@ -90,6 +93,7 @@ Cherchez sur `response` ce qui donne accès au JSON parsé.
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const fetchJoke = () =>
   pipe(
@@ -113,6 +117,7 @@ const fetchJoke = () =>
 
 Pour définir un service maison, on crée un `Tag` — un identifiant unique qui permet à Effect de trouver l'implémentation dans le contexte :
 
+<!-- prettier-ignore -->
 ```typescript
 type LoggerService = {
   log: (message: string) => Effect.Effect<void>;
@@ -123,6 +128,7 @@ const LoggerService = Context.GenericTag<LoggerService>("LoggerService");
 
 On fournit ensuite une implémentation avec `Layer.succeed` :
 
+<!-- prettier-ignore -->
 ```typescript
 const LoggerServiceLive = Layer.succeed(LoggerService, {
   log: (msg) => Effect.sync(() => console.log("[LIVE]", msg)),
@@ -135,6 +141,7 @@ const LoggerServiceTest = Layer.succeed(LoggerService, {
 
 Et on utilise le service comme n'importe quel service Effect :
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   LoggerService,
@@ -146,6 +153,7 @@ pipe(
 
 Créez `JokeService`, `JokeServiceTest` et `JokeServiceLive` :
 
+<!-- prettier-ignore -->
 ```typescript
 type JokeService = { getRandom: () => Effect.Effect<string> }
 
@@ -169,6 +177,7 @@ const JokeServiceLive = Layer.succeed(
 <details>
   <summary>La signature de `Context.GenericTag`</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 Context.GenericTag<TypeDuService>("IdentifiantUnique");
 ```
@@ -182,6 +191,7 @@ L'identifiant est une string unique dans l'application — par convention, le no
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const JokeService = Context.GenericTag<JokeService>("JokeService");
 
@@ -202,6 +212,7 @@ const JokeServiceLive = Layer.succeed(JokeService, {
 
 `Context.GenericTag` + `Layer.succeed` fonctionne, mais c'est verbeux. `Effect.Service` est la forme moderne qui regroupe tout en une classe :
 
+<!-- prettier-ignore -->
 ```typescript
 class UserService extends Effect.Service<UserService>()("UserService", {
   effect: pipe(
@@ -230,6 +241,7 @@ Une classe `Effect.Service` génère automatiquement plusieurs membres statiques
 
 Réécrivez `JokeService` avec `Effect.Service` :
 
+<!-- prettier-ignore -->
 ```typescript
 const JokeService = ??? // À compléter avec Effect.Service
 ```
@@ -241,6 +253,7 @@ const JokeService = ??? // À compléter avec Effect.Service
 <details>
   <summary>La structure `Effect.Service`</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 class MyService extends Effect.Service<MyService>()("MyService", {
   effect: pipe(
@@ -261,6 +274,7 @@ class MyService extends Effect.Service<MyService>()("MyService", {
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 class JokeService extends Effect.Service<JokeService>()("JokeService", {
   effect: pipe(
@@ -289,6 +303,7 @@ Pour tester un service qui dépend d'un autre, `Layer.mock` permet de remplacer 
 
 `Layer.mock` accepte une implémentation **partielle** : seules les méthodes utiles pour le test ont besoin d'être fournies. Toute méthode non fournie lèvera un `UnimplementedError` defect si elle est appelée — ce qui est un filet de sécurité utile en test.
 
+<!-- prettier-ignore -->
 ```typescript
 class EmailService extends Effect.Service<EmailService>()("EmailService", {
   effect: Effect.succeed({
@@ -305,6 +320,7 @@ const EmailServiceTest = Layer.mock(EmailService, {
 
 On fournit ensuite ce mock au layer qui en dépend :
 
+<!-- prettier-ignore -->
 ```typescript
 const UserServiceTest = pipe(
   UserService.DefaultWithoutDependencies,
@@ -318,6 +334,7 @@ const UserServiceTest = pipe(
 
 Créez `JokeServiceTest` avec un `HttpClient` qui échoue toujours — le `orElseSucceed` de `JokeService` devra renvoyer `"No jokes for today"` :
 
+<!-- prettier-ignore -->
 ```typescript
 const JokeServiceTest = ??? // À compléter
 ```
@@ -339,6 +356,7 @@ const JokeServiceTest = ??? // À compléter
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const ClientTest = Layer.mock(HttpClient.HttpClient, {
   get: () => Effect.fail(undefined),

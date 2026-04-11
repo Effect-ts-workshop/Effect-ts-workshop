@@ -16,6 +16,7 @@ Fichier à compléter : `packages/api/_exercices/8-api.spec.ts`
 
 Le contrat décrit la forme de l'API. Il ne contient aucune logique.
 
+<!-- prettier-ignore -->
 ```typescript
 const MyApi = HttpApi.make("MyApi").add(
   HttpApiGroup.make("greet").add(
@@ -36,6 +37,7 @@ Ce contrat est la _source de vérité_ : le serveur l'implémente, le client le 
 
 ## L'implémentation — `HttpApiBuilder.group`
 
+<!-- prettier-ignore -->
 ```typescript
 const MyApiLive = HttpApiBuilder.group(
   MyApi,
@@ -54,6 +56,7 @@ Si `"sayHello"` n'existe pas dans le contrat `MyApi`, TypeScript signale une err
 
 ## Le layer — `HttpLayerRouter`
 
+<!-- prettier-ignore -->
 ```typescript
 const apiLayer = pipe(
   HttpLayerRouter.addHttpApi(MyApi),  // branche le contrat
@@ -69,6 +72,7 @@ Ce layer est ensuite converti en handler HTTP pour les tests — ou fourni à un
 
 Pour les tests, `HttpLayerRouter.toWebHandler` crée un handler en mémoire. On le branche sur un `FetchHttpClient` personnalisé pour intercepter les requêtes :
 
+<!-- prettier-ignore -->
 ```typescript
 const { dispose, handler } = HttpLayerRouter.toWebHandler(apiLayer, { disableLogger: true })
 
@@ -93,11 +97,13 @@ L'implémentation et le client de test sont fournis. Votre rôle : écrire le **
 
 Définissez `MyApi` pour qu'il décrive une route `GET /hello` qui retourne une string, regroupée dans un groupe `"greet"` :
 
+<!-- prettier-ignore -->
 ```typescript
 const MyApi = ??? // À compléter
 ```
 
 Le test vérifie ensuite que :
+
 - `MyApi.identifier` vaut `"MyApi"`
 - l'endpoint `"sayHello"` est bien en `GET` sur `/hello`
 - le schema de succès accepte des strings
@@ -118,6 +124,7 @@ Le test vérifie ensuite que :
 
 `HttpApi.make` prend un identifiant et renvoie une API. On y ajoute des groupes avec `.add(...)`.
 
+<!-- prettier-ignore -->
 ```typescript
 const MyApi = HttpApi.make("MyApi").add(
   // votre groupe ici
@@ -135,6 +142,7 @@ const MyApi = HttpApi.make("MyApi").add(
 
 Pour un endpoint `GET /hello` qui retourne une string :
 
+<!-- prettier-ignore -->
 ```typescript
 HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)
 ```
@@ -146,6 +154,7 @@ HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const MyApi = HttpApi.make("MyApi").add(
   HttpApiGroup.make("greet").add(

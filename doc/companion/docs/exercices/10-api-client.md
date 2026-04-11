@@ -16,6 +16,7 @@ Fichier de référence : `packages/app/_exercices/10-api-client.spec.tsx`
 
 `HttpApiClient.make` génère un client typé à partir du contrat. La structure reflète l'organisation en groupes :
 
+<!-- prettier-ignore -->
 ```typescript
 const program = pipe(
   HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
@@ -31,6 +32,7 @@ Si `getAllItems` n'existe pas dans le contrat, TypeScript signale une erreur de 
 
 `Effect.all` exécute plusieurs Effects en parallèle et attend tous les résultats :
 
+<!-- prettier-ignore -->
 ```typescript
 const program = pipe(
   HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
@@ -66,6 +68,7 @@ Les tests de cette section sont déjà implémentés. Parcourez-les pour observe
 
 Dans l'application, on n'appelle pas `HttpApiClient` directement dans les composants. `AtomHttpApi.Tag` l'encapsule dans un système d'Atoms réactifs :
 
+<!-- prettier-ignore -->
 ```typescript
 class ApiClient extends AtomHttpApi.Tag<ApiClient>()("ApiClient", {
   api: Api,
@@ -78,6 +81,7 @@ Deux usages :
 
 **Query** — lit des données, se met à jour automatiquement quand les clés de réactivité changent :
 
+<!-- prettier-ignore -->
 ```typescript
 const allItemsAtom = ApiClient.query("items", "getAllItems", {
   reactivityKeys: ["items"]
@@ -94,6 +98,7 @@ function MyComponent() {
 
 **Mutation** — déclenche un appel et invalide les queries concernées :
 
+<!-- prettier-ignore -->
 ```typescript
 const removeItem = useAtomSet(ApiClient.mutation("items", "removeItemById"))
 ```
@@ -101,11 +106,13 @@ const removeItem = useAtomSet(ApiClient.mutation("items", "removeItemById"))
 ### À lire et comprendre
 
 Le test `"query résout en Result.Success avec les items"` montre le cycle complet :
+
 1. L'atom démarre en état initial (loading)
 2. La query s'exécute automatiquement au montage du composant
 3. L'atom passe en `Result.Success` quand la réponse arrive
 4. `useAtomValue` re-render le composant avec les données
 
+<!-- prettier-ignore -->
 ```typescript
 function TestComponent() {
   const result = useAtomValue(allItemsAtom)

@@ -22,6 +22,7 @@ Cet exercice démarre un conteneur PostgreSQL via `testcontainers`. **Docker doi
 
 `@effect/sql` fournit un client SQL (`SqlClient.SqlClient`) utilisable comme service Effect. Les requêtes s'écrivent avec des template literals :
 
+<!-- prettier-ignore -->
 ```typescript
 const getAll = Effect.fn("getAll")(function*() {
   const sql = yield* SqlClient.SqlClient   // récupère le client depuis le contexte
@@ -37,6 +38,7 @@ Le template literal est _safe_ par construction : les variables interpolées son
 
 Complétez `getAll` pour exécuter `SELECT * FROM items ORDER BY id` :
 
+<!-- prettier-ignore -->
 ```typescript
 const getAll = Effect.fn("getAll")(function*() {
   const sql = yield* SqlClient.SqlClient
@@ -60,6 +62,7 @@ const getAll = Effect.fn("getAll")(function*() {
 
 Le client `sql` s'utilise comme un template literal :
 
+<!-- prettier-ignore -->
 ```typescript
 const rows = yield* sql`SELECT * FROM ma_table`
 ```
@@ -73,6 +76,7 @@ const rows = yield* sql`SELECT * FROM ma_table`
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const getAll = Effect.fn("getAll")(function*() {
   const sql = yield* SqlClient.SqlClient
@@ -93,6 +97,7 @@ const getAll = Effect.fn("getAll")(function*() {
 
 Pour les opérations CRUD classiques, `Model.Class` et `Model.makeRepository` génèrent le repository automatiquement à partir d'un schema :
 
+<!-- prettier-ignore -->
 ```typescript
 class DbItem extends Model.Class<DbItem>("DbItem")({
   id: InventoryItemIdSchema,
@@ -117,6 +122,7 @@ Le `repository` expose `insert`, `findById`, `findAll`, `update`, `delete` — t
 
 Complétez `getCrud` pour créer un repository `DbItem` :
 
+<!-- prettier-ignore -->
 ```typescript
 const getCrud = Effect.fn("getCrud")(function*() {
   const repository = ??? // À compléter
@@ -131,6 +137,7 @@ const getCrud = Effect.fn("getCrud")(function*() {
 <details>
   <summary>Les arguments de `makeRepository`</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 yield* Model.makeRepository(LaClasse, {
   tableName: "nom_de_la_table",
@@ -146,6 +153,7 @@ yield* Model.makeRepository(LaClasse, {
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const getCrud = Effect.fn("getCrud")(function*() {
   const repository = yield* Model.makeRepository(DbItem, {
@@ -165,6 +173,7 @@ const getCrud = Effect.fn("getCrud")(function*() {
 
 Pour les requêtes plus complexes, Drizzle offre un query builder qui reste dans le monde Effect via le service `Database` :
 
+<!-- prettier-ignore -->
 ```typescript
 const add = Effect.fn("add")(function*(item: InferInsertModel<typeof items>) {
   const db = yield* Database
@@ -183,6 +192,7 @@ const findByBrand = Effect.fn("findByBrand")(function*(brand: string) {
 
 Complétez `add` (insert) et `findByBrand` (select + where) :
 
+<!-- prettier-ignore -->
 ```typescript
 const add = Effect.fn("add")(function*(item: InferInsertModel<typeof items>) {
   const db = yield* Database
@@ -202,6 +212,7 @@ const findByBrand = Effect.fn("findByBrand")(function*(brand: string) {
 <details>
   <summary>Syntaxe Drizzle pour l'insert</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 db.insert(table).values(item)
 ```
@@ -213,6 +224,7 @@ db.insert(table).values(item)
 <details>
   <summary>Syntaxe Drizzle pour le select avec where</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 db.select().from(table).where(eq(table.champ, valeur))
 ```
@@ -226,6 +238,7 @@ db.select().from(table).where(eq(table.champ, valeur))
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const add = Effect.fn("add")(function*(item: InferInsertModel<typeof items>) {
   const db = yield* Database

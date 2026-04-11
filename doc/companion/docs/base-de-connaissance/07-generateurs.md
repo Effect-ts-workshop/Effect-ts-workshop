@@ -8,6 +8,7 @@ sidebar_position: 7
 
 `pipe` prend une valeur et la passe à travers une série de fonctions :
 
+<!-- prettier-ignore -->
 ```typescript
 import { pipe } from "effect";
 
@@ -28,6 +29,7 @@ const résultat = transformation3(transformation2(transformation1(valeurInitiale
 
 `pipe` est la façon standard de composer des transformations Effect :
 
+<!-- prettier-ignore -->
 ```typescript
 import { pipe } from "effect"
 
@@ -40,6 +42,7 @@ const résultat = pipe(
 
 La plupart des fonctions Effect ont une signature **curryée** — elles attendent la valeur en dernier, ce qui les rend directement utilisables dans `pipe` :
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.map(monEffect, (n) => n * 2)       // data-first (rare)
 pipe(monEffect, Effect.map((n) => n * 2)) // data-last dans pipe (standard)
@@ -49,6 +52,7 @@ pipe(monEffect, Effect.map((n) => n * 2)) // data-last dans pipe (standard)
 
 `Effect.gen` permet d'écrire des Effects avec la syntaxe générateur JavaScript (`function*` et `yield*`), similaire à `async/await` :
 
+<!-- prettier-ignore -->
 ```typescript
 // Avec pipe et flatMap
 const résultat = pipe(
@@ -71,6 +75,7 @@ const résultat = Effect.gen(function* () {
 
 ### Équivalences
 
+<!-- prettier-ignore -->
 ```typescript
 // pipe + flatMap
 pipe(a, Effect.flatMap((va) => pipe(b, Effect.flatMap((vb) => ...))))
@@ -86,9 +91,11 @@ Effect.gen(function* () {
 ## `Effect.fn` — fonctions nommées avec traçage
 
 `Effect.fn` est un wrapper autour d'`Effect.gen` qui ajoute :
+
 - Un **nom** pour les messages d'erreur et le débogage
 - Un **span OpenTelemetry** pour le traçage distribué
 
+<!-- prettier-ignore -->
 ```typescript
 // Effect.gen — sans traçage
 const fetchUser = (id: string) =>
@@ -106,15 +113,16 @@ La syntaxe est légèrement différente : les arguments vont dans la fonction g�
 
 ## Choisir entre pipe et Effect.gen
 
-| Situation | Recommandation |
-|-----------|---------------|
-| 1-2 transformations simples | `pipe` |
-| Logique avec plusieurs étapes | `Effect.gen` |
-| Fonctions en production | `Effect.fn` (traçage) |
+| Situation                          | Recommandation                    |
+| ---------------------------------- | --------------------------------- |
+| 1-2 transformations simples        | `pipe`                            |
+| Logique avec plusieurs étapes      | `Effect.gen`                      |
+| Fonctions en production            | `Effect.fn` (traçage)             |
 | Gestion d'erreurs en fin de chaîne | `pipe(gen, Effect.catchTag(...))` |
 
 En pratique, on mélange les deux styles. Le bloc logique avec `Effect.gen`, la gestion d'erreurs avec `pipe` :
 
+<!-- prettier-ignore -->
 ```typescript
 const créerCommande = pipe(
   Effect.fn("créerCommande")(function*(userId: string, articleId: string) {

@@ -16,6 +16,7 @@ Fichier à compléter : `packages/app/_exercices/12-form.spec.tsx`
 
 Un formulaire se définit en ajoutant des champs un par un. Chaque champ a un nom et un schema de validation :
 
+<!-- prettier-ignore -->
 ```typescript
 const MyFormBuilder = FormBuilder.empty
   .addField("brand", Schema.NonEmptyTrimmedString)
@@ -28,6 +29,7 @@ const MyFormBuilder = FormBuilder.empty
 
 Créez `MyFormBuilder` avec deux champs : `brand` et `model`, tous deux `Schema.NonEmptyTrimmedString` :
 
+<!-- prettier-ignore -->
 ```typescript
 const MyFormBuilder = ??? // À compléter
 
@@ -51,6 +53,7 @@ expect(MyFormBuilder.fields).toMatchObject({
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const MyFormBuilder = FormBuilder.empty
   .addField("brand", Schema.NonEmptyTrimmedString)
@@ -65,6 +68,7 @@ const MyFormBuilder = FormBuilder.empty
 
 Pour un champ qui contient plusieurs valeurs, `Field.makeArrayField` crée un champ tableau :
 
+<!-- prettier-ignore -->
 ```typescript
 const ItemIdsField = Field.makeArrayField("itemIds", Schema.UUID)
 const MyFormBuilder = FormBuilder.empty.addField(ItemIdsField)
@@ -74,6 +78,7 @@ const MyFormBuilder = FormBuilder.empty.addField(ItemIdsField)
 
 Créez `MyFormBuilder` avec un champ `itemIds` de type `Schema.UUID[]` :
 
+<!-- prettier-ignore -->
 ```typescript
 const MyFormBuilder = ??? // À compléter
 
@@ -89,6 +94,7 @@ expect(MyFormBuilder.fields).toMatchObject({
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const ItemIdsField = Field.makeArrayField("itemIds", Schema.UUID)
 const MyFormBuilder = FormBuilder.empty.addField(ItemIdsField)
@@ -102,6 +108,7 @@ const MyFormBuilder = FormBuilder.empty.addField(ItemIdsField)
 
 `FormReact.make` prend le builder et une configuration pour produire un composant React :
 
+<!-- prettier-ignore -->
 ```typescript
 const loginForm = FormReact.make(loginFormBuilder, {
   fields: {
@@ -127,6 +134,7 @@ Créez `loginFormBuilder` pour un formulaire de connexion avec trois champs :
 - `password` : `Schema.NonEmptyTrimmedString` avec message `"Required field"`, puis `Schema.minLength(8)` avec message `"Minimum 8 chars"`
 - `remember` : `Schema.Boolean`
 
+<!-- prettier-ignore -->
 ```typescript
 const loginFormBuilder = ??? // À compléter
 ```
@@ -140,6 +148,7 @@ const loginFormBuilder = ??? // À compléter
 
 Pour `password`, on compose les validations avec `pipe` :
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   Schema.NonEmptyTrimmedString.annotations({ message: () => "Required field" }),
@@ -154,6 +163,7 @@ pipe(
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const loginFormBuilder = FormBuilder.empty
   .addField("username", Schema.NonEmptyTrimmedString)
@@ -175,6 +185,7 @@ const loginFormBuilder = FormBuilder.empty
 
 Le formulaire expose un atom `submit`. `useAtomSet` renvoie un setter — ici, c'est le handler de soumission du `<form>` :
 
+<!-- prettier-ignore -->
 ```typescript
 function TestComponent({ defaultValues }) {
   const submit = useAtomSet(loginForm.submit)
@@ -199,6 +210,7 @@ function TestComponent({ defaultValues }) {
 
 Récupérez `submit` avec `useAtomSet` :
 
+<!-- prettier-ignore -->
 ```typescript
 function TestComponent({ defaultValues }) {
   const submit = ??? // À compléter
@@ -213,6 +225,7 @@ function TestComponent({ defaultValues }) {
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const submit = useAtomSet(loginForm.submit)
 ```

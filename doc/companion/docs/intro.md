@@ -99,6 +99,7 @@ Avant de plonger dans le code, voici l'idée centrale d'Effect :
 
 Exactement comme une recette de cuisine n'est pas le plat. La recette décrit ce qu'il faut faire. Le plat n'existe que quand on exécute la recette.
 
+<!-- prettier-ignore -->
 ```typescript
 // Ceci ne fait rien — c'est juste une description
 const monEffect = Effect.succeed(42);

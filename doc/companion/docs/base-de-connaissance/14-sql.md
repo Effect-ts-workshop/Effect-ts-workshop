@@ -9,6 +9,7 @@ sidebar_position: 14
 `@effect/sql` intègre les bases de données relationnelles dans le monde Effect. Les requêtes sont des Effects — elles bénéficient automatiquement de la gestion d'erreurs typée, de la composition, et du tracing distribué.
 
 Deux niveaux d'abstraction sont disponibles :
+
 - **SQL natif** — requêtes SQL directes avec le template literal `sql`
 - **Drizzle** — query builder typé, intégré via le service `Database`
 
@@ -18,6 +19,7 @@ Deux niveaux d'abstraction sont disponibles :
 
 `SqlClient.SqlClient` est le service de base. On le récupère depuis le contexte comme n'importe quel service Effect :
 
+<!-- prettier-ignore -->
 ```typescript
 import { SqlClient } from "@effect/sql"
 import { Effect } from "effect"
@@ -36,6 +38,7 @@ Le service est fourni via `SqlLive`, un Layer qui gère la connexion PostgreSQL 
 
 Le client `sql` s'utilise comme un template literal. Les variables interpolées sont **automatiquement paramétrées** — pas d'injection SQL possible.
 
+<!-- prettier-ignore -->
 ```typescript
 const findByBrand = Effect.fn("findByBrand")(function*(brand: string) {
   const sql = yield* SqlClient.SqlClient
@@ -57,6 +60,7 @@ Le résultat est un tableau de lignes brutes. Le type est `ReadonlyArray<unknown
 
 `Model.Class` définit la forme d'un objet en base, avec des types spéciaux pour les timestamps :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Model, Schema } from "@effect/sql"
 
@@ -78,6 +82,7 @@ class DbItem extends Model.Class<DbItem>("DbItem")({
 
 `Model.makeRepository` génère un repository complet à partir d'un `Model.Class` :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Model } from "@effect/sql"
 
@@ -92,6 +97,7 @@ const getCrud = Effect.fn("getCrud")(function*() {
 ```
 
 Le repository expose :
+
 - `insert(values)` → insère une ligne, retourne la ligne insérée
 - `findById(id)` → retourne `Option<DbItem>`
 - `update(values)` → met à jour, retourne la ligne modifiée
@@ -105,6 +111,7 @@ Toutes ces opérations sont des Effects typés.
 
 Pour des requêtes plus complexes (jointures, sous-requêtes, agrégations), Drizzle offre un query builder qui reste dans le monde Effect via le service `Database` :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Database } from "../database-drizzle"
 import { eq } from "drizzle-orm"
@@ -126,6 +133,7 @@ const findByBrand = Effect.fn("findByBrand")(function*(brand: string) {
 
 Les tables sont définies séparément, dans `db/item.sql.ts` :
 
+<!-- prettier-ignore -->
 ```typescript
 import { pgTable, text, timestamp } from "drizzle-orm/pg-core"
 
@@ -144,6 +152,7 @@ export const items = pgTable("items", {
 
 Les tests SQL démarrent un vrai conteneur PostgreSQL via `testcontainers` — pas de mock en mémoire. Cela garantit que les requêtes fonctionnent contre une vraie base.
 
+<!-- prettier-ignore -->
 ```typescript
 import { GenericContainer, Wait } from "testcontainers"
 
@@ -170,6 +179,7 @@ const it = itBase.extend("pgConfig", async ({}, { onCleanup }) => {
 
 ## Layers SQL
 
+<!-- prettier-ignore -->
 ```typescript
 // Layer minimal pour les tests
 const databaseLayer = Layer.mergeAll(SqlLive, MigratorLive)
@@ -189,10 +199,10 @@ const testLayer = pipe(
 
 ## Récapitulatif
 
-| Besoin | API |
-|---|---|
-| Requête SQL brute | `` sql`SELECT ...` `` (template literal) |
-| CRUD simple | `Model.Class` + `Model.makeRepository` |
-| Requêtes complexes | Drizzle via service `Database` |
-| Connexion gérée | `SqlLive` + `MigratorLive` |
+| Besoin                | API                                          |
+| --------------------- | -------------------------------------------- |
+| Requête SQL brute     | `` sql`SELECT ...` `` (template literal)     |
+| CRUD simple           | `Model.Class` + `Model.makeRepository`       |
+| Requêtes complexes    | Drizzle via service `Database`               |
+| Connexion gérée       | `SqlLive` + `MigratorLive`                   |
 | Tests avec vraie base | `testcontainers` + `Layer.setConfigProvider` |

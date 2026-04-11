@@ -18,6 +18,7 @@ Fichier à compléter : `packages/app/_exercices/11-atom.spec.tsx`
 
 Un `Atom` est une unité de state. On le lit et le modifie via un `Registry` :
 
+<!-- prettier-ignore -->
 ```typescript
 const counter = Atom.make(0)
 
@@ -31,6 +32,7 @@ r.get(counter)   // 1
 
 Créez un atom `counter` initialisé à `0` :
 
+<!-- prettier-ignore -->
 ```typescript
 const counter = ??? // À compléter
 expect(r.get(counter)).toEqual(0)
@@ -49,6 +51,7 @@ expect(r.get(counter)).toEqual(0)
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const counter = Atom.make(0)
 ```
@@ -63,6 +66,7 @@ const counter = Atom.make(0)
 
 Mettez `counter` à `1` via le registry `r` :
 
+<!-- prettier-ignore -->
 ```typescript
 const counter = Atom.make(0)
 ??? // À compléter
@@ -74,6 +78,7 @@ expect(r.get(counter)).toEqual(1)
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 r.set(counter, 1)
 ```
@@ -86,6 +91,7 @@ r.set(counter, 1)
 
 Un atom peut _dériver_ sa valeur d'autres atoms. La fonction reçoit `get` pour lire d'autres atoms :
 
+<!-- prettier-ignore -->
 ```typescript
 const counter = Atom.make(0)
 const doubled = Atom.make((get) => get(counter) * 2)
@@ -98,6 +104,7 @@ r.get(doubled) // 18 — recalculé automatiquement
 
 Créez `doubled`, un atom dérivé qui vaut toujours `counter * 2` :
 
+<!-- prettier-ignore -->
 ```typescript
 const counter = Atom.make(0)
 const doubled = ??? // À compléter
@@ -111,6 +118,7 @@ expect(r.get(doubled)).toEqual(18)
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const doubled = Atom.make((get) => get(counter) * 2)
 ```
@@ -123,6 +131,7 @@ const doubled = Atom.make((get) => get(counter) * 2)
 
 `Atom.map` est un raccourci pour créer un atom dérivé avec une transformation simple :
 
+<!-- prettier-ignore -->
 ```typescript
 const doubled = Atom.map(counter, (v) => v * 2)
 // équivalent à Atom.make((get) => get(counter) * 2)
@@ -132,6 +141,7 @@ const doubled = Atom.map(counter, (v) => v * 2)
 
 Créez `doubled` avec `Atom.map` :
 
+<!-- prettier-ignore -->
 ```typescript
 const doubled = ??? // À compléter
 ```
@@ -141,6 +151,7 @@ const doubled = ??? // À compléter
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const doubled = Atom.map(counter, (v) => v * 2)
 ```
@@ -153,6 +164,7 @@ const doubled = Atom.map(counter, (v) => v * 2)
 
 `Atom.fnSync` crée un atom dont la valeur est le _résultat_ d'une fonction appliquée à son état :
 
+<!-- prettier-ignore -->
 ```typescript
 const increment = (count: number) => count + 1
 const next = Atom.fnSync(increment, { initialValue: 0 })
@@ -165,6 +177,7 @@ r.get(next)       // 1
 
 Créez `next` avec `Atom.fnSync` et la fonction `increment` :
 
+<!-- prettier-ignore -->
 ```typescript
 const increment = (count: number) => count + 1
 const next = ??? // À compléter
@@ -178,6 +191,7 @@ expect(r.get(next)).toEqual(1)
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const next = Atom.fnSync(increment, { initialValue: 0 })
 ```
@@ -190,6 +204,7 @@ const next = Atom.fnSync(increment, { initialValue: 0 })
 
 Un atom peut contenir un `Effect`. Le registry l'exécute et stocke le résultat sous forme de `Result` :
 
+<!-- prettier-ignore -->
 ```typescript
 const counter = Atom.make(Effect.succeed(2))
 
@@ -201,6 +216,7 @@ const value: Result.Result<number, unknown> = r.get(counter)
 
 Créez un atom à partir de `Effect.succeed(2)` :
 
+<!-- prettier-ignore -->
 ```typescript
 const counter = ??? // À compléter
 
@@ -214,6 +230,7 @@ expect(value.value).toEqual(2)
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const counter = Atom.make(Effect.succeed(2))
 ```
@@ -226,6 +243,7 @@ const counter = Atom.make(Effect.succeed(2))
 
 Pour être notifié quand un atom change, on s'y abonne avec `r.subscribe` :
 
+<!-- prettier-ignore -->
 ```typescript
 r.subscribe(counter, (newValue) => {
   console.log("nouvelle valeur :", newValue)
@@ -236,6 +254,7 @@ r.subscribe(counter, (newValue) => {
 
 Abonnez `listener` aux changements de `counter` :
 
+<!-- prettier-ignore -->
 ```typescript
 const listener = vi.fn()
 const counter = Atom.make(0)
@@ -251,6 +270,7 @@ expect(listener).toHaveBeenCalledWith(9)
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 r.subscribe(counter, listener)
 ```
@@ -263,6 +283,7 @@ r.subscribe(counter, listener)
 
 Par défaut, un atom sans abonné peut être garbage-collecté. `Atom.keepAlive` garantit que la valeur persiste même sans listener :
 
+<!-- prettier-ignore -->
 ```typescript
 const aliveAtom = Atom.keepAlive(initialAtom)
 ```
@@ -271,6 +292,7 @@ const aliveAtom = Atom.keepAlive(initialAtom)
 
 Créez `aliveAtom` à partir de `initialAtom` avec `Atom.keepAlive` :
 
+<!-- prettier-ignore -->
 ```typescript
 const initialAtom = Atom.make(0)
 const aliveAtom = ??? // À compléter
@@ -287,6 +309,7 @@ expect(r.get(aliveAtom)).toEqual(9)   // persisté
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const aliveAtom = Atom.keepAlive(initialAtom)
 ```
@@ -301,6 +324,7 @@ const aliveAtom = Atom.keepAlive(initialAtom)
 
 `useAtomValue` abonne le composant à l'atom. Quand l'atom change, le composant re-render automatiquement :
 
+<!-- prettier-ignore -->
 ```typescript
 function TestComponent() {
   const value = useAtomValue(atom)
@@ -312,6 +336,7 @@ function TestComponent() {
 
 Lisez la valeur de `atom` avec `useAtomValue` :
 
+<!-- prettier-ignore -->
 ```typescript
 const atom = Atom.make(42)
 
@@ -326,6 +351,7 @@ function TestComponent() {
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const value = useAtomValue(atom)
 ```
@@ -338,6 +364,7 @@ const value = useAtomValue(atom)
 
 `useAtom` retourne `[valeur, setter]` — comme `useState`, mais pour un atom partagé :
 
+<!-- prettier-ignore -->
 ```typescript
 const [value, setValue] = useAtom(atom)
 setValue((v) => v + 1) // mise à jour fonctionnelle
@@ -347,6 +374,7 @@ setValue((v) => v + 1) // mise à jour fonctionnelle
 
 Utilisez `useAtom` pour lire et mettre à jour `counter` :
 
+<!-- prettier-ignore -->
 ```typescript
 function TestComponent() {
   const [value, setValue] = ??? // À compléter
@@ -364,6 +392,7 @@ function TestComponent() {
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const [value, setValue] = useAtom(atom)
 ```
@@ -376,6 +405,7 @@ const [value, setValue] = useAtom(atom)
 
 `AtomHttpApi.Tag` crée automatiquement des atoms à partir des endpoints d'une API. L'état est géré par un `Result` :
 
+<!-- prettier-ignore -->
 ```typescript
 class DemoClient extends AtomHttpApi.Tag<DemoClient>()("DemoClient", {
   api: Api,
@@ -401,6 +431,7 @@ function TestComponent() {
 
 Lisez l'atom de query avec `useAtomValue` pour `DemoClient.query("items", "getAllItems", ...)` :
 
+<!-- prettier-ignore -->
 ```typescript
 function TestComponent() {
   const result = ??? as Result.Result<{ items: any[] }, any> // À compléter
@@ -413,6 +444,7 @@ function TestComponent() {
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const result = useAtomValue(
   DemoClient.query("items", "getAllItems", { reactivityKeys: ["items"] })

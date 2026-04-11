@@ -4,10 +4,11 @@ sidebar_position: 4
 
 # Exercice 4 — Pattern Matching
 
-En TypeScript un `switch/case` fonctionne, mais il a des angles morts : 
-* il ne vérifie pas l'exhaustivité par défaut,
-* les conditions complexes - comme discriminer sur plusieurs propriétés - sont maladroites,
-* on ne peut pas l'utiliser dans une expression `pipe`.
+En TypeScript un `switch/case` fonctionne, mais il a des angles morts :
+
+- il ne vérifie pas l'exhaustivité par défaut,
+- les conditions complexes - comme discriminer sur plusieurs propriétés - sont maladroites,
+- on ne peut pas l'utiliser dans une expression `pipe`.
 
 Effect fournit avec `Match` une alternative typée, composable et exhaustive.
 
@@ -19,6 +20,7 @@ Fichier à compléter : `packages/api/_exercices/4-pattern-matching.spec.ts`
 
 Le pattern de base : démarrer un match sur une valeur, définir les cas, clore avec `exhaustive`.
 
+<!-- prettier-ignore -->
 ```typescript
 type Circle = { kind: "circle"; radius: number }
 type Rectangle = { kind: "rectangle"; width: number, height: number }
@@ -32,12 +34,14 @@ pipe(
   Match.exhaustive // ← le compilateur vérifie qu'aucun cas n'est oublié
 )
 ```
+
 Le Matcher a un paramètre de type F (Filters) qui trace ce qui n'a pas encore été matché, chaque appel à Match.when met à jour F: il "retire" le type couvert du filtre. La signature de `Match.exhaustive` _exige_ que F soit never. Si un cas possible n'est pas couvert, TypeScript signale une erreur de compilation.
 
 ### Exercice
 
 Complétez `getValue` pour couvrir les quatre variants du type `AnyField` :
 
+<!-- prettier-ignore -->
 ```typescript
 const getValue = (field: AnyField) =>
   pipe(
@@ -48,6 +52,7 @@ const getValue = (field: AnyField) =>
 ```
 
 Les valeurs attendues :
+
 - `{ type: "number", value: 42 }` → `"42"`
 - `{ type: "text", value: "awesome" }` → `"awesome"`
 - `{ type: "select", multiple: false, value: "selected" }` → `"selected"`
@@ -68,6 +73,7 @@ Les valeurs attendues :
 
 On peut matcher sur un objet partiel. `{ type: "number" }` correspond à tout objet dont `type` vaut `"number"`. TypeScript affine ensuite le type dans le handler.
 
+<!-- prettier-ignore -->
 ```typescript
 Match.when({ type: "number" }, (f) => /* f est de type NumberField ici */)
 ```
@@ -81,6 +87,7 @@ Match.when({ type: "number" }, (f) => /* f est de type NumberField ici */)
 
 Les deux cas `SelectField` et `MultipleSelectField` ont `type: "select"`. Pour les différencier, ajoutez `multiple` au prédicat :
 
+<!-- prettier-ignore -->
 ```typescript
 Match.when({ type: "select", multiple: true }, (f) => f.value.join(", "))
 Match.when({ type: "select", multiple: false }, (f) => f.value)
@@ -93,6 +100,7 @@ Match.when({ type: "select", multiple: false }, (f) => f.value)
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const getValue = (field: AnyField) =>
   pipe(
@@ -113,15 +121,16 @@ const getValue = (field: AnyField) =>
 
 `Option` représente une valeur qui peut être présente (`Some`) ou absente (`None`). Il est ainsi possible de décrire une séquence au sein de laquelle les `Some` seront traités et les `None` ignorés. En un sens `Option` est une adaptation du _railway pattern_ au cas de l'absence de valeur. Chacun des cas peut ensuite être traité de façon différenciée.
 
-
 Ici, `Array.get` renvoie un `Option` plutôt qu'un `undefined` silencieux :
 
+<!-- prettier-ignore -->
 ```typescript
 Array.get(colors, 0) // Option<string>
 ```
 
 `Option.match` permet de traiter les deux cas explicitement :
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   Array.get(colors, 0),
@@ -136,6 +145,7 @@ pipe(
 
 Complétez `getValueAt` pour renvoyer la valeur en majuscules si elle existe, ou `"DEFAULT"` sinon :
 
+<!-- prettier-ignore -->
 ```typescript
 const getValueAt = (index: number) =>
   pipe(
@@ -161,6 +171,7 @@ const getValueAt = (index: number) =>
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const getValueAt = (index: number) =>
   pipe(
@@ -181,6 +192,7 @@ const getValueAt = (index: number) =>
 
 Parfois, on ne _veut_ pas couvrir tous les cas — seulement certains. `Match.option` clôt le match en enveloppant le résultat dans un `Option` : `Some` si un cas a matché, `None` sinon.
 
+<!-- prettier-ignore -->
 ```typescript
 type Free = { tier: 'free', annual: number}
 type Pro = { tier: 'pro', annual: number}
@@ -200,6 +212,7 @@ const getTrialDays = (plan: Plan): Option.Option<number> =>
 
 Complétez `getDeliveryDays` pour renvoyer le délai uniquement pour `"in_stock"` :
 
+<!-- prettier-ignore -->
 ```typescript
 const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
   pipe(
@@ -216,6 +229,7 @@ const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
   pipe(
@@ -233,6 +247,7 @@ const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
 
 Quand les variants d'une union ont une propriété `_tag`, `Match.tag` est plus concis que `Match.when({ _tag: "..." })` :
 
+<!-- prettier-ignore -->
 ```typescript
 type OrderPlaced = { _tag: "OrderPlaced"; id: string; total: string }
 type PaymentFailed = { _tag: "PaymentFailed"; id: string; reason: string }
@@ -253,6 +268,7 @@ pipe(
 
 Complétez `describe` pour les trois types de notifications :
 
+<!-- prettier-ignore -->
 ```typescript
 type Notification = EmailNotification | SmsNotification | PushNotification
 
@@ -271,6 +287,7 @@ const describe = (notif: Notification) =>
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const describe = (notif: Notification) =>
   pipe(
@@ -290,6 +307,7 @@ const describe = (notif: Notification) =>
 
 Quand on ne _peut_ pas couvrir tous les cas (type `string` ouvert, valeurs inconnues), `Match.orElse` joue le rôle du `default` dans un `switch/case` :
 
+<!-- prettier-ignore -->
 ```typescript
 type Locale = 'fr' | 'en' | 'es' | 'de' | 'nl'
 
@@ -306,6 +324,7 @@ pipe(
 
 Complétez `getProcessingFee` avec trois cas explicites et un fallback :
 
+<!-- prettier-ignore -->
 ```typescript
 const getProcessingFee = (method: PaymentMethod): string =>
   pipe(
@@ -321,6 +340,7 @@ const getProcessingFee = (method: PaymentMethod): string =>
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const getProcessingFee = (method: PaymentMethod): string =>
   pipe(
@@ -340,6 +360,7 @@ const getProcessingFee = (method: PaymentMethod): string =>
 
 Pour matcher "tout sauf X", `Match.not` exclut une valeur spécifique :
 
+<!-- prettier-ignore -->
 ```typescript
 type Day = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
 
@@ -354,6 +375,7 @@ pipe(
 
 Implémentez `isTrackable` : une commande est traçable sauf si elle est `"cancelled"` :
 
+<!-- prettier-ignore -->
 ```typescript
 const isTrackable = (status: OrderStatus) =>
   pipe(
@@ -370,6 +392,7 @@ const isTrackable = (status: OrderStatus) =>
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const isTrackable = (status: OrderStatus) =>
   pipe(
@@ -387,6 +410,7 @@ const isTrackable = (status: OrderStatus) =>
 
 `Match.whenOr` est un raccourci pour plusieurs `Match.when` qui renvoient la même chose :
 
+<!-- prettier-ignore -->
 ```typescript
 type Environment = 'testing' | 'staging' | 'production'
 
@@ -398,6 +422,7 @@ Match.whenOr("testing", "staging", () => mockDatabase)
 
 `canAccessDashboard` renvoie `true` uniquement pour `"admin"` et `"superAdmin"` :
 
+<!-- prettier-ignore -->
 ```typescript
 const canAccessDashboard = (role: Role) =>
   pipe(
@@ -414,6 +439,7 @@ const canAccessDashboard = (role: Role) =>
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const canAccessDashboard = (role: Role) =>
   pipe(
@@ -431,6 +457,7 @@ const canAccessDashboard = (role: Role) =>
 
 Pour matcher sur des types primitifs, `Match` fournit des prédicats prêts à l'emploi :
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   Match.value(config),
@@ -446,6 +473,7 @@ pipe(
 
 Complétez `formatForDisplay` pour les quatre types de `FieldValue` :
 
+<!-- prettier-ignore -->
 ```typescript
 type FieldValue = string | number | boolean | null
 
@@ -473,6 +501,7 @@ Placez `Match.when(Match.null, ...)` avant `Match.when(Match.string, ...)` — `
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const formatForDisplay = (value: FieldValue) =>
   pipe(

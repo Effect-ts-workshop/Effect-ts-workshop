@@ -6,6 +6,7 @@ sidebar_position: 4
 
 ## Le problème des dépendances implicites
 
+<!-- prettier-ignore -->
 ```typescript
 // Cette fonction dépend implicitement de fetch (navigateur)
 // et de console (Node.js ou navigateur)
@@ -22,6 +23,7 @@ Ces dépendances sont invisibles dans le type `Promise<Item[]>`. Impossible de l
 
 Le troisième paramètre de `Effect<A, E, R>` est le **Contexte** (aussi appelé Requirements) :
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.Effect<Item[], ErreurAPI, HttpClient.HttpClient | LoggingService>
 //                               ↑               ↑
@@ -34,6 +36,7 @@ Toutes les dépendances sont **visibles dans le type**. Impossible d'oublier d'e
 
 Un `Tag` est l'identifiant d'un service dans le contexte Effect. C'est la "clé" qui permet de retrouver l'implémentation.
 
+<!-- prettier-ignore -->
 ```typescript
 import { Context, Effect } from "effect";
 
@@ -54,6 +57,7 @@ Le nom doit être **unique** dans toute l'application. Il apparaît dans les err
 
 Dans `Effect.gen`, `yield*` extrait le service du contexte :
 
+<!-- prettier-ignore -->
 ```typescript
 const monProgramme = Effect.gen(function* () {
   const logger = yield* LoggingService;  // Récupère le service
@@ -69,6 +73,7 @@ const monProgramme = Effect.gen(function* () {
 
 Effect fournit `Effect.Service` pour créer des services de façon plus concise :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Effect } from "effect";
 
@@ -89,6 +94,7 @@ C'est le pattern utilisé dans `packages/api/db/item-repository.ts`.
 
 Les services dans le contexte s'**additionnent** automatiquement :
 
+<!-- prettier-ignore -->
 ```typescript
 const programme = Effect.gen(function* () {
   const client = yield* HttpClient.HttpClient;
@@ -109,6 +115,7 @@ const programme = Effect.gen(function* () {
 
 Dans `packages/api/db/item-repository-drizzle.ts` :
 
+<!-- prettier-ignore -->
 ```typescript
 // Un service qui dépend de la base de données
 class ItemRepositoryDrizzle extends Effect.Service<ItemRepositoryDrizzle>()(

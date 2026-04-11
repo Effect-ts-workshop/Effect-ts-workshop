@@ -8,14 +8,15 @@ sidebar_position: 12
 
 `Result` est un type qui représente l'état d'une opération **asynchrone** — typiquement un appel réseau ou un Effect long. Il a trois états possibles :
 
-| État | Signification |
-|---|---|
-| `Result.Initial` | Pas encore lancé (état de départ) |
+| État                | Signification                          |
+| ------------------- | -------------------------------------- |
+| `Result.Initial`    | Pas encore lancé (état de départ)      |
 | `Result.Success<A>` | Terminé avec succès, valeur disponible |
-| `Result.Failure<E>` | Terminé en erreur |
+| `Result.Failure<E>` | Terminé en erreur                      |
 
 C'est le type retourné par `useAtomValue` quand l'Atom contient un `Effect` :
 
+<!-- prettier-ignore -->
 ```typescript
 const dataAtom = Atom.make(Effect.succeed(42));
 const value = r.get(dataAtom);
@@ -24,6 +25,7 @@ const value = r.get(dataAtom);
 
 ## Tester l'état
 
+<!-- prettier-ignore -->
 ```typescript
 import { Result } from "@effect-atom/atom-react";
 
@@ -44,6 +46,7 @@ if (Result.isFailure(value)) {
 
 Le pattern classique dans un composant :
 
+<!-- prettier-ignore -->
 ```typescript
 function InventoryList() {
   const result = useAtomValue(
@@ -62,6 +65,7 @@ function InventoryList() {
 
 `Result.builder` permet de décrire le rendu pour chaque état sans if/else imbriqués :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Result } from "@effect-atom/atom-react";
 
@@ -86,11 +90,11 @@ function DataComponent() {
 
 Effect propose plusieurs types pour représenter un résultat. Voici comment choisir :
 
-| Type | Contexte d'utilisation |
-|---|---|
-| `Either<A, E>` | Résultat synchrone qui peut réussir ou échouer |
-| `Exit<A, E>` | Comment une Fiber s'est terminée (succès, erreur, interruption) |
-| `Result<A, E>` | État d'un Atom asynchrone (initial / success / failure) |
-| `Option<A>` | Valeur qui peut être absente (`Some` ou `None`) |
+| Type           | Contexte d'utilisation                                          |
+| -------------- | --------------------------------------------------------------- |
+| `Either<A, E>` | Résultat synchrone qui peut réussir ou échouer                  |
+| `Exit<A, E>`   | Comment une Fiber s'est terminée (succès, erreur, interruption) |
+| `Result<A, E>` | État d'un Atom asynchrone (initial / success / failure)         |
+| `Option<A>`    | Valeur qui peut être absente (`Some` ou `None`)                 |
 
 `Result` est spécifique à `@effect-atom/atom-react`. `Either`, `Exit` et `Option` font partie du package `effect` de base.

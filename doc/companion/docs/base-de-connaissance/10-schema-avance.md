@@ -18,6 +18,7 @@ La différence clé : un seul Schema fait les trois.
 
 `Schema.decodeUnknownSync` valide une valeur de type `unknown`. Les champs inconnus sont **filtrés automatiquement** :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Schema } from "effect";
 
@@ -36,16 +37,17 @@ const user = Schema.decodeUnknownSync(UserSchema)({
 
 ### Choisir le mode d'exécution
 
-| Fonction | Comportement en erreur |
-|---|---|
-| `decodeUnknownSync` | lève une exception |
+| Fonction              | Comportement en erreur             |
+| --------------------- | ---------------------------------- |
+| `decodeUnknownSync`   | lève une exception                 |
 | `decodeUnknownEither` | retourne `Either.Left(ParseError)` |
-| `decodeUnknown` | retourne un `Effect` |
+| `decodeUnknown`       | retourne un `Effect`               |
 
 Utilisez `Either` ou `Effect` pour traiter les erreurs proprement dans votre code.
 
 ### Messages d'erreur
 
+<!-- prettier-ignore -->
 ```typescript
 const result = Schema.decodeUnknownEither(UserSchema, { errors: "all" })({})
 // → Either.Left avec :
@@ -60,6 +62,7 @@ const result = Schema.decodeUnknownEither(UserSchema, { errors: "all" })({})
 
 Pour un traitement programmatique (formulaires), `ParseResult.ArrayFormatter` produit un tableau :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Either, ParseResult, Schema } from "effect";
 
@@ -79,6 +82,7 @@ Date TypeScript  ←→  string ISO (JSON)
 new Date("2026-04-22")  ←→  "2026-04-22T00:00:00.000Z"
 ```
 
+<!-- prettier-ignore -->
 ```typescript
 import { Schema } from "effect";
 
@@ -103,6 +107,7 @@ Le voyage aller-retour `encode → decode` produit une valeur identique à l'ori
 
 `Arbitrary.make` génère un arbitraire `fast-check` à partir d'un Schema. Chaque valeur générée respecte les contraintes du Schema :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Arbitrary, Schema } from "effect";
 import fc from "fast-check";
@@ -132,6 +137,7 @@ Au lieu de tester 3 cas manuels, on vérifie qu'une **propriété tient pour des
 
 `Brand` crée des types nominaux — des types TypeScript **incompatibles** avec leur type de base, même s'ils ont la même structure :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Brand, Schema, pipe } from "effect";
 
@@ -157,6 +163,7 @@ Cela empêche de mélanger accidentellement un `string` quelconque avec un `Emai
 
 Les annotations enrichissent un Schema sans changer son comportement de validation :
 
+<!-- prettier-ignore -->
 ```typescript
 const NameSchema = Schema.NonEmptyString.annotations({
   identifier: "Name",                // Nom dans les messages d'erreur
@@ -169,11 +176,11 @@ Avec `identifier`, le message d'erreur affiche `Expected Name, actual null` au l
 
 ## Récapitulatif
 
-| Besoin | Fonction |
-|---|---|
+| Besoin                      | Fonction                                         |
+| --------------------------- | ------------------------------------------------ |
 | Valider une valeur inconnue | `Schema.decodeUnknownSync` / `Either` / `Effect` |
-| Sérialiser pour l'API | `Schema.encodeSync` |
-| Désérialiser depuis l'API | `Schema.decodeSync` |
-| Générer des données de test | `Arbitrary.make` + `fc.assert` |
-| Type nominal validé | `Brand` + `Schema.fromBrand` |
-| Personnaliser les erreurs | `.annotations({ identifier, message })` |
+| Sérialiser pour l'API       | `Schema.encodeSync`                              |
+| Désérialiser depuis l'API   | `Schema.decodeSync`                              |
+| Générer des données de test | `Arbitrary.make` + `fc.assert`                   |
+| Type nominal validé         | `Brand` + `Schema.fromBrand`                     |
+| Personnaliser les erreurs   | `.annotations({ identifier, message })`          |

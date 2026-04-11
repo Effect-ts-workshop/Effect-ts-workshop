@@ -16,6 +16,7 @@ Fichier à compléter : `packages/api/_exercices/2-errors.spec.ts`
 
 Quand `Effect.succeed` crée un Effect qui réussit, `Effect.fail` crée un Effect qui échoue :
 
+<!-- prettier-ignore -->
 ```typescript
 // Succès
 const ok: Effect.Effect<number> = Effect.succeed(42);
@@ -32,6 +33,7 @@ Le deuxième paramètre de type — `Error` — est visible dans la signature. L
 
 Complétez `squareRoot` pour qu'elle échoue explicitement quand `n < 0` :
 
+<!-- prettier-ignore -->
 ```typescript
 function squareRoot(n: number): Effect.Effect<number, Error> {
   if (n < 0) {
@@ -56,6 +58,7 @@ function squareRoot(n: number): Effect.Effect<number, Error> {
 
 Comme `Effect.succeed` emballe une valeur de succès, `Effect.fail` emballe une valeur d'erreur.
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.fail(new Error("message"));
 ```
@@ -67,6 +70,7 @@ Effect.fail(new Error("message"));
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 function squareRoot(n: number): Effect.Effect<number, Error> {
   if (n < 0) {
@@ -84,6 +88,7 @@ function squareRoot(n: number): Effect.Effect<number, Error> {
 
 Une même fonction peut échouer de plusieurs façons. Effect le modélise avec une union dans le type d'erreur :
 
+<!-- prettier-ignore -->
 ```typescript
 type ParseCSV = (
   path: string,
@@ -94,6 +99,7 @@ type ParseCSV = (
 
 `Effect.filterOrFail` permet de convertir un cas de succès partiel en échec :
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   Effect.tryPromise({
@@ -111,6 +117,7 @@ pipe(
 
 Complétez les deux `TODO` dans `catch` et dans `filterOrFail` :
 
+<!-- prettier-ignore -->
 ```typescript
 const fetch: Fetch = (input, init) =>
   pipe(
@@ -148,6 +155,7 @@ const fetch: Fetch = (input, init) =>
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const fetch: Fetch = (input, init) =>
   pipe(
@@ -170,6 +178,7 @@ const fetch: Fetch = (input, init) =>
 
 Les classes d'erreur classiques ont un problème : impossible de les distinguer par leur type à l'exécution si on n'a que `instanceof`. `Data.TaggedError` ajoute une propriété `_tag` qui sert d'identifiant :
 
+<!-- prettier-ignore -->
 ```typescript
 class ReadError extends Data.TaggedError("ReadError")<{ path: string }> {}
 class InvalidFormatError extends Data.TaggedError("InvalidFormatError")<{
@@ -186,6 +195,7 @@ Le paramètre générique `<{ ... }>` définit les données portées par l'erreu
 
 Définissez `NetworkError` et `HTTPResponseError` avec `Data.TaggedError` :
 
+<!-- prettier-ignore -->
 ```typescript
 const NetworkError = ??? // _tag: "NetworkError", data: { error: unknown }
 const HTTPResponseError = ??? // _tag: "HTTPResponseError", data: { response: Response }
@@ -204,6 +214,7 @@ const HTTPResponseError = ??? // _tag: "HTTPResponseError", data: { response: Re
 <details>
   <summary>La syntaxe de `Data.TaggedError`</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 class MyError extends Data.TaggedError("MyError")<{ field: string }> {}
 ```
@@ -217,6 +228,7 @@ Le premier argument est le `_tag`. Le générique est l'objet de données associ
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 class NetworkError extends Data.TaggedError("NetworkError")<{
   error: unknown;
@@ -234,6 +246,7 @@ class HTTPResponseError extends Data.TaggedError("HTTPResponseError")<{
 
 `Effect.catchTag` intercepte une erreur par son `_tag` et permet de la gérer — sans toucher aux autres :
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   parseCSV(), // Effect<string[], InvalidFormatError | ReadError>
@@ -248,6 +261,7 @@ Le type de l'erreur est mis à jour automatiquement : `InvalidFormatError` dispa
 
 Rattrapez l'erreur `HTTPResponseError` et renvoyez `"Fallback joke"` :
 
+<!-- prettier-ignore -->
 ```typescript
 const program = pipe(
   getJoke(), // Effect<string, HTTPResponseError | NetworkError>
@@ -263,6 +277,7 @@ const program = pipe(
 <details>
   <summary>Signature de `catchTag`</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.catchTag("TheTag", (error) => fallbackEffect);
 ```
@@ -276,6 +291,7 @@ Le handler reçoit l'erreur typée correspondant au tag.
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const program = pipe(
   getJoke(),
@@ -291,6 +307,7 @@ const program = pipe(
 
 Quand on veut gérer plusieurs tags, `Effect.catchTags` évite d'enchaîner les `catchTag` :
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   parseCSV(),
@@ -307,6 +324,7 @@ Chaque clé est un tag, chaque valeur est le handler correspondant.
 
 Gérez `HTTPResponseError` et `NetworkError` ensemble, en renvoyant `"Fallback joke"` dans les deux cas :
 
+<!-- prettier-ignore -->
 ```typescript
 const program = pipe(
   getJoke(), // Effect<string, UnknownException | HTTPResponseError | NetworkError>
@@ -321,6 +339,7 @@ const program = pipe(
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const program = pipe(
   getJoke(),
@@ -339,6 +358,7 @@ const program = pipe(
 
 Quand on veut éliminer _toutes_ les erreurs typées d'un Effect, `Effect.catchAll` est le bon outil :
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   parseCSV(),
@@ -353,6 +373,7 @@ pipe(
 
 Rattrapez toutes les erreurs de `getJoke()` et renvoyez `"Fallback joke"` :
 
+<!-- prettier-ignore -->
 ```typescript
 const program = pipe(
   getJoke(), // Effect<string, UnknownException | HTTPResponseError | NetworkError>
@@ -367,6 +388,7 @@ const program = pipe(
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const program = pipe(
   getJoke(),
@@ -391,6 +413,7 @@ Un `defect` est une erreur qu'on n'avait pas prévue — l'équivalent d'une exc
 
 La différence avec Effect : `catchAllDefect` permet de s'en remettre proprement plutôt que de crasher :
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   compute(), // lève un defect avec Effect.dieMessage
@@ -402,6 +425,7 @@ pipe(
 
 Rattrapez le defect levé par `trustMe()` et renvoyez `"I'm alive"` :
 
+<!-- prettier-ignore -->
 ```typescript
 const program = pipe(
   trustMe(),
@@ -416,6 +440,7 @@ const program = pipe(
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const program = pipe(
   trustMe(),

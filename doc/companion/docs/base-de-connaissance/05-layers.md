@@ -8,6 +8,7 @@ sidebar_position: 5
 
 Un `Layer` est une **recette** pour construire un service.
 
+<!-- prettier-ignore -->
 ```typescript
 Layer<Service, ErreurDeConstruction, DépendancesRequises>
 ```
@@ -20,6 +21,7 @@ Un Layer peut lui-même avoir des dépendances (d'autres services). Effect réso
 
 ### `Layer.succeed` — implémentation sans dépendances
 
+<!-- prettier-ignore -->
 ```typescript
 import { Layer, Effect } from "effect";
 
@@ -30,6 +32,7 @@ const LoggingConsole = Layer.succeed(LoggingService, {
 
 ### `Layer.effect` — implémentation qui utilise des Effects
 
+<!-- prettier-ignore -->
 ```typescript
 const ItemRepositoryHttp = Layer.effect(
   ItemRepository,
@@ -53,6 +56,7 @@ const ItemRepositoryHttp = Layer.effect(
 
 Pour des ressources qui doivent être libérées (connexions de base de données, fichiers ouverts) :
 
+<!-- prettier-ignore -->
 ```typescript
 const DatabaseLayer = Layer.scoped(
   Database,
@@ -71,6 +75,7 @@ const DatabaseLayer = Layer.scoped(
 
 `Effect.provide` résout les dépendances d'un Effect :
 
+<!-- prettier-ignore -->
 ```typescript
 // Avant : dépendance non résolue
 const programme: Effect<Items, Err, HttpClient.HttpClient> = fetchItems
@@ -91,6 +96,7 @@ Les Layers peuvent se composer pour former des Layers plus complexes.
 
 ### `Layer.provide` — fournir les dépendances d'un Layer
 
+<!-- prettier-ignore -->
 ```typescript
 // ItemRepositoryHttp a besoin de HttpClient
 const AppLayer = pipe(
@@ -102,6 +108,7 @@ const AppLayer = pipe(
 
 ### `Layer.merge` — combiner plusieurs Layers
 
+<!-- prettier-ignore -->
 ```typescript
 const AppLayer = Layer.merge(
   ConsoleLogging,
@@ -112,6 +119,7 @@ const AppLayer = Layer.merge(
 
 ### `Layer.mergeAll` — combiner N Layers
 
+<!-- prettier-ignore -->
 ```typescript
 const AppLayer = Layer.mergeAll(
   ConsoleLogging,
@@ -125,6 +133,7 @@ const AppLayer = Layer.mergeAll(
 
 Dans `packages/api/server.ts`, toute la composition de l'application :
 
+<!-- prettier-ignore -->
 ```typescript
 // packages/api/server.ts (simplifié)
 const ApiLive = pipe(
@@ -144,9 +153,9 @@ Chaque `Layer.provide(...)` résout une couche de dépendances. Effect valide qu
 
 ## Pourquoi les Layers ?
 
-| Problème | Sans Layers | Avec Layers |
-|----------|-------------|-------------|
-| Tests | Modifier les modules ou mocker globalement | Fournir un Layer de test |
-| Environnements | Variables d'environnement dans le code | Layer différent par environnement |
-| Cycle de vie | Gérer manuellement les connexions | `Layer.scoped` garantit la fermeture |
-| Dépendances | Implicites, cachées | Explicites, dans le type |
+| Problème       | Sans Layers                                | Avec Layers                          |
+| -------------- | ------------------------------------------ | ------------------------------------ |
+| Tests          | Modifier les modules ou mocker globalement | Fournir un Layer de test             |
+| Environnements | Variables d'environnement dans le code     | Layer différent par environnement    |
+| Cycle de vie   | Gérer manuellement les connexions          | `Layer.scoped` garantit la fermeture |
+| Dépendances    | Implicites, cachées                        | Explicites, dans le type             |

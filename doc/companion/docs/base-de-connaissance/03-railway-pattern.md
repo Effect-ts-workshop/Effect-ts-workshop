@@ -17,6 +17,7 @@ Entrée ──────────<
 ```
 
 Un Effect voyage toujours sur l'une des deux voies. Le type `Effect<A, E>` dit :
+
 - Voie succès → produit une valeur `A`
 - Voie erreur → transporte une erreur `E`
 
@@ -26,6 +27,7 @@ Quand vous chaînez des Effects, Effect gère automatiquement l'aiguillage.
 
 Si un Effect est sur la voie d'erreur, les transformations suivantes sont **ignorées** :
 
+<!-- prettier-ignore -->
 ```typescript
 const résultat = pipe(
   diviser(10, 0), // ❌ Erreur → DivisionParZéro
@@ -42,12 +44,14 @@ C'est exactement le comportement de `async/await` avec les Promises — une exce
 
 ### Voie succès → voie erreur
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.fail(new MonErreur())   // Bascule sur la voie erreur
 ```
 
 ### Voie erreur → voie succès
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.catchTag("MonErreur", () => Effect.succeed(valeurDeRécupération))
 // Bascule sur la voie succès avec une valeur de récupération
@@ -55,6 +59,7 @@ Effect.catchTag("MonErreur", () => Effect.succeed(valeurDeRécupération))
 
 ### Voie erreur → voie erreur (différente)
 
+<!-- prettier-ignore -->
 ```typescript
 Effect.catchTag("ErreurA", () => Effect.fail(new ErreurB()))
 // Reste sur la voie erreur, mais avec un type d'erreur différent
@@ -88,6 +93,7 @@ Le Railway Pattern rend la gestion d'erreurs **composable** et **prévisible** :
 
 3. **Lisible** : Le chemin heureux est visible directement. Les erreurs sont gérées séparément, sans polluer la logique principale.
 
+<!-- prettier-ignore -->
 ```typescript
 // Code Effect — logique principale et erreurs bien séparées
 const créerCommande = (userId: string, articleId: string) =>

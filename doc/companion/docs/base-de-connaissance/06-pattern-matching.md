@@ -8,6 +8,7 @@ sidebar_position: 6
 
 Le module `Match` d'Effect permet une correspondance de motifs **exhaustive** sur des valeurs :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Match, pipe } from "effect"
 
@@ -23,6 +24,7 @@ const résultat = pipe(
 
 ### Valeurs littérales
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   Match.value("chargement"),
@@ -35,6 +37,7 @@ pipe(
 
 ### Types discriminants (objets avec `type`)
 
+<!-- prettier-ignore -->
 ```typescript
 type État =
   | { type: "vide" }
@@ -54,6 +57,7 @@ pipe(
 
 Quand les variantes d'une union utilisent `_tag` comme discriminant, `Match.tag` est plus concis que `Match.when({ _tag: "..." })` :
 
+<!-- prettier-ignore -->
 ```typescript
 type Notification =
   | { _tag: "Email"; to: string }
@@ -71,6 +75,7 @@ pipe(
 
 ### `Match.not` — exclure un cas
 
+<!-- prettier-ignore -->
 ```typescript
 // Tout sauf "cancelled"
 pipe(
@@ -82,6 +87,7 @@ pipe(
 
 ### `Match.whenOr` — plusieurs valeurs, même branche
 
+<!-- prettier-ignore -->
 ```typescript
 // Évite d'écrire deux Match.when identiques
 pipe(
@@ -95,6 +101,7 @@ pipe(
 
 `Match.option` clôt le match en enveloppant le résultat dans un `Option`. Si aucun cas ne correspond : `Option.none()`.
 
+<!-- prettier-ignore -->
 ```typescript
 const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
   pipe(
@@ -108,6 +115,7 @@ const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
 
 ### Gardes de type — `Match.null`, `Match.boolean`, `Match.number`, `Match.string`
 
+<!-- prettier-ignore -->
 ```typescript
 pipe(
   Match.value(valeur),
@@ -121,6 +129,7 @@ pipe(
 
 ## `Match.exhaustive` vs `Match.orElse`
 
+<!-- prettier-ignore -->
 ```typescript
 // Match.exhaustive — compile seulement si tous les cas sont couverts
 pipe(
@@ -142,6 +151,7 @@ pipe(
 
 `Option<A>` représente une valeur qui peut être absente :
 
+<!-- prettier-ignore -->
 ```typescript
 import { Option } from "effect";
 
@@ -154,6 +164,7 @@ const absent: Option.Option<number> = Option.none();
 
 ### Créer un Option
 
+<!-- prettier-ignore -->
 ```typescript
 // Depuis une valeur nullable
 Option.fromNullable(valeur)         // undefined/null → Option.none()
@@ -167,6 +178,7 @@ Option.none()
 
 ### Utiliser un Option
 
+<!-- prettier-ignore -->
 ```typescript
 // Matcher le résultat
 Option.match(option, {
@@ -192,6 +204,7 @@ Option.isNone(option) // true si None
 
 L'endpoint `getItemById` retourne un `Option<Item>` :
 
+<!-- prettier-ignore -->
 ```typescript
 // packages/shared/item.ts
 export const getItemByIdResponseSchema = Schema.Option(InventoryItemSchema);
@@ -199,6 +212,7 @@ export const getItemByIdResponseSchema = Schema.Option(InventoryItemSchema);
 
 Dans l'interface utilisateur (`ItemDetail.tsx`) :
 
+<!-- prettier-ignore -->
 ```typescript
 Option.match(item, {
   onNone: () => <p>Article non trouvé</p>,

@@ -18,6 +18,7 @@ C'est l'équivalent d'un `signal` (SolidJS), d'un `atom` (Jotai) ou d'un `ref` (
 
 Tous les Atoms vivent dans une **Registry**. C'est le conteneur qui stocke les valeurs et gère les abonnements.
 
+<!-- prettier-ignore -->
 ```typescript
 import { Registry } from "@effect-atom/atom-react";
 
@@ -30,6 +31,7 @@ Dans une application React, la Registry est fournie par `<RegistryProvider>` (da
 
 ### Valeur statique
 
+<!-- prettier-ignore -->
 ```typescript
 import { Atom } from "@effect-atom/atom-react";
 
@@ -44,6 +46,7 @@ r.get(counter);     // → 42
 
 Un Atom peut être calculé à partir d'autres Atoms. Il se recalcule automatiquement quand ses dépendances changent.
 
+<!-- prettier-ignore -->
 ```typescript
 const counter = Atom.make(0);
 const doubled = Atom.make((get) => get(counter) * 2);
@@ -58,6 +61,7 @@ r.get(doubled); // → 18
 
 Quand on passe un `Effect` à `Atom.make`, la valeur devient un **`Result`** :
 
+<!-- prettier-ignore -->
 ```typescript
 const dataAtom = Atom.make(Effect.succeed(42));
 
@@ -71,6 +75,7 @@ C'est exactement ce que fait `ApiClient.query(...)` : un Atom construit depuis u
 
 `Atom.fnSync` crée un Atom "callable" : chaque `r.set` exécute la fonction avec la valeur passée pour produire la prochaine valeur.
 
+<!-- prettier-ignore -->
 ```typescript
 const increment = (count: number) => count + 1;
 const next = Atom.fnSync(increment, { initialValue: 0 });
@@ -81,6 +86,7 @@ r.get(next);    // → 1
 
 ## S'abonner aux changements
 
+<!-- prettier-ignore -->
 ```typescript
 const counter = Atom.make(0);
 
@@ -97,6 +103,7 @@ r.set(counter, 9); // → "nouvelle valeur : 9"
 
 Par défaut, un Atom sans abonné peut être collecté par le garbage collector. `Atom.keepAlive` force sa persistance :
 
+<!-- prettier-ignore -->
 ```typescript
 const persistent = Atom.keepAlive(Atom.make(0));
 
@@ -113,6 +120,7 @@ Pour les Atoms qui doivent persister entre deux rendus React — par exemple, un
 
 ### Lire une valeur : `useAtomValue`
 
+<!-- prettier-ignore -->
 ```typescript
 import { useAtomValue } from "@effect-atom/atom-react";
 
@@ -128,6 +136,7 @@ Le composant se re-rend automatiquement quand l'Atom change.
 
 ### Lire et écrire : `useAtom`
 
+<!-- prettier-ignore -->
 ```typescript
 import { useAtom } from "@effect-atom/atom-react";
 
@@ -145,6 +154,7 @@ function Compteur() {
 
 ### Écrire seulement : `useAtomSet`
 
+<!-- prettier-ignore -->
 ```typescript
 import { useAtomSet } from "@effect-atom/atom-react";
 
@@ -160,6 +170,7 @@ function BoutonIncrément() {
 
 `AtomHttpApi.Tag` n'est qu'une surcouche qui crée automatiquement des Atoms depuis les endpoints d'une API :
 
+<!-- prettier-ignore -->
 ```typescript
 // Ce que AtomHttpApi.Tag fait en interne (simplifié)
 const allItemsAtom = Atom.make(

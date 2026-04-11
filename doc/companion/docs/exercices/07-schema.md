@@ -14,6 +14,7 @@ Fichier à compléter : `packages/api/_exercices/7-schema.spec.ts`
 
 ## `Schema.Struct` — valider un objet
 
+<!-- prettier-ignore -->
 ```typescript
 const PersonSchema = Schema.Struct({
   name: Schema.String,
@@ -31,6 +32,7 @@ type Person = typeof PersonSchema.Type
 
 Créez un schema qui valide `{ name: string, age: number, isActive: boolean }` :
 
+<!-- prettier-ignore -->
 ```typescript
 const schema = ??? // À compléter
 
@@ -51,6 +53,7 @@ const result = pipe(rawData, Schema.decodeUnknownSync(schema))
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const schema = Schema.Struct({
   name: Schema.String,
@@ -69,6 +72,7 @@ Les champs non déclarés (`unknown`) sont automatiquement éliminés à la vali
 
 Les erreurs de validation de `Schema` sont structurées. Pour les afficher proprement, on utilise `decodeUnknownEither` + `ParseResult.ArrayFormatter` :
 
+<!-- prettier-ignore -->
 ```typescript
 const result = Schema.decodeUnknownEither(schema, { errors: "all" })(data)
 
@@ -84,6 +88,7 @@ if (Either.isLeft(result)) {
 
 Formatez les erreurs en tableau en utilisant `Either.mapLeft` et `ParseResult.ArrayFormatter.formatErrorSync` :
 
+<!-- prettier-ignore -->
 ```typescript
 const errors = pipe(
   result,
@@ -100,6 +105,7 @@ const errors = pipe(
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const errors = pipe(
   result,
@@ -117,6 +123,7 @@ const errors = pipe(
 
 Un `Schema` peut encoder (TypeScript → JSON) et décoder (JSON → TypeScript) :
 
+<!-- prettier-ignore -->
 ```typescript
 const DataSchema = Schema.Struct({ createdAt: Schema.Date })
 const originalData = { createdAt: new Date("2026-04-22") }
@@ -134,6 +141,7 @@ const back = pipe(dto, Schema.decodeSync(DataSchema))
 
 Encodez `originalData` en DTO, puis redecodez le DTO :
 
+<!-- prettier-ignore -->
 ```typescript
 const dataDto = pipe(originalData, ???(DataSchema)) // À compléter
 const decodedData = pipe(dataDto, ???(DataSchema))  // À compléter
@@ -146,6 +154,7 @@ const decodedData = pipe(dataDto, ???(DataSchema))  // À compléter
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const dataDto = pipe(originalData, Schema.encodeSync(DataSchema))
 const decodedData = pipe(dataDto, Schema.decodeSync(DataSchema))
@@ -159,6 +168,7 @@ const decodedData = pipe(dataDto, Schema.decodeSync(DataSchema))
 
 Pour les tests property-based, `Arbitrary.make` génère automatiquement des données aléatoires conformes à un schema :
 
+<!-- prettier-ignore -->
 ```typescript
 const arbitrary = Arbitrary.make(DataSchema)
 
@@ -176,6 +186,7 @@ fc.assert(
 
 Créez un `arbitrary` à partir de `DataSchema` :
 
+<!-- prettier-ignore -->
 ```typescript
 const arbitrary = ??? // À compléter
 ```
@@ -187,6 +198,7 @@ const arbitrary = ??? // À compléter
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const arbitrary = Arbitrary.make(DataSchema)
 ```
@@ -199,6 +211,7 @@ const arbitrary = Arbitrary.make(DataSchema)
 
 Pour valider une email, un UUID, un numéro de téléphone, on combine `Schema.pattern` (regex) avec `Schema.fromBrand` (type opaque) :
 
+<!-- prettier-ignore -->
 ```typescript
 type Email = string & Brand.Brand<"email">
 const Email = Brand.nominal<Email>()
@@ -217,6 +230,7 @@ const EmailSchema = pipe(
 
 Créez `EmailSchema` à partir des éléments ci-dessus :
 
+<!-- prettier-ignore -->
 ```typescript
 const EmailSchema = ??? // À compléter
 ```
@@ -228,6 +242,7 @@ const EmailSchema = ??? // À compléter
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const EmailSchema = pipe(
   Schema.String,
@@ -244,6 +259,7 @@ const EmailSchema = pipe(
 
 Les annotations enrichissent les messages d'erreur pour les rendre exploitables :
 
+<!-- prettier-ignore -->
 ```typescript
 const Person = Schema.Struct({
   name: Schema.String.annotations({ identifier: "Name" }),
@@ -258,6 +274,7 @@ Avec annotations : `"Expected Name, actual undefined"` dans le contexte `Person`
 
 Annotez le schema avec `{ identifier: "Person" }` :
 
+<!-- prettier-ignore -->
 ```typescript
 const Person = Schema.Struct({}).annotations(???) // À compléter
 ```
@@ -266,6 +283,7 @@ const Person = Schema.Struct({}).annotations(???) // À compléter
 
 Annotez les champs `name` (identifier: "Name") et `age` (identifier: "Age") :
 
+<!-- prettier-ignore -->
 ```typescript
 const Person = Schema.Struct({
   name: ???, // À compléter
@@ -280,6 +298,7 @@ const Person = Schema.Struct({
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const Person = Schema.Struct({}).annotations({ identifier: "Person" })
 ```
@@ -291,6 +310,7 @@ const Person = Schema.Struct({}).annotations({ identifier: "Person" })
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const Person = Schema.Struct({
   name: Schema.String.annotations({ identifier: "Name" }),
@@ -306,6 +326,7 @@ const Person = Schema.Struct({
 
 Les raffinements ajoutent des contraintes au-delà du type :
 
+<!-- prettier-ignore -->
 ```typescript
 // Schema.Positive = nombre > 0
 const AgeSchema = Schema.Positive
@@ -321,6 +342,7 @@ const StrengthSchema = pipe(
 
 Créez `Person` avec un champ `age` contraint à être positif :
 
+<!-- prettier-ignore -->
 ```typescript
 const Person = Schema.Struct({
   age: ??? // À compléter
@@ -331,6 +353,7 @@ const Person = Schema.Struct({
 
 Créez `Person` avec un champ `strength` limité à 9000, avec le message `"is over 9000 !!!"` :
 
+<!-- prettier-ignore -->
 ```typescript
 const Person = Schema.Struct({
   strength: ??? // À compléter
@@ -344,6 +367,7 @@ const Person = Schema.Struct({
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const Person = Schema.Struct({
   age: Schema.Positive
@@ -357,6 +381,7 @@ const Person = Schema.Struct({
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const Person = Schema.Struct({
   strength: pipe(

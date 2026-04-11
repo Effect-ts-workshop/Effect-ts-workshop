@@ -4,9 +4,7 @@ sidebar_position: 6
 
 # Exercice 6 — Générateurs
 
-Enchaîner des `flatMap` fonctionne, mais cinq niveaux d'imbrication plus tard, le code ressemble à une pyramide. Il existe une autre façon d'écrire la même chose : les générateurs JavaScript.
-
-Cet exercice a deux parties. La première explore les générateurs JS eux-mêmes — pas dans Effect, juste le mécanisme de base. La deuxième montre comment Effect les utilise avec `Effect.fn`.
+Les générateurs JavaScript sont un mécanisme du langage souvent méconnu. Cet exercice a deux parties : la première explore le mécanisme pur, sans Effect. La deuxième montre comment Effect s'en sert pour écrire des programmes complexes avec le flot de contrôle impératif qu'on connaît déjà — `if`, `for`, `while`, ...
 
 Fichier à compléter : `packages/api/_exercices/6-generators.spec.ts`
 
@@ -18,24 +16,26 @@ Fichier à compléter : `packages/api/_exercices/6-generators.spec.ts`
 
 Un générateur est une fonction qui peut être mise en _pause_. Chaque `yield` suspend l'exécution et expose une valeur à l'extérieur :
 
+<!-- prettier-ignore -->
 ```typescript
-function* items() {
-  yield "laptop"
-  yield "mouse"
-  yield "keyboard"
+function* colors() {
+  yield "red";
+  yield "green";
+  yield "blue";
 }
 
-const gen = items()
-gen.next() // { value: "laptop", done: false }
-gen.next() // { value: "mouse", done: false }
-gen.next() // { value: "keyboard", done: false }
-gen.next() // { value: undefined, done: true }
+const gen = colors();
+gen.next(); // { value: "red", done: false }
+gen.next(); // { value: "green", done: false }
+gen.next(); // { value: "blue", done: false }
+gen.next(); // { value: undefined, done: true }
 ```
 
 ### Exercice
 
 Créez un générateur `items` qui produit `"laptop"`, `"mouse"`, `"keyboard"` dans cet ordre :
 
+<!-- prettier-ignore -->
 ```typescript
 const items = ??? // À compléter
 ```
@@ -53,11 +53,12 @@ const items = ??? // À compléter
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 function* items() {
-  yield "laptop"
-  yield "mouse"
-  yield "keyboard"
+  yield "laptop";
+  yield "mouse";
+  yield "keyboard";
 }
 ```
 
@@ -69,10 +70,11 @@ function* items() {
 
 La valeur `return` d'un générateur apparaît dans le dernier `.next()`, avec `done: true` :
 
+<!-- prettier-ignore -->
 ```typescript
-function* getBrand(): Generator<string, string, unknown> {
-  yield "validating…" // done: false
-  return "Apple"      // done: true
+function* checkStatus(): Generator<string, number, unknown> {
+  yield "checking…"; // done: false
+  return 200; // done: true
 }
 ```
 
@@ -80,6 +82,7 @@ function* getBrand(): Generator<string, string, unknown> {
 
 Créez `getBrand` : il `yield` `"validating…"` comme étape intermédiaire, puis `return` `"Apple"` comme valeur finale :
 
+<!-- prettier-ignore -->
 ```typescript
 const getBrand = ??? // À compléter
 ```
@@ -91,10 +94,11 @@ const getBrand = ??? // À compléter
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 function* getBrand(): Generator<string, string, unknown> {
-  yield "validating…"
-  return "Apple"
+  yield "validating…";
+  return "Apple";
 }
 ```
 
@@ -106,18 +110,19 @@ function* getBrand(): Generator<string, string, unknown> {
 
 `yield*` délègue l'itération à un sous-générateur : toutes ses valeurs sont produites comme si elles étaient dans le générateur courant.
 
+<!-- prettier-ignore -->
 ```typescript
-function* brands() {
-  yield "Apple"
-  yield "Dell"
+function* vegetables() {
+  yield "carrot";
+  yield "spinach";
 }
 
-function* models() {
-  yield* brands() // produit "Apple" puis "Dell"
-  yield "ThinkPad"
+function* smoothie() {
+  yield* vegetables(); // produit "carrot" puis "spinach"
+  yield "banana";
 }
 
-[...models()] // ["Apple", "Dell", "ThinkPad"]
+[...smoothie()]; // ["carrot", "spinach", "banana"]
 ```
 
 C'est l'équivalent d'un `flatMap` pour les générateurs.
@@ -126,6 +131,7 @@ C'est l'équivalent d'un `flatMap` pour les générateurs.
 
 Créez `models` qui délègue à `brands` puis produit `"ThinkPad"` :
 
+<!-- prettier-ignore -->
 ```typescript
 const models = ??? // À compléter
 ```
@@ -137,10 +143,11 @@ const models = ??? // À compléter
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 function* models() {
-  yield* brands()
-  yield "ThinkPad"
+  yield* brands();
+  yield "ThinkPad";
 }
 ```
 
@@ -152,17 +159,18 @@ function* models() {
 
 La vraie magie des générateurs : on peut _envoyer_ une valeur dans le générateur via `next(value)`. Cette valeur devient le résultat de l'expression `yield` en cours.
 
+<!-- prettier-ignore -->
 ```typescript
-function* approveItem(): Generator<string, string, boolean> {
-  const approved = yield "Approve this item?" // suspend et expose la question
-  return approved ? "Item approved" : "Item rejected"
+function* askQuestion(): Generator<string, string, boolean> {
+  const correct = yield "TypeScript is a superset of JavaScript?"; // suspend
+  return correct ? "Correct!" : "Wrong answer";
 }
 
-const gen = approveItem()
-gen.next()       // { value: "Approve this item?", done: false }
-gen.next(true)   // { value: "Item approved", done: true }
+const gen = askQuestion();
+gen.next(); // { value: "TypeScript is a superset of JavaScript?", done: false }
+gen.next(true); // { value: "Correct!", done: true }
 //       ^
-//  on injecte `true` → approved = true
+//  on injecte `true` → correct = true
 ```
 
 C'est _exactement_ le mécanisme qu'Effect utilise pour injecter les résultats d'Effects dans vos générateurs.
@@ -171,6 +179,7 @@ C'est _exactement_ le mécanisme qu'Effect utilise pour injecter les résultats 
 
 Appelez `gen.next(true)` pour approuver l'item et récupérer le résultat :
 
+<!-- prettier-ignore -->
 ```typescript
 const gen = approveItem()
 const question = gen.next()
@@ -184,8 +193,9 @@ const result = ??? // À compléter : répondre "true" au générateur
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
-const result = gen.next(true)
+const result = gen.next(true);
 ```
 
 </details>
@@ -194,27 +204,38 @@ const result = gen.next(true)
 
 ## Partie 2 — `Effect.fn`
 
+Les générateurs permettent de mettre une fonction en pause et d'y injecter des valeurs. Effect exploite ce mécanisme pour deux choses : remplacer les longues chaînes de `flatMap` par une syntaxe linéaire, et retrouver le flot de contrôle impératif — `if`, `for`, `while`, ... — sans sortir du monde Effect.
+
 ### `Effect.fn` — nommer et composer des handlers
 
 `Effect.fn` crée une fonction qui retourne un `Effect`, en utilisant un générateur pour la logique interne.
 
+<!-- prettier-ignore -->
 ```typescript
-const getItemLabel = Effect.fn("getItemLabel")(function*(brand: string, model: string) {
-  const upper = yield* Effect.sync(() => brand.toUpperCase())
-  return `${upper} – ${model}`
-})
+const formatName = Effect.fn("formatName")(function* (
+  first: string,
+  last: string,
+) {
+  const upper = yield* Effect.sync(() => last.toUpperCase());
+  return `${first} ${upper}`;
+});
 
-Effect.runSync(getItemLabel("apple", "MacBook Pro")) // "APPLE – MacBook Pro"
+Effect.runSync(formatName("John", "doe")); // "John DOE"
 ```
 
-Le `yield*` à l'intérieur joue le rôle d'`await` : il suspend le générateur jusqu'à ce que l'Effect soit résolu, et injecte le résultat.
+Le `yield*` à l'intérieur joue le rôle de `flatMap` : il suspend le générateur jusqu'à ce que l'Effect soit résolu, et injecte le résultat.
 
-C'est la syntaxe utilisée partout dans le projet : `item-repository.ts`, `http.ts`.
+:::info `Effect.gen` vs `Effect.fn`
+
+Il existe aussi `Effect.gen(function*() { ... })` qui s'occupe uniquement du generateur. Préférez `Effect.fn` : le nom passé en premier argument apparaît dans les stack traces et active le tracing automatique — ce qui rend le débogage beaucoup plus simple.
+
+:::
 
 ### Exercice
 
 Créez `getItemLabel` avec `Effect.fn` :
 
+<!-- prettier-ignore -->
 ```typescript
 const getItemLabel = ??? // À compléter
 // doit : mettre brand en majuscules, renvoyer "${UPPER} – ${model}"
@@ -227,10 +248,11 @@ const getItemLabel = ??? // À compléter
 <details>
   <summary>Squelette `Effect.fn`</summary>
 
+<!-- prettier-ignore -->
 ```typescript
-const maFonction = Effect.fn("maFonction")(function*(arg1: string, arg2: string) {
-  const resultat = yield* Effect.sync(() => /* calcul */)
-  return `${resultat} – ${arg2}`
+const myFn = Effect.fn("myFn")(function*(arg1: string, arg2: string) {
+  const result = yield* Effect.sync(() => /* computation */)
+  return `${result} – ${arg2}`
 })
 ```
 
@@ -243,11 +265,15 @@ const maFonction = Effect.fn("maFonction")(function*(arg1: string, arg2: string)
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
-const getItemLabel = Effect.fn("getItemLabel")(function*(brand: string, model: string) {
-  const upper = yield* Effect.sync(() => brand.toUpperCase())
-  return `${upper} – ${model}`
-})
+const getItemLabel = Effect.fn("getItemLabel")(function* (
+  brand: string,
+  model: string,
+) {
+  const upper = yield* Effect.sync(() => brand.toUpperCase());
+  return `${upper} – ${model}`;
+});
 ```
 
 </details>
@@ -256,39 +282,57 @@ const getItemLabel = Effect.fn("getItemLabel")(function*(brand: string, model: s
 
 ### `Effect.fn` vs `pipe` — la lisibilité avant tout
 
+Vous connaissez probablement le "Callback Hell" — des callbacks imbriqués sur plusieurs niveaux, impossible à lire :
+
+<!-- prettier-ignore -->
+```typescript
+// Callback Hell
+fetchUser(id, function (user) {
+  fetchProfile(user.id, function (profile) {
+    fetchSettings(profile.id, function (settings) {
+      // ...
+    });
+  });
+});
+```
+
+JavaScript l'a résolu avec `async/await` : même logique, lecture linéaire. `Effect.fn` joue exactement le même rôle pour Effect — `yield*` est l'équivalent d'`await`.
+
 Les deux écritures suivantes sont équivalentes. La version générateur est souvent plus lisible quand il y a plusieurs étapes :
 
+<!-- prettier-ignore -->
 ```typescript
 // Avec pipe et flatMap
-const fetchJoke = (id: string) =>
+const fetchWeather = (city: string) =>
   pipe(
     HttpClient.HttpClient,
     Effect.flatMap((client) =>
       pipe(
-        client.get(`https://api.chucknorris.io/jokes/${id}`),
+        client.get(`https://api.weather.io/${city}`),
         Effect.flatMap((response) =>
           pipe(
             response.json,
-            Effect.map((data) => ({ response, data }))
-          )
-        )
-      )
-    )
-  )
+            Effect.map((data) => ({ response, data })),
+          ),
+        ),
+      ),
+    ),
+  );
 
 // Avec Effect.fn — même logique, lecture linéaire
-const fetchJokeGen = Effect.fn("fetchJokeGen")(function*(id: string) {
-  const client = yield* HttpClient.HttpClient
-  const response = yield* client.get(`https://api.chucknorris.io/jokes/${id}`)
-  const data = yield* response.json
-  return { response, data }
-})
+const fetchWeatherGen = Effect.fn("fetchWeatherGen")(function* (city: string) {
+  const client = yield* HttpClient.HttpClient;
+  const response = yield* client.get(`https://api.weather.io/${city}`);
+  const data = yield* response.json;
+  return { response, data };
+});
 ```
 
 ### Exercice
 
 Réécrivez `fetchJoke` avec `Effect.fn` :
 
+<!-- prettier-ignore -->
 ```typescript
 const fetchJokeGen = ??? // À compléter
 ```
@@ -300,13 +344,14 @@ const fetchJokeGen = ??? // À compléter
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
-const fetchJokeGen = Effect.fn("fetchJokeGen")(function*(id: string) {
-  const client = yield* HttpClient.HttpClient
-  const response = yield* client.get(`https://api.chucknorris.io/jokes/${id}`)
-  const data = yield* response.json
-  return { response, data }
-})
+const fetchJokeGen = Effect.fn("fetchJokeGen")(function* (id: string) {
+  const client = yield* HttpClient.HttpClient;
+  const response = yield* client.get(`https://api.chucknorris.io/jokes/${id}`);
+  const data = yield* response.json;
+  return { response, data };
+});
 ```
 
 </details>
@@ -315,12 +360,13 @@ const fetchJokeGen = Effect.fn("fetchJokeGen")(function*(id: string) {
 
 ### Flot de contrôle impératif dans un générateur
 
-Un des grands avantages des générateurs : les boucles, conditions, et `for` fonctionnent naturellement. Pas besoin de `Effect.forEach` ou de récursion pour itérer.
+Un des grands avantages des générateurs : les boucles et conditions fonctionnent naturellement
 
 ### Exercice
 
-Complétez `buildUsers` pour créer `count` utilisateurs avec une boucle `for` :
+Complétez `buildUsers` pour créer `count` utilisateurs avec une boucle :
 
+<!-- prettier-ignore -->
 ```typescript
 const buildUsers = Effect.fn(function*(count: number) {
   const users = []
@@ -336,10 +382,11 @@ const buildUsers = Effect.fn(function*(count: number) {
 <details>
   <summary>La syntaxe standard fonctionne</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 for (let index = 0; index < count; index++) {
-  const user = yield* buildUser()
-  users.push(user)
+  const user = yield* buildUser();
+  users.push(user);
 }
 ```
 
@@ -352,15 +399,16 @@ for (let index = 0; index < count; index++) {
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
-const buildUsers = Effect.fn(function*(count: number) {
-  const users = []
+const buildUsers = Effect.fn(function* (count: number) {
+  const users = [];
   for (let index = 0; index < count; index++) {
-    const user = yield* buildUser()
-    users.push(user)
+    const user = yield* buildUser();
+    users.push(user);
   }
-  return users
-})
+  return users;
+});
 ```
 
 </details>
@@ -371,24 +419,25 @@ const buildUsers = Effect.fn(function*(count: number) {
 
 `yield*` propage les erreurs automatiquement. Pour les rattraper sans sortir du générateur, on utilise `Effect.orElse` :
 
+<!-- prettier-ignore -->
 ```typescript
-const getUser = Effect.fn(function*(id: string) {
-  const user = yield* getUserById(id)
+const getOrder = Effect.fn(function* (id: string) {
+  const order = yield* getOrderById(id);
 
-  // getUserFriends peut échouer — on fournit un fallback
-  const friends = yield* Effect.orElse(
-    getUserFriends(id),
-    () => Effect.succeed([])
-  )
+  // getOrderItems peut échouer — on fournit un fallback
+  const items = yield* Effect.orElse(getOrderItems(id), () =>
+    Effect.succeed([]),
+  );
 
-  return { ...user, friends }
-})
+  return { ...order, items };
+});
 ```
 
 ### Exercice
 
 Rattrapez l'échec de `getUserFriends` en renvoyant une liste vide :
 
+<!-- prettier-ignore -->
 ```typescript
 const getUser = Effect.fn(function*(id: string) {
   const user = yield* getUserById(id)
@@ -404,30 +453,45 @@ const getUser = Effect.fn(function*(id: string) {
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
 const friends = yield* Effect.orElse(
-  getUserFriends(id),
+  getUserFriends(id), 
   () => Effect.succeed([])
-)
+);
 ```
 
 </details>
 
 ---
 
-### Interopérabilité avec d'autres types de données
+### Interopérabilité — `Option` et `Either` sont des Effects
 
-Effect peut travailler avec des types qui ne sont pas des Effects — `Option`, `Either`, tableaux… via `yield*` et `Effect.catchAll` :
+`Option` et `Either` sont des sous-types d'`Effect` : les fonctions du module `Effect` les acceptent directement. On peut les utiliser avec `yield*` dans un générateur comme n'importe quel Effect.
 
+| Type | Comportement |
+|------|-------------|
+| `Option.Some(a)` | Succès — injecte `a` |
+| `Option.None` | Échec avec `NoSuchElementException` |
+| `Either.Right(a)` | Succès — injecte `a` |
+| `Either.Left(e)` | Échec avec `e` |
+
+<!-- prettier-ignore -->
 ```typescript
-const findUser = Effect.fn("findUser")(function*(id: string) {
-  const foundUser = Array.findFirst(users, (user) => user.id === id)
-  // foundUser est un Option<User>
+const parseConfig = Effect.fn("parseConfig")(function*(raw: string) {
+  // Option.fromNullable renvoie un Option<string>
+  const host = yield* Option.fromNullable(process.env.HOST)
+  // Some(h) → h, None → NoSuchElementException
 
-  const user = yield* Effect.catchAll(foundUser, (error) => new MyDomainError({ error }))
-  //            ^
-  //     yield* sur un Option : Some(u) → u, None → déclenche le catch
-  return user
+  // Either.fromPredicate renvoie un Either<string, number>
+  const port = yield* Either.fromPredicate(
+    parseInt(raw),
+    (n) => !Number.isNaN(n),
+    () => `invalid port: ${raw}`
+  )
+  // Right(n) → n, Left(msg) → échec avec msg
+
+  return { host, port }
 })
 ```
 
@@ -435,6 +499,7 @@ const findUser = Effect.fn("findUser")(function*(id: string) {
 
 Complétez `findUser` pour transformer un `Option.None` en `MyDomainError` :
 
+<!-- prettier-ignore -->
 ```typescript
 const findUser = Effect.fn("findUser")(function*(id: string) {
   const foundUser = Array.findFirst(users, (user) => user.id === id)
@@ -450,8 +515,12 @@ const findUser = Effect.fn("findUser")(function*(id: string) {
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```typescript
-const user = yield* Effect.catchAll(foundUser, (error) => new MyDomainError({ error }))
+const user = yield* Effect.catchAll(
+  foundUser, 
+  (error) => new MyDomainError({ error })
+);
 ```
 
 </details>

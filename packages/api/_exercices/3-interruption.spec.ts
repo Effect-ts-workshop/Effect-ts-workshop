@@ -34,13 +34,10 @@ describe("Interruption", () => {
     expect(Exit.isInterrupted(exit)).toBe(true)
     expect(abortCallback).toHaveBeenCalled()
   })
-
-  // TODO Add resource cleanup
 })
 
 describe("addFinalizer — connexion base de données", () => {
   it("ferme la connexion même si une erreur survient", async () => {
-    // Given
     // On simule une connexion avec un flag pour savoir si elle est ouverte
     const makeConnection = (log: Array<string>) => ({
       query: () => Effect.fail(new Error("requête échouée")),
@@ -59,11 +56,9 @@ describe("addFinalizer — connexion base de données", () => {
       return yield* conn.query()
     })
 
-    // When
     // scoped() crée un Scope et le ferme à la fin du programme
     await Effect.runPromise(Effect.scoped(program)).catch(() => {})
 
-    // Then
     // Même si la requête a échoué, le finalizer a bien été exécuté
     expect(closedLog).toContain("connection:closed")
   })
@@ -71,7 +66,6 @@ describe("addFinalizer — connexion base de données", () => {
 
 describe("addFinalizer — lock distribué (multi-pods)", () => {
   it("un seul pod exécute le job, l'autre est bloqué", async () => {
-    // Given
     // Simule un Redis partagé entre tous les pods
     const sharedRedis = { locks: new Set<string>() }
 
@@ -102,7 +96,6 @@ describe("addFinalizer — lock distribué (multi-pods)", () => {
 
     const executionLog: Array<string> = []
 
-    // When
     // Les deux pods tentent de démarrer en même temps
     await Effect.runPromise(
       Effect.scoped(
@@ -113,14 +106,12 @@ describe("addFinalizer — lock distribué (multi-pods)", () => {
       )
     )
 
-    // Then
     expect(executionLog).toContain("pod-A:running") // pod-A a le lock
     expect(executionLog).toContain("pod-B:skipped") // pod-B est bloqué
     expect(sharedRedis.locks.size).toBe(0) // lock libéré à la fin
   })
 
   it("libère le lock si le job est interrompu", async () => {
-    // Given
     const sharedRedis = { locks: new Set<string>() }
 
     const releaseLock = (key: string) => Effect.sync(() => sharedRedis.locks.delete(key))
@@ -134,18 +125,16 @@ describe("addFinalizer — lock distribué (multi-pods)", () => {
       yield* Effect.never
     })
 
-    // When
     const fiber = Effect.runFork(Effect.scoped(longJob))
     await Effect.runPromise(Fiber.interrupt(fiber))
 
-    // Then
     // Le lock a bien été libéré malgré l'interruption
     expect(sharedRedis.locks.size).toBe(0)
   })
 })
+
 describe("addFinalizer — fichier temporaire", () => {
   it("supprime le fichier temporaire après utilisation", async () => {
-    // Given
     // Simule un système de fichiers en mémoire
     const filesystem = new Set<string>()
 
@@ -166,16 +155,13 @@ describe("addFinalizer — fichier temporaire", () => {
       return path.replace(".tmp", ".processed")
     })
 
-    // When
     const result = await Effect.runPromise(Effect.scoped(program))
 
-    // Then
     expect(result).toBe("upload-12345.processed") // traitement ok
     expect(filesystem.has("upload-12345.tmp")).toBe(false) // fichier supprimé
   })
 
   it("supprime le fichier même si le traitement échoue", async () => {
-    // Given
     const filesystem = new Set<string>()
 
     const program = Effect.gen(function*() {
@@ -187,10 +173,8 @@ describe("addFinalizer — fichier temporaire", () => {
       return yield* Effect.fail(new Error("export échoué"))
     })
 
-    // When
     await Effect.runPromise(Effect.scoped(program)).catch(() => {})
 
-    // Then
     // Fichier supprimé même après échec → pas de fichiers tmp orphelins
     expect(filesystem.has("report.tmp")).toBe(false)
   })
@@ -204,7 +188,6 @@ describe("acquireRelease — garantie du release", () => {
   })
 
   it("exécute le release après un succès", async () => {
-    // Given
     const log: Array<string> = []
 
     // acquireRelease couple explicitement l'ouverture et la fermeture
@@ -218,16 +201,13 @@ describe("acquireRelease — garantie du release", () => {
       return yield* conn.query("SELECT 1")
     })
 
-    // When
     const result = await Effect.runPromise(Effect.scoped(program))
 
-    // Then
     expect(result).toBe("résultat: SELECT 1") // la requête a abouti
     expect(log).toContain("connection:closed") // connexion bien fermée
   })
 
   it("exécute le release même si une erreur survient", async () => {
-    // Given
     const log: Array<string> = []
 
     const resource = Effect.acquireRelease(
@@ -243,16 +223,13 @@ describe("acquireRelease — garantie du release", () => {
       return yield* conn.query()
     })
 
-    // When
     await Effect.runPromise(Effect.scoped(program)).catch(() => {})
 
-    // Then
     // release appelé malgré l'échec → pas de connexion qui reste ouverte
     expect(log).toContain("connection:closed")
   })
 
   it("exécute le release si le fiber est interrompu", async () => {
-    // Given
     const log: Array<string> = []
 
     const resource = Effect.acquireRelease(
@@ -265,11 +242,9 @@ describe("acquireRelease — garantie du release", () => {
       yield* Effect.never // simule un traitement long
     })
 
-    // When
     const fiber = Effect.runFork(Effect.scoped(program))
     await Effect.runPromise(Fiber.interrupt(fiber))
 
-    // Then
     // release appelé malgré l'interruption → connexion proprement fermée
     expect(log).toContain("connection:closed")
   })

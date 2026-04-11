@@ -20,8 +20,8 @@ La `try` de `Effect.tryPromise` reçoit un `signal` en paramètre — il suffit 
 
 ```typescript
 Effect.tryPromise({
-  try: (signal) => fetch("https://api.example.com", { signal }),
-  catch: (e) => new NetworkError({ error: e })
+  try: (signal) => readLargeFile("/data/export.csv", { signal }),
+  catch: (e) => new ReadError({ error: e })
 })
 ```
 
@@ -33,7 +33,7 @@ Complétez le `try` pour passer le `signal` à `slowFetch` :
 
 ```typescript
 const program = Effect.tryPromise({
-  try: () => slowFetch("https://api.chucknorris.io/jokes/random", { signal: ??? }),
+  try: () => slowFetch("https://api.chucknorris.io/jokes/random"),
   catch: (error) => new NetworkError({ error })
 })
 ```
@@ -52,10 +52,10 @@ const program = Effect.tryPromise({
 <details>
   <summary>D'où vient le signal ?</summary>
 
-La fonction passée à `try` peut recevoir un argument : le `signal` géré par Effect.
+La fonction passée à `try` peut recevoir un argument optionnel — le signal d'annulation qu'Effect gère pour vous.
 
 ```typescript
-try: (signal) => myFetch(url, { signal })
+try: (signal) => /* ... */
 ```
 
 Effect crée ce signal et l'annule automatiquement si le fiber est interrompu.
@@ -115,7 +115,14 @@ Les tests suivants illustrent trois cas d'usage courants — ils sont déjà imp
 
 ## `Effect.acquireRelease` — coupler ouverture et fermeture
 
-Quand une ressource a un cycle de vie clair (ouvrir / utiliser / fermer), `Effect.acquireRelease` couple explicitement les deux opérations :
+Quand une ressource a un cycle de vie clair (ouvrir / utiliser / fermer), `Effect.acquireRelease` couple explicitement les deux opérations. C'est l'équivalent Effect de `await using` (TypeScript 5.2) : dans les deux cas, l'ouverture et la fermeture sont définies au même endroit.
+
+```typescript
+// await using — fermeture couplée à l'ouverture
+await using conn = getConnection() // conn[Symbol.asyncDispose]() appelé à la sortie du bloc
+```
+
+La différence : `await using` ne couvre pas l'interruption. `Effect.acquireRelease` garantit le `release` dans les trois cas — succès, échec, et interruption.
 
 ```typescript
 const resource = Effect.acquireRelease(

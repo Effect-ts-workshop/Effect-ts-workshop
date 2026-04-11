@@ -19,7 +19,7 @@
 ### Langue
 
 - Le companion est **en français**.
-- Les termes techniques anglais ne se traduisent **jamais** : `pipe`, `curried function`, `Effect`, `map`, `flatMap`, `promise`, `generator`, `schema`, `layer`, `context`, `fiber`…
+- Les termes techniques anglais ne se traduisent **jamais** : `pipe`, `curried function`, `Effect`, `map`, `flatMap`, `promise`, `generator`, `schema`, `layer`, `context`, `fiber`, `defect`…
 - On ne dit pas "tuyau" pour `pipe`. On dit `pipe`.
 
 ### Syntaxe de code
@@ -455,7 +455,7 @@ Chaque page doc correspond à **un seul fichier spec**. On ne mélange pas deux 
 
 - [ ] Le concept est expliqué avec un problème concret avant l'API
 - [ ] Le code utilise `pipe(...)` et jamais `xxx.pipe(...)`
-- [ ] Les termes anglais techniques, variables et types ne sont pas traduits
+- [ ] Les termes anglais techniques, variables, types et noms de fonctions ne sont pas traduits (ex: `squareRoot` et non `racineCarrée`)
 - [ ] Les exemples dans l'explication du concept ne donne pas la solution, ni utiliser le meme domaine metier
 - [ ] Les indices sont progressifs (pas la solution au premier indice)
 - [ ] La solution est dans un `<details>`

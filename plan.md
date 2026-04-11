@@ -19,7 +19,7 @@
 ### Langue
 
 - Le companion est **en français**.
-- Les termes techniques anglais ne se traduisent **jamais** : `pipe`, `curried function`, `Effect`, `map`, `flatMap`, `promise`, `generator`, `schema`, `layer`, `context`, `fiber`, `defect`…
+- Les termes techniques anglais ne se traduisent **jamais** : `pipe`, `curried function`, `Effect`, `map`, `flatMap`, `promise`, `generator`, `schema`, `layer`, `context`, `fiber`, `defect`, `body` (HTTP)…
 - On ne dit pas "tuyau" pour `pipe`. On dit `pipe`.
 
 ### Syntaxe de code

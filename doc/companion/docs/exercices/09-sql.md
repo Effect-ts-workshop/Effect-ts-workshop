@@ -10,6 +10,12 @@ Les tests de cet exercice démarrent un vrai conteneur PostgreSQL via `testconta
 
 Fichier à compléter : `packages/api/_exercices/9-sql.spec.ts`
 
+:::warning Prérequis
+
+Cet exercice démarre un conteneur PostgreSQL via `testcontainers`. **Docker doit être installé et démarré** sur votre machine avant de lancer les tests.
+
+:::
+
 ---
 
 ## SQL natif — template literal

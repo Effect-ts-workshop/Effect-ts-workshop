@@ -12,14 +12,11 @@ Avez-vous déjà écrit du code TypeScript et ressenti que quelque chose manquai
 
 Effect-TS répond à ces trois problèmes en un seul concept : le type `Effect`.
 
-## Qu'allons-nous construire ?
+## Qu'allons-nous apprendre ?
 
-À la fin de cet atelier, vous aurez les clés pour comprendre et écrire une application fullstack complète avec Effect-TS :
+À la fin de cet atelier, vous aurez un modèle mental pour écrire des programmes TypeScript asynchrones, faillibles et testables avec Effect. Pas une liste d'API mémorisées — une façon de penser les programmes.
 
-- Une **API REST** avec gestion d'erreurs typée, injection de dépendances, et traçage distribué.
-- Un **frontend React** qui consomme cette API via Effect.
-
-Le code final est visible dans le dossier `/packages` du repository. Chaque exercice vous en rapproche progressivement.
+Le repository contient une application fullstack complète (API REST + frontend React) à titre d'exemple. À la fin de l'atelier, vous aurez toutes les clés pour en construire une similaire.
 
 ## Comment est organisé cet atelier ?
 
@@ -27,25 +24,40 @@ L'atelier est divisé en **3 grandes sections** :
 
 ### 1. Les Exercices
 
-Cinq parties, chacune introduisant un nouveau concept Effect-TS :
+Douze exercices progressifs. Chaque exercice introduit un concept, construit sur le précédent.
 
-| Partie | Thème            | Concepts                                             |
-| ------ | ---------------- | ---------------------------------------------------- |
-| 1      | Premiers pas     | `Effect.succeed`, `Effect.sleep`, `Effect.runSync`   |
-| 2      | Erreurs          | `Data.TaggedError`, `Effect.fail`, `Effect.catchTag` |
-| 3      | Contexte         | Services, `Layer`, injection de dépendances          |
-| 4      | Pattern Matching | `Match`, `Option`                                    |
-| 5      | Générateurs      | `pipe`, `Effect.gen`, `Effect.fn`                    |
+**Les fondations — du type `Effect` aux services :**
+
+| #   | Thème            | Concepts clés                                          |
+| --- | ---------------- | ------------------------------------------------------ |
+| 1   | Bases            | `pipe`, `Effect.succeed/map/flatMap`, `Effect.promise` |
+| 2   | Erreurs          | `Effect.fail`, `Data.TaggedError`, `Effect.catchTag`   |
+| 3   | Interruption     | `Scope`, ressources, interruption de fibers            |
+| 4   | Pattern Matching | `Match`, exhaustivité                                  |
+| 5   | Context & Layer  | Services, `Layer`, injection de dépendances            |
+| 6   | Générateurs      | `Effect.fn`, syntaxe generator                         |
+| 7   | Schema           | Validation, inférence de types                         |
+
+**En pratique — appliquer ces concepts à une vraie application :**
+
+| #   | Thème      | Concepts clés                                  |
+| --- | ---------- | ---------------------------------------------- |
+| 8   | HTTP API   | `@effect/platform`, définir un contrat         |
+| 9   | SQL        | `@effect/sql`, Drizzle, testcontainers         |
+| 10  | API Client | Consommer une API typée côté client            |
+| 11  | Atom       | State réactif, intégration React               |
+| 12  | Form       | `effect-form-react`, validation de formulaires |
 
 ### 2. La Base de Connaissance
 
-Des fiches de référence pour chaque concept abordé. Chaque exercice y fait référence.
+Des fiches de référence pour chaque concept abordé. Chaque exercice y renvoie.
 
 ## Prérequis
 
 - Connaissances de base en TypeScript
 - Votre ordinateur 💻
 - Un éditeur de code (VS Code recommandé)
+- Docker installé et démarré (requis pour l'exercice 9 — SQL)
 
 ## Installation
 
@@ -55,27 +67,29 @@ Une fois le repository cloné :
 npm install
 ```
 
-Pour lancer l'application finale (API + Frontend) :
+<details>
+  <summary>Lancer l'application d'exemple (API + Frontend)</summary>
 
 ```bash
 docker-compose up -d   # Lance PostgreSQL
 npm run dev            # Lance l'API et l'app
 ```
 
-:::info Services disponibles
+Services disponibles :
 
 - API : http://localhost:3000
 - App : http://localhost:5173
 - Documentation API : http://localhost:3000/docs
 - Traces : http://localhost:9999 (admin@signoz.local / admin123)
-  :::
+
+</details>
 
 ## Conseils avant de commencer
 
 - Chaque exercice n'introduit **qu'un seul nouveau concept** à la fois.
 - Utilisez les **indices** avant de regarder la solution.
 - La section **"Ressources"** de chaque exercice pointe vers la base de connaissance.
-- N'hésitez pas à appeler les formateurs en cas de doute !
+- **Sollicitez-nous au maximum — on est là pour ça.**
 
 ## La philosophie d'Effect
 
@@ -95,4 +109,4 @@ const résultat = Effect.runSync(monEffect); // 42
 
 Cette distinction est fondamentale. Elle permet à Effect de composer des programmes complexes avant de les exécuter.
 
-**Bonne chance et bon courage ! 🚀**
+**Commençons l'aventure Effect ! 💪**

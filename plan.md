@@ -434,6 +434,7 @@ Chaque page doc correspond à **un seul fichier spec**. On ne mélange pas deux 
 - [ ] Le concept est expliqué avec un problème concret avant l'API
 - [ ] Le code utilise `pipe(...)` et jamais `xxx.pipe(...)`
 - [ ] Les termes anglais techniques ne sont pas traduits
+- [ ] Les exemples de code ne donne pas la solution
 - [ ] Les indices sont progressifs (pas la solution au premier indice)
 - [ ] La solution est dans un `<details>`
 - [ ] Le `sidebar_position` est correct

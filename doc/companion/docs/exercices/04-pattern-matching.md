@@ -4,9 +4,12 @@ sidebar_position: 4
 
 # Exercice 4 — Pattern Matching
 
-Un `switch/case` TypeScript fonctionne, mais il a des angles morts : il ne vérifie pas l'exhaustivité par défaut, les conditions complexes sont maladroites, et on ne peut pas l'utiliser dans une expression `pipe`.
+En TypeScript un `switch/case` fonctionne, mais il a des angles morts : 
+* il ne vérifie pas l'exhaustivité par défaut,
+* les conditions complexes - comme discriminer sur plusieurs propriétés - sont maladroites,
+* on ne peut pas l'utiliser dans une expression `pipe`.
 
-`Match` d'Effect est une alternative typée, composable et exhaustive.
+Effect fournit avec `Match` une alternative typée, composable et exhaustive.
 
 Fichier à compléter : `packages/api/_exercices/4-pattern-matching.spec.ts`
 
@@ -17,23 +20,25 @@ Fichier à compléter : `packages/api/_exercices/4-pattern-matching.spec.ts`
 Le pattern de base : démarrer un match sur une valeur, définir les cas, clore avec `exhaustive`.
 
 ```typescript
+type Circle = { kind: "circle"; radius: number }
+type Rectangle = { kind: "rectangle"; width: number, height: number }
+
+type AnyShape = Circle | Rectangle
+
 pipe(
-  Match.value(field),
-  Match.when({ type: "number" }, (f) => String(f.value)),
-  Match.when({ type: "text" }, (f) => f.value),
+  Match.value(shape),
+  Match.when({ kind: "circle" }, (s) => Math.PI * s.radius ** 2),
+  Match.when({ kind: "rectangle" }, (s) => s.width * s.height),
   Match.exhaustive // ← le compilateur vérifie qu'aucun cas n'est oublié
 )
 ```
-
-`Match.exhaustive` transforme le matcher en valeur. Si un cas possible n'est pas couvert, TypeScript signale une erreur de compilation.
+Le Matcher a un paramètre de type F (Filters) qui trace ce qui n'a pas encore été matché, chaque appel à Match.when met à jour F: il "retire" le type couvert du filtre. La signature de `Match.exhaustive` _exige_ que F soit never. Si un cas possible n'est pas couvert, TypeScript signale une erreur de compilation.
 
 ### Exercice
 
-Complétez `getValue` pour couvrir les quatre variantes de `AnyField` :
+Complétez `getValue` pour couvrir les quatre variants du type `AnyField` :
 
 ```typescript
-type AnyField = NumberField | TextField | SelectField | MultipleSelectField
-
 const getValue = (field: AnyField) =>
   pipe(
     Match.value(field),
@@ -97,7 +102,7 @@ const getValue = (field: AnyField) =>
     Match.when({ type: "select", multiple: true }, (field) => field.value.join(", ")),
     Match.when({ type: "select", multiple: false }, (field) => field.value),
     Match.exhaustive
-  )
+  );
 ```
 
 </details>
@@ -106,20 +111,23 @@ const getValue = (field: AnyField) =>
 
 ## `Option.match` — valeurs optionnelles
 
-`Option` représente une valeur qui peut être présente (`Some`) ou absente (`None`). `Array.get` renvoie un `Option` plutôt qu'un `undefined` silencieux :
+`Option` représente une valeur qui peut être présente (`Some`) ou absente (`None`). Il est ainsi possible de décrire une séquence au sein de laquelle les `Some` seront traités et les `None` ignorés. En un sens `Option` est une adaptation du _railway pattern_ au cas de l'absence de valeur. Chacun des cas peut ensuite être traité de façon différenciée.
+
+
+Ici, `Array.get` renvoie un `Option` plutôt qu'un `undefined` silencieux :
 
 ```typescript
-Array.get(allValues, 0) // Option<string>
+Array.get(colors, 0) // Option<string>
 ```
 
 `Option.match` permet de traiter les deux cas explicitement :
 
 ```typescript
 pipe(
-  Array.get(allValues, index),
+  Array.get(colors, 0),
   Option.match({
-    onSome: (v) => v.toUpperCase(),
-    onNone: () => "DEFAULT"
+    onSome: (c) => `Primary: ${c}`,
+    onNone: () => "transparent"
   })
 )
 ```
@@ -162,7 +170,7 @@ const getValueAt = (index: number) =>
       onSome: (v) => v.toUpperCase(),
       onNone: () => "DEFAULT"
     })
-  )
+  );
 ```
 
 </details>
@@ -171,14 +179,20 @@ const getValueAt = (index: number) =>
 
 ## `Match.option` — résultat dans un `Option`
 
-Parfois, on ne veut pas couvrir tous les cas — seulement certains. `Match.option` clôt le match en enveloppant le résultat dans un `Option` : `Some` si un cas a matché, `None` sinon.
+Parfois, on ne _veut_ pas couvrir tous les cas — seulement certains. `Match.option` clôt le match en enveloppant le résultat dans un `Option` : `Some` si un cas a matché, `None` sinon.
 
 ```typescript
-const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
+type Free = { tier: 'free', annual: number}
+type Pro = { tier: 'pro', annual: number}
+type Enterprise = { tier: 'enterprise', annual: number}
+
+type Plan = Free | Pro | Enterprise
+
+const getTrialDays = (plan: Plan): Option.Option<number> =>
   pipe(
-    Match.value(stock),
-    Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
-    Match.option // ← Option.some(2|5) si "in_stock", Option.none() sinon
+    Match.value(plan),
+    Match.when({ tier: "pro" }, (p) => (p.annual ? 30 : 14)),
+    Match.option // ← Option.some(30|14) si "pro", Option.none() sinon
   )
 ```
 
@@ -208,7 +222,7 @@ const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
     Match.value(stock),
     Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
     Match.option
-  )
+  );
 ```
 
 </details>
@@ -217,14 +231,20 @@ const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
 
 ## `Match.tag` — unions discriminées
 
-Quand les variantes d'une union ont une propriété `_tag`, `Match.tag` est plus concis que `Match.when({ _tag: "..." })` :
+Quand les variants d'une union ont une propriété `_tag`, `Match.tag` est plus concis que `Match.when({ _tag: "..." })` :
 
 ```typescript
+type OrderPlaced = { _tag: "OrderPlaced"; id: string; total: string }
+type PaymentFailed = { _tag: "PaymentFailed"; id: string; reason: string }
+type PaymentSucceeded = { _tag: "PaymentFailed"; id: string; amount: number }
+
+type CartStatus = UserSignedUp | OrderPlaced | PaymentFailed
+
 pipe(
-  Match.value(notification),
-  Match.tag("Email", (n) => `Email to ${n.to}: ${n.subject}`),
-  Match.tag("Sms", (n) => `SMS to ${n.phone}: ${n.body}`),
-  Match.tag("Push", (n) => `Push on ${n.deviceId}: ${n.title}`),
+  Match.value(cartStatus),
+  Match.tag("OrderPlaced", (c) => `Order #${c.id} for ${c.total}€`),
+  Match.tag("PaymentFailed", (c) => `Payment ${c.id} failed: ${c.reason}`),
+  Match.tag("PaymentSucceeded", (c) => `Payment ${c.id} succeeded: ${c.amount}`),
   Match.exhaustive
 )
 ```
@@ -259,7 +279,7 @@ const describe = (notif: Notification) =>
     Match.tag("Sms", (n) => `SMS to ${n.phone}: ${n.body}`),
     Match.tag("Push", (n) => `Push on ${n.deviceId}: ${n.title}`),
     Match.exhaustive
-  )
+  );
 ```
 
 </details>
@@ -268,14 +288,17 @@ const describe = (notif: Notification) =>
 
 ## `Match.orElse` — le cas par défaut
 
-Quand on ne peut pas couvrir tous les cas (type `string` ouvert, valeurs inconnues), `Match.orElse` joue le rôle du `default` dans un `switch` :
+Quand on ne _peut_ pas couvrir tous les cas (type `string` ouvert, valeurs inconnues), `Match.orElse` joue le rôle du `default` dans un `switch/case` :
 
 ```typescript
+type Locale = 'fr' | 'en' | 'es' | 'de' | 'nl'
+
 pipe(
-  Match.value(method),
-  Match.when("card", () => "1.5%"),
-  Match.when("paypal", () => "2.9%"),
-  Match.orElse(() => "frais inconnus : 3%") // attrape tout le reste
+  Match.value(locale),
+  Match.when("fr", () => "Bonjour"),
+  Match.when("es", () => "Hola"),
+  Match.when("de", () => "Hallo"),
+  Match.orElse(() => "Hello") // attrape tout les cas non couverts
 )
 ```
 
@@ -306,7 +329,7 @@ const getProcessingFee = (method: PaymentMethod): string =>
     Match.when("paypal", () => "2.9%"),
     Match.when("crypto", () => "0%"),
     Match.orElse(() => "unknown method, default fee: 3%")
-  )
+  );
 ```
 
 </details>
@@ -318,10 +341,12 @@ const getProcessingFee = (method: PaymentMethod): string =>
 Pour matcher "tout sauf X", `Match.not` exclut une valeur spécifique :
 
 ```typescript
+type Day = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'
+
 pipe(
-  Match.value(status),
-  Match.not("cancelled", () => true), // tout sauf "cancelled"
-  Match.orElse(() => false)
+  Match.value(day),
+  Match.not("Sunday", () => "working day"),
+  Match.orElse(() => "day off")
 )
 ```
 
@@ -351,7 +376,7 @@ const isTrackable = (status: OrderStatus) =>
     Match.value(status),
     Match.not("cancelled", () => true),
     Match.orElse(() => false)
-  )
+  );
 ```
 
 </details>
@@ -363,8 +388,10 @@ const isTrackable = (status: OrderStatus) =>
 `Match.whenOr` est un raccourci pour plusieurs `Match.when` qui renvoient la même chose :
 
 ```typescript
+type Environment = 'testing' | 'staging' | 'production'
+
 // Équivalent à deux Match.when séparés
-Match.whenOr("admin", "superAdmin", () => true)
+Match.whenOr("testing", "staging", () => mockDatabase)
 ```
 
 ### Exercice
@@ -393,7 +420,7 @@ const canAccessDashboard = (role: Role) =>
     Match.value(role),
     Match.whenOr("admin", "superAdmin", () => true),
     Match.orElse(() => false)
-  )
+  );
 ```
 
 </details>
@@ -406,11 +433,11 @@ Pour matcher sur des types primitifs, `Match` fournit des prédicats prêts à l
 
 ```typescript
 pipe(
-  Match.value(value),
-  Match.when(Match.null, () => "—"),
-  Match.when(Match.boolean, (b) => (b ? "Oui" : "Non")),
-  Match.when(Match.number, (n) => n.toLocaleString("fr-FR")),
-  Match.when(Match.string, (s) => s),
+  Match.value(config),
+  Match.when(Match.null, () => "not set"),
+  Match.when(Match.boolean, (b) => (b ? "enabled" : "disabled")),
+  Match.when(Match.number, (n) => `${n} items`),
+  Match.when(Match.string, (s) => `"${s}"`),
   Match.exhaustive
 )
 ```
@@ -455,7 +482,7 @@ const formatForDisplay = (value: FieldValue) =>
     Match.when(Match.number, (n) => n.toLocaleString("fr-FR")),
     Match.when(Match.string, (s) => s),
     Match.exhaustive
-  )
+  );
 ```
 
 </details>

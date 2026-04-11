@@ -60,12 +60,14 @@ sidebar_position: N
 
 [Explication du problème que ce concept résout — avec un exemple concret qui fait "ah oui, j'ai déjà eu ce problème".]
 
+<!-- prettier-ignore -->
 ```ts
 // exemple minimal qui montre le problème
 ```
 
 [Explication de la solution conceptuelle en 2-3 phrases.]
 
+<!-- prettier-ignore -->
 ```ts
 // exemple minimal qui montre la solution
 ```
@@ -105,6 +107,7 @@ sidebar_position: N
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
+<!-- prettier-ignore -->
 ```ts
 // solution complète et commentée si nécessaire
 ```
@@ -130,6 +133,7 @@ Cet exercice est la fondation de tout le reste. On y introduit deux idées indé
 
 Le problème classique de l'imbrication de fonctions qui se lit de droite à gauche :
 
+<!-- prettier-ignore -->
 ```ts
 // Difficile à lire : on lit de droite à gauche
 const result = multiply(add(4, 6), 4)
@@ -137,6 +141,7 @@ const result = multiply(add(4, 6), 4)
 
 `pipe` permet d'écrire la même chose dans l'ordre de lecture naturel :
 
+<!-- prettier-ignore -->
 ```ts
 const result = pipe(
   add(4, 6),
@@ -152,6 +157,7 @@ Compléter le `pipe` en ajoutant la transformation `multiply(a, 4)` sur le résu
 `pipe` passe le résultat de chaque étape à la suivante. La première étape produit `10`. Il faut une fonction qui prend `10` et renvoie `40`.
 
 **Solution :**
+<!-- prettier-ignore -->
 ```ts
 const result = pipe(
   add(4, 6),
@@ -167,6 +173,7 @@ const result = pipe(
 
 Une `curried function` est une fonction qui, au lieu de prendre tous ses arguments d'un coup, les prend un par un et renvoie une fonction intermédiaire :
 
+<!-- prettier-ignore -->
 ```ts
 // Fonction normale
 const add = (a: number, b: number) => a + b
@@ -177,6 +184,7 @@ const add = (a: number) => (b: number) => a + b
 
 L'intérêt : `add(6)` renvoie une fonction `(b: number) => 6 + b` — une fonction qu'on peut passer directement à `pipe`.
 
+<!-- prettier-ignore -->
 ```ts
 const result = pipe(
   4,
@@ -193,6 +201,7 @@ Compléter le `pipe` en ajoutant `multiply(4)` après `add(6)`.
 `add(6)` renvoie une fonction. `pipe` va l'appeler avec le résultat de l'étape précédente (`10`). Il suffit de faire la même chose avec `multiply`.
 
 **Solution :**
+<!-- prettier-ignore -->
 ```ts
 const result = pipe(
   4,
@@ -219,6 +228,7 @@ Le problème : rien dans la signature de la fonction ne le dit. Une fonction `as
 
 Effect résout ça en rendant tout explicite dans le type :
 
+<!-- prettier-ignore -->
 ```ts
 Effect<Value, Error, Requirements>
 //       ^       ^          ^
@@ -237,6 +247,7 @@ Un `Effect` est une **description** d'un programme. Il ne s'exécute pas tout se
 
 La brique de base : envelopper une valeur dans un `Effect` pour qu'elle entre dans le monde Effect.
 
+<!-- prettier-ignore -->
 ```ts
 const result: Effect.Effect<number> = Effect.succeed(42)
 ```
@@ -251,6 +262,7 @@ La fonction `add` renvoie la somme, mais la signature attend un `Effect.Effect<n
 `Effect.succeed` prend une valeur et renvoie un `Effect` qui contient cette valeur. C'est l'équivalent de `Promise.resolve` mais pour Effect.
 
 **Solution :**
+<!-- prettier-ignore -->
 ```ts
 const add = (a: number, b: number): Effect.Effect<number> => {
   const result = a + b
@@ -266,6 +278,7 @@ const add = (a: number, b: number): Effect.Effect<number> => {
 
 On a un `Effect<number>` et on veut transformer la valeur à l'intérieur sans "sortir" de l'Effect. C'est exactement ce que fait `map`.
 
+<!-- prettier-ignore -->
 ```ts
 // Sans Effect
 const double = (n: number) => n * 2
@@ -288,6 +301,7 @@ Transformer l'`Effect.succeed(2)` avec `add(8)` en utilisant `Effect.map`.
 `add(8)` renvoie une fonction `(b: number) => 8 + b`. C'est exactement ce qu'attend `Effect.map` : une fonction qui transforme la valeur.
 
 **Solution :**
+<!-- prettier-ignore -->
 ```ts
 const result = pipe(
   Effect.succeed(2),
@@ -303,6 +317,7 @@ const result = pipe(
 
 Que se passe-t-il si la fonction de transformation renvoie elle-même un `Effect` ?
 
+<!-- prettier-ignore -->
 ```ts
 const add = (a: number) => (b: number) => Effect.succeed(a + b)
 
@@ -314,6 +329,7 @@ pipe(
 
 On se retrouve avec un `Effect` imbriqué dans un autre `Effect`. `flatMap` règle ça : il applique la transformation _et_ aplatit le résultat.
 
+<!-- prettier-ignore -->
 ```ts
 pipe(
   Effect.succeed(2),
@@ -331,6 +347,7 @@ Remplacer `map` par `flatMap` puisque `add` renvoie maintenant un `Effect.succee
 `add` renvoie `Effect.succeed(a + b)`, donc un `Effect`. Si on utilise `map`, on obtient `Effect<Effect<number>>`. Il faut "aplatir".
 
 **Solution :**
+<!-- prettier-ignore -->
 ```ts
 const result = pipe(
   Effect.succeed(2),
@@ -346,6 +363,7 @@ const result = pipe(
 
 Pour intégrer du code asynchrone existant (une `Promise`) dans Effect, on utilise `Effect.promise`. Il faut passer une _fonction_ qui renvoie la `Promise` — pas la `Promise` directement — pour que l'exécution reste lazy.
 
+<!-- prettier-ignore -->
 ```ts
 // ❌ La Promise démarre immédiatement
 Effect.promise(fetch("https://api.example.com"))
@@ -362,6 +380,7 @@ Envelopper l'appel `add(a, b)` (qui renvoie une `Promise`) dans `Effect.promise`
 `Effect.promise` attend `() => Promise<T>`. Donc `() => add(a, b)` est exactement ce qu'il faut.
 
 **Solution :**
+<!-- prettier-ignore -->
 ```ts
 const addWithDelay = (a: number, b: number): Effect.Effect<number> => {
   return Effect.promise(() => add(a, b))
@@ -378,6 +397,7 @@ const addWithDelay = (a: number, b: number): Effect.Effect<number> => {
 
 `Effect.tryPromise` permet de modéliser cette faillibilité. Il prend deux fonctions : `try` (la `Promise`) et `catch` (comment transformer l'erreur en une valeur typée).
 
+<!-- prettier-ignore -->
 ```ts
 Effect.tryPromise({
   try: () => fetch(url),
@@ -395,6 +415,7 @@ C'est la différence fondamentale avec `Promise` : l'erreur n'est plus un "throw
 Implémenter `fetch` en utilisant `Effect.tryPromise`, avec `baseFetch` pour la `Promise` et une `new Error("meh")` pour le catch.
 
 **Indice 1** — *La structure de `tryPromise`*
+<!-- prettier-ignore -->
 ```ts
 Effect.tryPromise({
   try: () => /* ta Promise ici */,
@@ -406,6 +427,7 @@ Effect.tryPromise({
 `baseFetch` est importé de `undici`. C'est lui qui doit être appelé dans `try`, avec les arguments `input` et `init` déjà disponibles dans la closure.
 
 **Solution :**
+<!-- prettier-ignore -->
 ```ts
 const fetch: Fetch = (input, init) => {
   return Effect.tryPromise({
@@ -433,8 +455,8 @@ Chaque page doc correspond à **un seul fichier spec**. On ne mélange pas deux 
 
 - [ ] Le concept est expliqué avec un problème concret avant l'API
 - [ ] Le code utilise `pipe(...)` et jamais `xxx.pipe(...)`
-- [ ] Les termes anglais techniques ne sont pas traduits
-- [ ] Les exemples de code ne donne pas la solution
+- [ ] Les termes anglais techniques, variables et types ne sont pas traduits
+- [ ] Les exemples dans l'explication du concept ne donne pas la solution, ni utiliser le meme domaine metier
 - [ ] Les indices sont progressifs (pas la solution au premier indice)
 - [ ] La solution est dans un `<details>`
 - [ ] Le `sidebar_position` est correct

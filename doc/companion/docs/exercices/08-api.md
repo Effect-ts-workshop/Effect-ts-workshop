@@ -25,9 +25,9 @@ const MyApi = HttpApi.make("MyApi").add(
 )
 ```
 
-- `HttpApi.make("MyApi")` — crée l'API racine
+- `HttpApi.make("MyApi")` — crée l'API racine avec un identifiant
 - `HttpApiGroup.make("greet")` — un groupe d'endpoints (correspond souvent à une ressource)
-- `HttpApiEndpoint.get("sayHello", "/hello")` — un endpoint GET
+- `HttpApiEndpoint.get("sayHello", "/hello")` — un endpoint GET sur le chemin `/hello`
 - `.addSuccess(Schema.String)` — type de la réponse en cas de succès
 
 Ce contrat est la _source de vérité_ : le serveur l'implémente, le client le consomme. Les deux sont garantis cohérents par TypeScript.
@@ -48,7 +48,7 @@ const MyApiLive = HttpApiBuilder.group(
 - Deuxième argument : le nom du groupe à implémenter
 - Troisième argument : une fonction qui reçoit les handlers et les implémente un par un
 
-Si `"sayHello"` n'existe pas dans le contrat `MyApi`, TypeScript signale une erreur.
+Si `"sayHello"` n'existe pas dans le contrat `MyApi`, TypeScript signale une erreur. Le contrat est le garant de la cohérence.
 
 ---
 
@@ -85,23 +85,23 @@ const TestHttpClient = pipe(
 
 Le `handler` reçoit une `Request` standard et renvoie une `Response` — sans passer par le réseau.
 
-### Exercice
+---
 
-Créez `TestHttpClient` en substituant `FetchHttpClient.Fetch` par le `handler` local :
+## Exercice
 
-```typescript
-const TestHttpClient = ??? // À compléter
-```
+L'implémentation et le client de test sont fournis. Votre rôle : écrire le **contrat**.
 
-Puis utilisez-le pour appeler `client.greet.sayHello()` :
+Définissez `MyApi` pour qu'il décrive une route `GET /hello` qui retourne une string, regroupée dans un groupe `"greet"` :
 
 ```typescript
-const program = pipe(
-  HttpApiClient.make(MyApi, { baseUrl: "http://localhost" }),
-  Effect.flatMap((client) => client.greet.sayHello()),
-  Effect.provide(TestHttpClient)
-)
+const MyApi = ??? // À compléter
 ```
+
+Le test vérifie ensuite que :
+- `MyApi.identifier` vaut `"MyApi"`
+- l'endpoint `"sayHello"` est bien en `GET` sur `/hello`
+- le schema de succès accepte des strings
+- l'appel `client.greet.sayHello()` retourne `"Hello, World!"`
 
 À vous de jouer !
 
@@ -114,29 +114,29 @@ const program = pipe(
 #### Indice 1
 
 <details>
-  <summary>Substituer un service dans un Layer</summary>
+  <summary>Par où commencer ?</summary>
 
-`Layer.succeed(FetchHttpClient.Fetch, valeur)` remplace le service `Fetch` par `valeur`.
+`HttpApi.make` prend un identifiant et renvoie une API. On y ajoute des groupes avec `.add(...)`.
 
-Ici, `valeur` est une fonction `(input, init) => handler(new Request(input as string, init))`.
+```typescript
+const MyApi = HttpApi.make("MyApi").add(
+  // votre groupe ici
+)
+```
 
 </details>
 
 #### Indice 2
 
 <details>
-  <summary>Squelette</summary>
+  <summary>Comment définir le groupe et l'endpoint ?</summary>
+
+`HttpApiGroup.make("greet")` crée un groupe. On y ajoute des endpoints avec `.add(...)`.
+
+Pour un endpoint `GET /hello` qui retourne une string :
 
 ```typescript
-const TestHttpClient = pipe(
-  FetchHttpClient.layer,
-  Layer.provide(
-    Layer.succeed(
-      FetchHttpClient.Fetch,
-      (input, init) => handler(new Request(input as string, init))
-    )
-  )
-)
+HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)
 ```
 
 </details>
@@ -147,20 +147,10 @@ const TestHttpClient = pipe(
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
 ```typescript
-const TestHttpClient = pipe(
-  FetchHttpClient.layer,
-  Layer.provide(
-    Layer.succeed(
-      FetchHttpClient.Fetch,
-      (input, init) => handler(new Request(input as string, init))
-    )
+const MyApi = HttpApi.make("MyApi").add(
+  HttpApiGroup.make("greet").add(
+    HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)
   )
-)
-
-const program = pipe(
-  HttpApiClient.make(MyApi, { baseUrl: "http://localhost" }),
-  Effect.flatMap((client) => client.greet.sayHello()),
-  Effect.provide(TestHttpClient)
 )
 ```
 

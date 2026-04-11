@@ -12,27 +12,36 @@ import { describe, expect, it } from "vitest"
 const TODO: any = {}
 
 describe("Api  Effect - serveur", () => {
-  // 1. Le contrat : une route GET /hello qui retourne une string À créer en test
-  const MyApi = HttpApi.make("MyApi").add(
-    HttpApiGroup.make("greet").add(
-      HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)
+  it.skip("HttpApiClient pour appeler l'API de façon typée", async () => {
+    // "Le contrat : une route GET /hello qui retourne une string
+    // #start
+    const MyApi = TODO
+    // #solution
+    // const MyApi = HttpApi.make("MyApi").add(
+    //   HttpApiGroup.make("greet").add(
+    //     HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)
+    //   )
+    // )
+    // #end
+    expect(MyApi.identifier).toBe("MyApi")
+    const endpoint = MyApi.groups?.["greet"]?.endpoints?.["sayHello"]
+    expect(endpoint?.method).toBe("GET")
+    expect(endpoint?.path).toBe("/hello")
+    expect(Schema.decodeUnknownSync(endpoint?.successSchema)("test")).toBe("test")
+
+    // 2. L'implémentation
+    const MyApiLive = HttpApiBuilder.group(
+      MyApi,
+      "greet",
+      (handlers) => handlers.handle("sayHello", () => Effect.succeed("Hello, World!"))
     )
-  )
 
-  // 2. L'implémentation
-  const MyApiLive = HttpApiBuilder.group(
-    MyApi,
-    "greet",
-    (handlers) => handlers.handle("sayHello", () => Effect.succeed("Hello, World!"))
-  )
+    // 3. Le layer de routes (= "brancher" l'implémentation sur le contrat)
+    const apiLayer = pipe(
+      HttpLayerRouter.addHttpApi(MyApi),
+      Layer.provide(MyApiLive)
+    ) as Layer.Layer<never>
 
-  // 3. Le layer de routes (= "brancher" l'implémentation sur le contrat)
-  const apiLayer = pipe(
-    HttpLayerRouter.addHttpApi(MyApi),
-    Layer.provide(MyApiLive)
-  ) as Layer.Layer<never>
-
-  it("HttpApiClient pour appeler l'API de façon typée", async () => {
     const { dispose, handler } = HttpLayerRouter.toWebHandler(apiLayer, { disableLogger: true })
 
     // #start

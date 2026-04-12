@@ -5,7 +5,7 @@ import { themes as prismThemes } from "prism-react-renderer"
 const config: Config = {
   title: "Effect-TS Workshop Companion",
   tagline: "Maîtrise Effect-TS par la pratique",
-  favicon: "img/favicon.ico",
+  favicon: "img/favicon.png",
 
   url: "https://effect-ts-workshop.github.io",
   trailingSlash: true,

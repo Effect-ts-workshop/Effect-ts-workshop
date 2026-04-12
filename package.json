@@ -5,7 +5,8 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run dev --workspaces=app,api",
+    "dev": "concurrently \"npm run dev --workspace=app\" \"npm run dev --workspace=api\"",
+    "test": "vitest",
     "build": "npm run build --workspace=app",
     "lint": "eslint \"**/{src,test,examples,scripts,dtslint}/**/*.{ts,mjs}\"",
     "lint-fix": "npm run lint --fix"
@@ -17,6 +18,7 @@
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
     "@tanstack/router-plugin": "^1.160.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.2",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-codegen": "^0.34.1",

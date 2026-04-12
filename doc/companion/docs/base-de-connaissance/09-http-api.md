@@ -38,7 +38,7 @@ const MyApi = HttpApi.make("MyApi").add(
 - `.addSuccess(Schema)` — le type de la réponse en cas de succès
 - `.addError(Schema, { status })` — un type d'erreur avec son code HTTP
 
-Le contrat est un **objet déclaratif pur** — il ne fait rien par lui-même.
+Le contrat est un objet **purement déclaratif** — il ne fait rien par lui-même.
 
 ## Étape 2 — Implémenter les handlers avec `HttpApiBuilder`
 
@@ -117,8 +117,8 @@ La structure du client reflète l'organisation en groupes : `client.users.getUse
 Dans le projet, le contrat vit dans `packages/shared/api.ts`. Serveur et client l'importent tous les deux :
 
 ```
-packages/shared/api.ts   ← source de vérité
-       ↓                         ↓
+          packages/shared/api.ts   // source de vérité
+            ↓                ↓
 packages/api/http.ts     packages/app/src/lib/client.ts
 (implémentation)         (consommation)
 ```

@@ -26,8 +26,8 @@ Le troisième paramètre de `Effect<A, E, R>` est le **Contexte** (aussi appelé
 <!-- prettier-ignore -->
 ```typescript
 Effect.Effect<Item[], ErreurAPI, HttpClient.HttpClient | LoggingService>
-//                               ↑               ↑
-//                        "J'ai besoin de ces deux services"
+//                                            ↑               ↑
+//                                "J'ai besoin de ces deux services"
 ```
 
 Toutes les dépendances sont **visibles dans le type**. Impossible d'oublier d'en fournir une.

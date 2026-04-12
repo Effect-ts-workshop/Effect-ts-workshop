@@ -40,7 +40,7 @@ const résultat = pipe(
 )
 ```
 
-La plupart des fonctions Effect ont une signature **curryée** — elles attendent la valeur en dernier, ce qui les rend directement utilisables dans `pipe` :
+La plupart des fonctions Effect ont une signature **curryfiée** — elles attendent la valeur en dernier, ce qui les rend directement utilisables dans `pipe` :
 
 <!-- prettier-ignore -->
 ```typescript

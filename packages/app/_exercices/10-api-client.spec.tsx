@@ -1,5 +1,8 @@
-import { //AtomHttpApi, 
-RegistryProvider, Result, useAtomValue } from "@effect-atom/atom-react"
+import { // AtomHttpApi,
+  RegistryProvider,
+  Result,
+  useAtomValue
+} from "@effect-atom/atom-react"
 import { FetchHttpClient, HttpApiClient } from "@effect/platform"
 import { render, screen, waitFor } from "@testing-library/react"
 import { Effect, Layer, Option, pipe } from "effect"
@@ -102,21 +105,6 @@ describe("HttpApiClient", () => {
     }
   })
 
-  it.skip("le contrat interdit les endpoints inexistants (vérification TypeScript)", () => {
-    // "getItemByName" n'existe pas dans le contrat Api.
-    // Essayez : supprimez le @ts-expect-error ligne 101 ci-dessous et observez l'erreur TypeScript.
-    pipe(
-      HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
-      // #start
-      Effect.flatMap(() => TODO),
-      // #solution
-      // @ts-expect-error -- getItemByName n'existe pas dans le contrat Api
-      // Effect.flatMap((client) => client.items.getItemByName({ query: { name: "Devoxx" } })),
-      // #end
-      Effect.provide(TestHttpClient)
-    )
-  })
-
   it.skip("compose plusieurs appels avec Effect.all", async () => {
     // Effect.all exécute les deux appels en parallèle par défaut
     const program = pipe(
@@ -140,67 +128,3 @@ describe("HttpApiClient", () => {
     expect(Option.isSome(single)).toBe(true)
   })
 })
-
-// ─── Partie 2 : AtomHttpApi.Tag ───────────────────────────────────────────────
-//
-// Dans l'appli, on n'utilise pas HttpApiClient directement dans les composants.
-// AtomHttpApi.Tag l'encapsule dans un Atom réactif :
-//   - ApiClient.query(...)    → Atom en lecture (état mis à jour automatiquement)
-//   - ApiClient.mutation(...) → setter (déclenche un appel + invalide les queries)
-//
-// C'est le pattern utilisé dans packages/app/src/routes/items/index.tsx :
-//   useAtomValue(ApiClient.query("items", "getAllItems", { reactivityKeys: ["items"] }))
-//   useAtomSet(ApiClient.mutation("items", "removeItemById"))
-
-describe("AtomHttpApi.Tag", () => {
-  it.skip("query résout en Result.Success avec les items", async () => {
-    // #start
-    class TestApiClient extends TODO
-    // #solution
-    // class TestApiClient extends AtomHttpApi.Tag<TestApiClient>()("TestApiClient", {
-    //   api: Api,
-    //   httpClient: TestHttpClient,
-    //   baseUrl: "http://localhost"
-    // }) {}
-    // #end
-
-    const allItemsAtom = TestApiClient.query("items", "getAllItems", {
-      reactivityKeys: ["items"]
-    })
-
-    function TestComponent() {
-      const result = useAtomValue(allItemsAtom)
-
-      if (Result.isSuccess(result)) {
-        return <div data-testid="count">{result.value.items.length}</div>
-      }
-      return <div data-testid="loading">loading</div>
-    }
-
-    render(
-      <RegistryProvider>
-        <TestComponent />
-      </RegistryProvider>
-    )
-
-    // L'atom démarre en état "initial" (loading) puis passe en Success
-    await waitFor(() => {
-      expect(screen.getByTestId("count")).toHaveTextContent("2")
-    })
-  })
-})
-
-// ─── Et maintenant ? ─────────────────────────────────────────────────────────
-//
-// Dans la Partie 2, on a utilisé AtomHttpApi.Tag sans trop se poser de questions.
-// Sous le capot, tout repose sur une seule primitive : Atom !
-//
-// Un Atom est une unité de state réactive :
-//   - il stocke une valeur (ou un Effect, ou un calcul dérivé d'autres Atoms)
-//   - quand sa valeur change, tous ses abonnés sont notifiés
-//
-// AtomHttpApi.Tag n'est qu'une surcouche qui crée automatiquement des Atoms
-// à partir des endpoints de l'API. Le Result que vous lisez avec useAtomValue
-// est géré par un Atom interne.
-//
-// → Exercice 11 : on explore Atom directement pour comprendre ces mécanismes.

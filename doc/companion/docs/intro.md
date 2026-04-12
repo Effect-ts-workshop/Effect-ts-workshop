@@ -100,6 +100,12 @@ npm run test
 
 5. Passez au test suivant.
 
+:::note Erreurs TypeScript dans les fichiers de spec
+
+Certains fichiers de test contiennent des erreurs TypeScript dès l'ouverture — c'est normal. Ces erreurs disparaîtront au fur et à mesure que vous complétez les exercices. **Ignorez-les jusqu'à ce que vous arriviez à l'exercice concerné**.
+
+:::
+
 ## Conseils avant de commencer
 
 - Chaque exercice n'introduit **qu'un seul nouveau concept** à la fois.

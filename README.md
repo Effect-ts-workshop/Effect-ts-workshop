@@ -16,48 +16,60 @@ Atelier progressif pour découvrir [Effect-ts](https://effect.website) à traver
 npm install
 ```
 
-### 2. Lancer les services (base de données + tracing)
-
-```bash
-docker compose up -d
-```
-
-### 3. Lancer les exercices
+### 2. Lancer les exercices
 
 Pour suivre les tests en mode watch :
 
 ```bash
-# Tous les exercices API
-npm test --workspace=packages/api
-
-# Tous les exercices frontend
-npm test --workspace=packages/app
-```
-
-### 4. Lancer l'application complète
-
-```bash
-npm run dev
+npm run test
 ```
 
 ## Exercices
 
-Les exercices se trouvent dans les dossiers `_exercices/` de chaque package :
+Les exercices se trouvent dans les dossiers `_exercices/` de chaque package.
 
-| #   | Thème                       | Fichier                                              |
-| --- | --------------------------- | ---------------------------------------------------- |
-| 1   | Bases (sync / async / pipe) | `packages/api/_exercices/1-base.spec.ts`             |
-| 2   | Gestion d'erreurs           | `packages/api/_exercices/2-errors.spec.ts`           |
-| 3   | Signal                      | `packages/api/_exercices/3-signal.spec.ts`           |
-| 4   | Pattern Matching            | `packages/api/_exercices/4-pattern-matching.spec.ts` |
-| 5   | Contexte & Services         | `packages/api/_exercices/5-context-layer.spec.ts`    |
-| 6   | Générateurs & Effect.fn     | `packages/api/_exercices/6-generators.spec.ts`       |
-| 7   | Schema & Validation         | `packages/api/_exercices/7-schema.spec.ts`           |
-| 8   | API HTTP                    | `packages/api/_exercices/8-api.spec.ts`              |
-| 9   | Base de données (SQL)       | `packages/api/_exercices/9-sql.spec.ts`              |
-| 10  | Atom State                  | `packages/app/_exercices/10-atom.spec.ts`            |
-| 11  | Client API typé             | `packages/app/_exercices/11-api-client.spec.ts`      |
-| 12  | Formulaires                 | `packages/app/_exercices/12-form.spec.ts`            |
+**Les fondations — du type `Effect` aux services :**
+
+| #   | Thème            | Fichier                                              |
+| --- | ---------------- | ---------------------------------------------------- |
+| 1   | Bases            | `packages/api/_exercices/1-base.spec.ts`             |
+| 2   | Erreurs          | `packages/api/_exercices/2-errors.spec.ts`           |
+| 3   | Interruption     | `packages/api/_exercices/3-interruption.spec.ts`     |
+| 4   | Pattern Matching | `packages/api/_exercices/4-pattern-matching.spec.ts` |
+| 5   | Context & Layer  | `packages/api/_exercices/5-context-layer.spec.ts`    |
+| 6   | Générateurs      | `packages/api/_exercices/6-generators.spec.ts`       |
+| 7   | Schema           | `packages/api/_exercices/7-schema.spec.ts`           |
+
+**En pratique — appliquer ces concepts à une vraie application :**
+
+| #   | Thème      | Fichier                                          |
+| --- | ---------- | ------------------------------------------------ |
+| 8   | HTTP API   | `packages/api/_exercices/8-api.spec.ts`          |
+| 9   | SQL        | `packages/api/_exercices/9-sql.spec.ts`          |
+| 10  | API Client | `packages/app/_exercices/10-api-client.spec.tsx` |
+| 11  | Atom       | `packages/app/_exercices/11-atom.spec.tsx`       |
+| 12  | Form       | `packages/app/_exercices/12-form.spec.tsx`       |
+
+## Fullstack App
+
+Le repository contient une application fullstack complète (API REST + frontend React) à titre d'exemple. À la fin de l'atelier, vous aurez toutes les clés pour en construire une similaire.
+
+<details>
+<summary>Lancer l'application d'example (API + Frontend)</summary>
+
+```bash
+docker compose up -d
+npm run dev
+```
+
+Services disponibles :
+
+- API : http://localhost:3000
+- App : http://localhost:5173
+- Documentation API : http://localhost:3000/docs
+- Traces : http://localhost:9999 (admin@signoz.local / admin123)
+
+</details>
 
 ## Documentation
 

@@ -21,7 +21,7 @@ Ces dépendances sont invisibles dans le type `Promise<Item[]>`. Impossible de l
 
 ## La solution : le Contexte Effect
 
-Le troisième paramètre de `Effect<A, E, R>` est le **Contexte** (aussi appelé Requirements) :
+Le troisième paramètre de `Effect<A, E, R>` est le **Contexte** (aussi appelé _Requirements_). Dans le monde effect la fonction `fetchItems` aurait par exmeple la signature suivante :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -30,7 +30,7 @@ Effect.Effect<Item[], ErreurAPI, HttpClient.HttpClient | LoggingService>
 //                                "J'ai besoin de ces deux services"
 ```
 
-Toutes les dépendances sont **visibles dans le type**. Impossible d'oublier d'en fournir une.
+Toutes les dépendances sont **visibles dans le type**. Une fois celui-ci déclaré impossible d'oublier d'en fournir une.
 
 ## `Context.GenericTag` — créer un service
 
@@ -47,11 +47,11 @@ interface LoggingService {
 
 // 2. Créer le Tag
 const LoggingService = Context.GenericTag<LoggingService>("LoggingService");
-//                                         ↑
-//                              Nom unique du service
+//                                                                ↑
+//                                                       Nom unique du service
 ```
 
-Le nom doit être **unique** dans toute l'application. Il apparaît dans les erreurs si vous oubliez de fournir le service.
+Le nom du service doit être **unique** dans toute l'application. Il apparaît dans les erreurs si vous oubliez de fournir le service.
 
 ## Utiliser un service avec `yield*`
 
@@ -59,7 +59,7 @@ Dans `Effect.gen`, `yield*` extrait le service du contexte :
 
 <!-- prettier-ignore -->
 ```typescript
-const monProgramme = Effect.gen(function* () {
+const myProgram = Effect.gen(function* () {
   const logger = yield* LoggingService;  // Récupère le service
   yield* logger.log("Hello !");          // Utilise le service
 });
@@ -96,15 +96,15 @@ Les services dans le contexte s'**additionnent** automatiquement :
 
 <!-- prettier-ignore -->
 ```typescript
-const programme = Effect.gen(function* () {
+const program = Effect.gen(function* () {
   const client = yield* HttpClient.HttpClient;
   const logger = yield* LoggingService;
 
   yield* logger.log("Démarrage de la requête");
-  const réponse = yield* client.get("http://localhost/api");
+  const response = yield* client.get("http://localhost/api");
   yield* logger.log("Requête terminée");
 
-  return yield* réponse.json;
+  return yield* response.json;
 });
 
 // Type : Effect<unknown, ..., HttpClient.HttpClient | LoggingService>

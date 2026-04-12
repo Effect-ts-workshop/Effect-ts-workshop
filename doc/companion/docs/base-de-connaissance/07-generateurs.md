@@ -111,7 +111,7 @@ const fetchUser = Effect.fn("fetchUser")(function* (id: string) {
 
 La syntaxe est légèrement différente : les arguments vont dans la fonction générateur, pas à l'extérieur.
 
-## Choisir entre pipe et Effect.gen
+## Choisir entre pipe, Effect.gen et Effect.fn
 
 | Situation                          | Recommandation                    |
 | ---------------------------------- | --------------------------------- |
@@ -120,7 +120,7 @@ La syntaxe est légèrement différente : les arguments vont dans la fonction g�
 | Fonctions en production            | `Effect.fn` (traçage)             |
 | Gestion d'erreurs en fin de chaîne | `pipe(gen, Effect.catchTag(...))` |
 
-En pratique, on mélange les deux styles. Le bloc logique avec `Effect.gen`, la gestion d'erreurs avec `pipe` :
+En pratique, on mélange les deux styles. Le bloc logique avec `Effect.gen`/`Effect.fn`, la gestion d'erreurs avec `pipe` :
 
 <!-- prettier-ignore -->
 ```typescript

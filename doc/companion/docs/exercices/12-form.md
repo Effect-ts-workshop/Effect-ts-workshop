@@ -12,15 +12,15 @@ Fichier à compléter : `packages/app/_exercices/12-form.spec.tsx`
 
 ---
 
-## `FormBuilder` — définir la structure du formulaire
+## Définir la structure d'un formulaire
 
 Un formulaire se définit en ajoutant des champs un par un. Chaque champ a un nom et un schema de validation :
 
 <!-- prettier-ignore -->
 ```typescript
-const MyFormBuilder = FormBuilder.empty
-  .addField("brand", Schema.NonEmptyTrimmedString)
-  .addField("model", Schema.NonEmptyTrimmedString)
+const contactFormBuilder = FormBuilder.empty
+  .addField("name", Schema.NonEmptyTrimmedString)
+  .addField("email", Schema.NonEmptyTrimmedString)
 ```
 
 `FormBuilder` ne contient pas de logique de rendu — c'est une description du formulaire. Le rendu vient ensuite avec `FormReact.make`.
@@ -64,14 +64,14 @@ const MyFormBuilder = FormBuilder.empty
 
 ---
 
-## Champs tableau — `Field.makeArrayField`
+## Ajouter un champ tableau
 
 Pour un champ qui contient plusieurs valeurs, `Field.makeArrayField` crée un champ tableau :
 
 <!-- prettier-ignore -->
 ```typescript
-const ItemIdsField = Field.makeArrayField("itemIds", Schema.UUID)
-const MyFormBuilder = FormBuilder.empty.addField(ItemIdsField)
+const RoleIdsField = Field.makeArrayField("roleIds", Schema.UUID)
+const profileFormBuilder = FormBuilder.empty.addField(RoleIdsField)
 ```
 
 ### Exercice
@@ -104,15 +104,15 @@ const MyFormBuilder = FormBuilder.empty.addField(ItemIdsField)
 
 ---
 
-## `FormReact.make` — le formulaire React
+## Créer le rendu React d'un formulaire
 
 `FormReact.make` prend le builder et une configuration pour produire un composant React :
 
 <!-- prettier-ignore -->
 ```typescript
-const loginForm = FormReact.make(loginFormBuilder, {
+const searchForm = FormReact.make(searchFormBuilder, {
   fields: {
-    username: ({ field }) => (
+    query: ({ field }) => (
       <input
         value={field.value}
         onChange={(e) => field.onChange(e.target.value)}
@@ -124,7 +124,38 @@ const loginForm = FormReact.make(loginFormBuilder, {
 })
 ```
 
-`field` expose `value`, `onChange`, et `error` (un `Option<string>`).
+L'objet retourné expose deux catégories d'atoms :
+
+**Atoms en lecture** — à utiliser avec `useAtomValue` :
+
+| Atom | Type | Description |
+|------|------|-------------|
+| `form.values` | `Atom<Option<Values>>` | Valeurs courantes de tous les champs |
+| `form.isDirty` | `Atom<boolean>` | `true` si au moins un champ a changé depuis l'initialisation |
+| `form.hasChangedSinceSubmit` | `Atom<boolean>` | `true` si des changements existent depuis la dernière soumission |
+| `form.lastSubmittedValues` | `Atom<Option<Values>>` | Valeurs de la dernière soumission valide |
+| `form.submitCount` | `Atom<number>` | Nombre de tentatives de soumission |
+
+**Atoms en écriture** — à utiliser avec `useAtomSet` :
+
+| Atom | Description |
+|------|-------------|
+| `form.submit` | Déclenche la validation puis appelle `onSubmit` si valide |
+| `form.validate` | Déclenche la validation manuellement sans soumettre |
+| `form.reset` | Remet le formulaire à son état initial |
+| `form.revertToLastSubmit` | Revient aux valeurs de la dernière soumission valide |
+| `form.setValues` | Remplace programmatiquement toutes les valeurs |
+
+**Chaque champ** reçoit un objet `field` dans son composant de rendu :
+
+| Propriété | Type | Description |
+|-----------|------|-------------|
+| `field.value` | `T` | Valeur courante |
+| `field.onChange` | `(v: T) => void` | Mettre à jour la valeur |
+| `field.onBlur` | `() => void` | Marquer le champ comme touché |
+| `field.error` | `Option<string>` | Message d'erreur à afficher |
+| `field.isTouched` | `boolean` | `true` si le champ a été interagi |
+| `field.isDirty` | `boolean` | `true` si la valeur a changé depuis l'init |
 
 ### Exercice
 
@@ -181,29 +212,28 @@ const loginFormBuilder = FormBuilder.empty
 
 ---
 
-## `useAtomSet` — déclencher la soumission
+## Déclencher la soumission
 
 Le formulaire expose un atom `submit`. `useAtomSet` renvoie un setter — ici, c'est le handler de soumission du `<form>` :
 
 <!-- prettier-ignore -->
 ```typescript
-function TestComponent({ defaultValues }) {
-  const submit = useAtomSet(loginForm.submit)
+function SearchWidget({ defaultValues }) {
+  const submit = useAtomSet(searchForm.submit)
 
   return (
-    <loginForm.Initialize defaultValues={defaultValues}>
+    <searchForm.Initialize defaultValues={defaultValues}>
       <form onSubmit={submit}>
-        <loginForm.username />
-        <loginForm.password />
-        <button type="submit">Envoyer</button>
+        <searchForm.query />
+        <button type="submit">Search</button>
       </form>
-    </loginForm.Initialize>
+    </searchForm.Initialize>
   )
 }
 ```
 
-- `loginForm.Initialize` fournit les valeurs par défaut
-- `loginForm.username`, `loginForm.password` — les composants de champ définis dans `FormReact.make`
+- `searchForm.Initialize` fournit les valeurs par défaut
+- `searchForm.query` — le composant de champ défini dans `FormReact.make`
 - `submit` — déclenche la validation et appelle `onSubmit` si tout est valide
 
 ### Exercice

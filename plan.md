@@ -43,6 +43,11 @@
 - La solution est toujours dans un `<details>` avec l'invite de solliciter un formateur d'abord.
 - On ne donne jamais plus d'une notion par exercice. Si un exercice couvre deux notions, on les sépare en deux sections claires.
 
+### Titres de sections
+
+- Les titres de sections décrivent ce que le participant **fait**, pas l'API qu'il utilise. Pas de nom de fonction dans le titre : `Définir la structure d'un formulaire` et non ~~`FormBuilder — définir la structure du formulaire`~~.
+- S'inspirer du nom du test correspondant dans le fichier spec (ex: `"should create simple form builder"` → `"Définir la structure d'un formulaire"`). Le titre du test est souvent le meilleur résumé de l'intention.
+
 ---
 
 ## 3. Structure type d'un exercice
@@ -457,6 +462,7 @@ Chaque page doc correspond à **un seul fichier spec**. On ne mélange pas deux 
 - [ ] Le code utilise `pipe(...)` et jamais `xxx.pipe(...)`
 - [ ] Les termes anglais techniques, variables, types et noms de fonctions ne sont pas traduits (ex: `squareRoot` et non `racineCarrée`)
 - [ ] Les exemples dans l'explication du concept ne donne pas la solution, ni utiliser le meme domaine metier
+- [ ] Les titres de sections décrivent une action, sans nom de fonction — inspirés des noms de tests dans le fichier spec
 - [ ] Les indices sont progressifs (pas la solution au premier indice)
 - [ ] La solution est dans un `<details>`
 - [ ] Le `sidebar_position` est correct

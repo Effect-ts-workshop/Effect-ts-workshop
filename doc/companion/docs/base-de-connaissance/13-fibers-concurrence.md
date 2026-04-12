@@ -6,7 +6,7 @@ sidebar_position: 13
 
 ## Qu'est-ce qu'une Fiber ?
 
-Un `Effect` est une description — il ne fait rien tant qu'il n'est pas exécuté. Quand on l'exécute, le runtime Effect crée une **Fiber** : un fil d'exécution léger (virtuel) qui porte le programme en cours.
+Un `Effect` est une description — il ne fait rien tant qu'il n'est pas exécuté. Quand on l'exécute, le runtime Effect crée une **Fiber** : un fil d'exécution léger (virtuel) qui traite le programme en cours.
 
 ```
 Effect (description)  →  exécution  →  Fiber (fil actif)
@@ -24,7 +24,7 @@ Même le code le plus simple s'exécute dans une Fiber — celle créée par `Ef
 
 ## `Effect.fork` — démarrer une fiber en arrière-plan
 
-`Effect.fork` démarre un Effect dans une nouvelle Fiber **sans attendre son résultat** :
+`Effect.fork` démarre un Effect dans une nouvelle Fiber **sans attendre son résultat**, pour récupérer ce résultat on utilisera `Fiber.join` :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -39,7 +39,7 @@ const program = Effect.gen(function*() {
 })
 ```
 
-La Fiber enfant est automatiquement rattachée à la Fiber parente : si la parente se termine, l'enfant est interrompue.
+Par défaut une Fiber enfant est automatiquement rattachée à la Fiber parente : si la parente se termine, l'enfant est interrompue.
 
 ---
 
@@ -115,7 +115,7 @@ const fiber = Effect.runFork(program)
 const exit = await Effect.runPromise(Fiber.await(fiber))
 ```
 
-Utilisé dans l'exercice 3 pour démarrer puis interrompre une Fiber dans les tests.
+`Effect.runFork` et `Fiber.interrupt` sont utilisé dans l'exercice 3 pour démarrer puis interrompre une Fiber dans les tests.
 
 ---
 
@@ -194,7 +194,7 @@ const withTimeout = yield* Effect.race(
 
 ## Supervision automatique
 
-Par défaut, les Fibers enfants sont supervisées par leur parent. Quand la Fiber parente se termine (succès, erreur, ou interruption), toutes ses Fibers enfants sont interrompues automatiquement.
+Par défaut (`Effect.fork`), les Fibers enfants sont supervisées par leur parent. Quand la Fiber parente se termine (succès, erreur, ou interruption), toutes ses Fibers enfants sont interrompues automatiquement. Avec `Effect.forkDaemon`, `Effect.forkScoped` ou `Effect.forkIn` les Fiber enfant ne sont pas supervisées et ont une durée de vie indépendant de la Fibre parente.
 
 <!-- prettier-ignore -->
 ```typescript

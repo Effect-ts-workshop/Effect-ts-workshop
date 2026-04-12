@@ -7,7 +7,7 @@ import { GenericContainer, Wait } from "testcontainers"
 import { describe, expect, it as itBase } from "vitest"
 import { SqlLive } from "../database"
 import { Database, DatabaseLive } from "../database-drizzle"
-import { items } from "../db/item.sql"
+import type { items } from "../db/item.sql"
 import { MigratorLive } from "../migrator"
 
 const it = itBase.extend("pgConfig", async ({}, { onCleanup }) => {
@@ -43,13 +43,12 @@ describe("Native effect module", () => {
     const getAll = Effect.fn("getAll")(function*() {
       const sql = yield* SqlClient.SqlClient
       // #start
-      // const items = TODO
+      const items = TODO
       // #solution
-      const items = yield* sql`
-          SELECT *
-          FROM items
-          ORDER BY id
-        `
+      // const items = yield* sql`
+      //     SELECT *
+      //     FROM items
+      //   `
       // #end
       return items
     })
@@ -76,15 +75,15 @@ describe("Native effect module", () => {
 
     const getCrud = Effect.fn("getCrud")(function*() {
       // #start
-      // const repository = TODO
+      const repository = TODO
       // #solution
-      const repoConfig = {
-        tableName: "items",
-        idColumn: "id" as const,
-        spanPrefix: "ItemRepository"
-      }
+      // const repoConfig = {
+      //   tableName: "items",
+      //   idColumn: "id" as const,
+      //   spanPrefix: "ItemRepository"
+      // }
 
-      const repository = yield* Model.makeRepository(DbItem, repoConfig)
+      // const repository = yield* Model.makeRepository(DbItem, repoConfig)
       // #end
 
       return repository
@@ -125,9 +124,9 @@ describe("Drizzle effect integration", () => {
       const db = yield* Database
 
       // #start
-      // return TODO
+      return TODO
       // #solution
-      return yield* db.insert(items).values(item)
+      // return yield* db.insert(items).values(item)
       // #end
     })
 
@@ -135,9 +134,9 @@ describe("Drizzle effect integration", () => {
       const db = yield* Database
 
       // #start
-      // return TODO
+      return TODO
       // #solution
-      return yield* db.select().from(items).where(eq(items.brand, brand))
+      // return yield* db.select().from(items).where(eq(items.brand, brand))
       // #end
     })
 

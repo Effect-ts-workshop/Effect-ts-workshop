@@ -24,10 +24,10 @@ Cet exercice démarre un conteneur PostgreSQL via `testcontainers`. **Docker doi
 
 <!-- prettier-ignore -->
 ```typescript
-const getAll = Effect.fn("getAll")(function*() {
+const getActive = Effect.fn("getActive")(function*() {
   const sql = yield* SqlClient.SqlClient   // récupère le client depuis le contexte
 
-  const rows = yield* sql`SELECT * FROM items ORDER BY id`
+  const rows = yield* sql`SELECT * FROM users WHERE active = true`
   return rows
 })
 ```
@@ -36,7 +36,7 @@ Le template literal est _safe_ par construction : les variables interpolées son
 
 ### Exercice
 
-Complétez `getAll` pour exécuter `SELECT * FROM items ORDER BY id` :
+Complétez `getAll` pour exécuter `SELECT * FROM items` :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -83,7 +83,6 @@ const getAll = Effect.fn("getAll")(function*() {
   const items = yield* sql`
     SELECT *
     FROM items
-    ORDER BY id
   `
   return items
 })
@@ -93,30 +92,27 @@ const getAll = Effect.fn("getAll")(function*() {
 
 ---
 
-## `Model.Class` + `Model.makeRepository` — CRUD automatique
+## CRUD automatique
 
 Pour les opérations CRUD classiques, `Model.Class` et `Model.makeRepository` génèrent le repository automatiquement à partir d'un schema :
 
 <!-- prettier-ignore -->
 ```typescript
-class DbItem extends Model.Class<DbItem>("DbItem")({
-  id: InventoryItemIdSchema,
-  brand: Schema.String,
-  model: Schema.String,
+class DbUser extends Model.Class<DbUser>("DbUser")({
+  id: Schema.String,
+  email: Schema.String,
   createdAt: Model.DateTimeInsertFromDate,
   updatedAt: Model.DateTimeUpdateFromDate
 }) {}
 
-const repoConfig = {
-  tableName: "items",
+const repository = yield* Model.makeRepository(DbUser, {
+  tableName: "users",
   idColumn: "id" as const,
-  spanPrefix: "ItemRepository"
-}
-
-const repository = yield* Model.makeRepository(DbItem, repoConfig)
+  spanPrefix: "UserRepository"
+})
 ```
 
-Le `repository` expose `insert`, `findById`, `findAll`, `update`, `delete` — typés selon `DbItem`.
+Le `repository` expose `insert`, `findById`, `findAll`, `update`, `delete` — typés selon `DbUser`.
 
 ### Exercice
 
@@ -139,10 +135,10 @@ const getCrud = Effect.fn("getCrud")(function*() {
 
 <!-- prettier-ignore -->
 ```typescript
-yield* Model.makeRepository(LaClasse, {
-  tableName: "nom_de_la_table",
+yield* Model.makeRepository(MyClass, {
+  tableName: "my_table",
   idColumn: "id" as const,
-  spanPrefix: "PrefixeDuSpan"
+  spanPrefix: "MyRepository"
 })
 ```
 
@@ -171,18 +167,20 @@ const getCrud = Effect.fn("getCrud")(function*() {
 
 ## Drizzle — query builder typé
 
-Pour les requêtes plus complexes, Drizzle offre un query builder qui reste dans le monde Effect via le service `Database` :
+En tant qu'amoureux de TypeScript, on aime les query builders : ils ajoutent de la sécurité de type là où le SQL natif ne voit que des strings. Drizzle a récemment créé une intégration Effect — les opérations renvoient des `Effect` au lieu de `Promise`, sans rien changer à l'API qu'on connaît déjà.
+
+Drizzle offre un query builder qui reste dans le monde Effect via le service `Database` :
 
 <!-- prettier-ignore -->
 ```typescript
-const add = Effect.fn("add")(function*(item: InferInsertModel<typeof items>) {
+const createOrder = Effect.fn("createOrder")(function*(order: InferInsertModel<typeof orders>) {
   const db = yield* Database
-  return yield* db.insert(items).values(item)
+  return yield* db.insert(orders).values(order)
 })
 
-const findByBrand = Effect.fn("findByBrand")(function*(brand: string) {
+const findByStatus = Effect.fn("findByStatus")(function*(status: string) {
   const db = yield* Database
-  return yield* db.select().from(items).where(eq(items.brand, brand))
+  return yield* db.select().from(orders).where(eq(orders.status, status))
 })
 ```
 
@@ -190,7 +188,7 @@ const findByBrand = Effect.fn("findByBrand")(function*(brand: string) {
 
 ### Exercice
 
-Complétez `add` (insert) et `findByBrand` (select + where) :
+Complétez `add` et `findByBrand` :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -226,7 +224,7 @@ db.insert(table).values(item)
 
 <!-- prettier-ignore -->
 ```typescript
-db.select().from(table).where(eq(table.champ, valeur))
+db.select().from(table).where(eq(table.column, value))
 ```
 
 `eq` est importé de `drizzle-orm`.

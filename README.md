@@ -67,7 +67,7 @@ Services disponibles :
 - API : http://localhost:3000
 - App : http://localhost:5173
 - Documentation API : http://localhost:3000/docs
-- Traces : http://localhost:9999 (admin@signoz.local / admin123)
+- Traces : http://localhost:16686/search?service=api (Jaeger UI)
 
 </details>
 
@@ -78,5 +78,5 @@ La documentation ici [Effect ts Companion](https://effect-ts-workshop.github.io/
 ## Outils inclus
 
 - **Effect Language Service Plugin** — meilleure expérience TypeScript dans VSCode
-- **Tracing / Logs** — [Signoz](http://localhost:9999) (email: `admin@signoz.local`, mot de passe: `admin123`)
+- **Tracing / Logs** — [Jaeger](http://localhost:16686/search?service=api)
 - **Base de données** — PostgreSQL sur le port `5433`

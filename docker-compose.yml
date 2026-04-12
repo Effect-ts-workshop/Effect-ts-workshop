@@ -13,24 +13,13 @@ services:
       interval: 3s
       timeout: 5s
       retries: 5
-  signoz:
-    container_name: signoz
-    # image: aegertracing/all-in-one # to try
-    image: ghcr.io/aetherall/signoz-standalone:latest
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:latest
     environment:
-      SIGNOZ_ADMIN_EMAIL: admin@signoz.local
-      SIGNOZ_ADMIN_PASSWORD: admin123
-      SIGNOZ_ADMIN_NAME: Admin
-      SIGNOZ_TELEMETRY_ENABLED: false
+      COLLECTOR_OTLP_ENABLED: "true"
     ports:
-      - 9999:8080
-      - 4318:4318
-    volumes:
-      - signoz_db_telemetry:/var/lib/clickhouse
-      - signoz_db_application:/var/lib/signoz
+      - 16686:16686  # UI
+      - 4318:4318    # OTLP HTTP
 
-volumes:
-  signoz_db_telemetry:
-    name: signoz_db_telemetry
-  signoz_db_application:
-    name: signoz_db_application
+volumes: {}

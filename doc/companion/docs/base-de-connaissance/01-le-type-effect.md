@@ -21,7 +21,7 @@ Les trois paramètres de type décrivent tout ce que le programme peut faire :
 | `Erreur`   | `never`           | Les types d'erreurs **typées** qui peuvent survenir |
 | `Contexte` | `never`           | Les services/dépendances dont le programme a besoin |
 
-`never` signifie "jamais" — `Erreur = never` veut dire "ne peut pas échouer", `Contexte = never` veut dire "n'a pas besoin de dépendances". Dans la documentation officielle, vous retrouvez la syntaxe anglaise Effect<A,E,R>
+`never` signifie "jamais" — `Erreur = never` veut dire "ne peut pas échouer", `Contexte = never` veut dire "n'a pas besoin de dépendances". Dans la documentation officielle, vous retrouvez la syntaxe anglaise `Effect<A, E, R>`
 
 ## Exemples de types
 

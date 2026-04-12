@@ -229,6 +229,8 @@ Le `yield*` à l'intérieur joue le rôle de `flatMap` : il suspend le générat
 
 Il existe aussi `Effect.gen(function*() { ... })` qui s'occupe uniquement du generateur. Préférez `Effect.fn` : le nom passé en premier argument apparaît dans les stack traces et active le tracing automatique — ce qui rend le débogage beaucoup plus simple.
 
+Pour comprendre comment visualiser ces traces dans Jaeger, voir [Observabilité](../base-de-connaissance/16-observabilite.md).
+
 :::
 
 ### Exercice
@@ -469,12 +471,12 @@ const friends = yield* Effect.orElse(
 
 `Option` et `Either` sont des sous-types d'`Effect` : les fonctions du module `Effect` les acceptent directement. On peut les utiliser avec `yield*` dans un générateur comme n'importe quel Effect.
 
-| Type | Comportement |
-|------|-------------|
-| `Option.Some(a)` | Succès — injecte `a` |
-| `Option.None` | Échec avec `NoSuchElementException` |
-| `Either.Right(a)` | Succès — injecte `a` |
-| `Either.Left(e)` | Échec avec `e` |
+| Type              | Comportement                        |
+| ----------------- | ----------------------------------- |
+| `Option.Some(a)`  | Succès — injecte `a`                |
+| `Option.None`     | Échec avec `NoSuchElementException` |
+| `Either.Right(a)` | Succès — injecte `a`                |
+| `Either.Left(e)`  | Échec avec `e`                      |
 
 <!-- prettier-ignore -->
 ```typescript

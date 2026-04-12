@@ -10,58 +10,61 @@ Effect distingue deux catégories d'échecs radicalement différentes.
 
 ### Erreurs (Failures)
 
-Des échecs **attendus et typés**. Ils font partie du contrat de la fonction.
+Au sens d'`Effect` les _failures_ dont des erreurs **attendues et typées**. Elles font partie du contrat de la fonction le cas échéant.
 
 <!-- prettier-ignore -->
 ```typescript
-class ArticleNonTrouvé extends Data.TaggedError("ArticleNonTrouvé")<{
+class ArticleNonTrouvé extends Data.TaggedError("ArticleNotFound")<{
   id: string;
 }> {}
 
-// Le type dit clairement : "peut échouer avec ArticleNonTrouvé"
-const getArticle = (id: string): Effect.Effect<Article, ArticleNonTrouvé> =>
+// Le type dit clairement : "peut échouer avec ArticleNotFound"
+const getArticle = (id: string): Effect.Effect<Article, ArticleNotFound> =>
   // ...
 ```
 
-- Apparaissent dans le **type** (`Effect<A, MonErreur>`)
-- Récupérables avec `Effect.catchTag`, `Effect.catchTags`, `Effect.catchAll`
+- Apparaissent dans le **type** en tant que second paramètre (`Effect<A, MyError>`)
+- Récupérables avec `Effect.catchTag` (une erreur) , `Effect.catchTags` (des erreurs), `Effect.catchAll` (toutes les erreurs)
 - Représentent des cas **normaux** (utilisateur non trouvé, fichier absent, accès refusé)
 
 ### Défauts (Defects)
 
-Des bugs **inattendus et non typés**. Ils ne devraient jamais se produire.
+Les bugs **inattendus et non typés** sont des _defects_ dans le monde `Effect`. Ils ne devraient jamais se produire.
 
 <!-- prettier-ignore -->
 ```typescript
 // NullPointerException, StackOverflow, etc.
-const monEffect = Effect.promise(() => operationQuiPeutBugger());
-// Si ça lance une exception → Défaut (invisible dans le type)
+const myEffect = Effect.promise(() => computationThatMayFail());
+// Pas d'erreur visible dans le type, en cas d'exception nous avons affaire à un defect
 ```
 
-- **Invisibles** dans le type (`Effect<A>` même si ça peut bugger)
-- Non récupérables avec `catchTag` (pas dans le type)
+Les _defects_ sont donc :
+- **Invisibles** dans le type (`Effect<A>`, même si ça peut bugger)
+- Non récupérables avec `catchTag`
 - Récupérables seulement avec `Effect.catchAllDefect` (traitement d'urgence)
 - Représentent des bugs à **corriger**, pas à gérer
 
 ## Créer des erreurs typées
+
+Comme évoqué précédemment on peut décrire des erreurs typées, les tags permettant de distinguer les différent cas.
 
 <!-- prettier-ignore -->
 ```typescript
 import { Data } from "effect";
 
 // Erreur sans données additionnelles
-class ErreurSimple extends Data.TaggedError("ErreurSimple")<{}> {}
+class SimpleError extends Data.TaggedError("SimpleError")<{}> {}
 
 // Erreur avec données
-class ErreurAvecMessage extends Data.TaggedError("ErreurAvecMessage")<{
+class ErrorWithMessage extends Data.TaggedError("ErrorWithMessage")<{
   message: string;
   code: number;
 }> {}
 
 // Utilisation
-const erreur = new ErreurAvecMessage({ message: "Oops", code: 500 });
+const error = new ErrorWithMessage({ message: "Oops", code: 500 });
 console.log(erreur.message); // "Oops"
-console.log(erreur._tag);    // "ErreurAvecMessage"
+console.log(erreur._tag);    // "ErrorWithMessage"
 ```
 
 ## Récupérer des erreurs
@@ -70,9 +73,9 @@ console.log(erreur._tag);    // "ErreurAvecMessage"
 
 <!-- prettier-ignore -->
 ```typescript
-const sûr = pipe(
+const safe = pipe(
   monEffect,
-  Effect.catchTag("ArticleNonTrouvé", (erreur) => {
+  Effect.catchTag("ArticleNotFound", (erreur) => {
     // erreur.id est disponible (type sûr !)
     return Effect.succeed(null)
   })
@@ -83,11 +86,11 @@ const sûr = pipe(
 
 <!-- prettier-ignore -->
 ```typescript
-const sûr = pipe(
+const safe = pipe(
   monEffect,
   Effect.catchTags({
-    ArticleNonTrouvé: (e) => Effect.succeed(null),
-    ErreurRéseau: (e) => Effect.fail(new ErreurServeur())
+    ArticleNotFound: (e) => Effect.succeed(null),
+    NetworkError: (e) => Effect.fail(new ServerError())
   })
 )
 ```
@@ -124,6 +127,6 @@ console.log(e._tag); // "MonErreur"
 :::tip Convention de nommage
 Donnez des noms **descriptifs** et **spécifiques** à vos erreurs. Évitez les noms génériques comme `Error` ou `Exception`.
 
-✅ `ArticleNonTrouvé`, `AccèsRefusé`, `FormatInvalide`
-❌ `Erreur`, `Problème`, `Bug`
+✅ `ArticleNotFound`, `AccessDenied`, `InvalidFormat`
+❌ `Error`, `Problem`, `Bug`
 :::

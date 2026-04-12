@@ -14,7 +14,7 @@ Fichier à compléter : `packages/app/_exercices/11-atom.spec.tsx`
 
 ## Partie 1 — Atom core
 
-### `Atom.make` — créer un état
+### Créer un état réactif
 
 Un `Atom` est une unité de state. On le lit et le modifie via un `Registry` :
 
@@ -60,7 +60,7 @@ const counter = Atom.make(0)
 
 ---
 
-### `r.set` — mettre à jour un état
+### Mettre à jour un état
 
 `r.set` remplace la valeur courante d'un atom. Tous ses abonnés sont notifiés :
 
@@ -136,7 +136,7 @@ const doubled = Atom.make((get) => get(counter) * 2)
 
 ---
 
-### `Atom.map` — transformer un atom
+### Transformer un atom
 
 `Atom.map` est un raccourci pour créer un atom dérivé avec une transformation simple :
 
@@ -170,7 +170,7 @@ const doubled = Atom.map(counter, (v) => v * 2)
 
 ---
 
-### `Atom.fnSync` — atom de fonction
+### Appliquer une fonction à chaque mise à jour
 
 `Atom.fnSync` crée un atom dont la valeur est le _résultat_ d'une fonction appliquée à son état :
 
@@ -249,7 +249,7 @@ const counter = Atom.make(Effect.succeed(2))
 
 ---
 
-### `r.subscribe` — réagir aux changements
+### Réagir aux changements d'un atom
 
 Pour être notifié quand un atom change, on s'y abonne avec `r.subscribe` :
 
@@ -289,7 +289,7 @@ r.subscribe(counter, listener)
 
 ---
 
-### `Atom.keepAlive` — persister sans abonné
+### Conserver un atom sans abonné
 
 Par défaut, un atom sans abonné peut être garbage-collecté. `Atom.keepAlive` garantit que la valeur persiste même sans listener :
 
@@ -331,7 +331,7 @@ const aliveAtom = Atom.keepAlive(initialAtom)
 
 ## Partie 2 — Atom React
 
-### `useAtomValue` — lire un atom dans un composant
+### Lire un atom dans un composant
 
 `useAtomValue` abonne le composant à l'atom. Quand l'atom change, le composant re-render automatiquement :
 
@@ -373,7 +373,7 @@ const value = useAtomValue(atom)
 
 ---
 
-### `useAtom` — lire et écrire
+### Lire et modifier un atom
 
 `useAtom` retourne `[value, setter]` — comme `useState`, mais pour un atom partagé :
 
@@ -414,7 +414,7 @@ const [value, setValue] = useAtom(atom)
 
 ---
 
-### `AtomHttpApi.Tag` — des atoms générés depuis une API
+### Intégrer les appels API avec les atoms
 
 Maintenant qu'on comprend les atoms, on peut regarder ce que `AtomHttpApi.Tag` fait par-dessus : il crée automatiquement des atoms à partir des endpoints d'une API HTTP et gère les états `loading`, `success` et `error` via un `Result` :
 

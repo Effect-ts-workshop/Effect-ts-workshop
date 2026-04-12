@@ -12,7 +12,7 @@ Fichier à compléter : `packages/api/_exercices/6-generators.spec.ts`
 
 ## Partie 1 — Générateurs JavaScript
 
-### `function*` et `yield`
+### Mettre une fonction en pause
 
 Un générateur est une fonction qui peut être mise en _pause_. Chaque `yield` suspend l'exécution et expose une valeur à l'extérieur :
 
@@ -66,7 +66,7 @@ function* items() {
 
 ---
 
-### `return` dans un générateur
+### Retourner une valeur finale
 
 La valeur `return` d'un générateur apparaît dans le dernier `.next()`, avec `done: true` :
 
@@ -106,7 +106,7 @@ function* getBrand(): Generator<string, string, unknown> {
 
 ---
 
-### `yield*` — déléguer à un autre générateur
+### Déléguer à un autre générateur
 
 `yield*` délègue l'itération à un sous-générateur : toutes ses valeurs sont produites comme si elles étaient dans le générateur courant.
 
@@ -155,7 +155,7 @@ function* models() {
 
 ---
 
-### Injecter une valeur avec `next(value)`
+### Envoyer une valeur dans le générateur
 
 La vraie magie des générateurs : on peut _envoyer_ une valeur dans le générateur via `next(value)`. Cette valeur devient le résultat de l'expression `yield` en cours.
 
@@ -202,11 +202,11 @@ const result = gen.next(true);
 
 ---
 
-## Partie 2 — `Effect.fn`
+## Partie 2 — Générateurs avec Effect
 
 Les générateurs permettent de mettre une fonction en pause et d'y injecter des valeurs. Effect exploite ce mécanisme pour deux choses : remplacer les longues chaînes de `flatMap` par une syntaxe linéaire, et retrouver le flot de contrôle impératif — `if`, `for`, `while`, ... — sans sortir du monde Effect.
 
-### `Effect.fn` — nommer et composer des handlers
+### Nommer et composer des handlers
 
 `Effect.fn` crée une fonction qui retourne un `Effect`, en utilisant un générateur pour la logique interne.
 
@@ -280,7 +280,7 @@ const getItemLabel = Effect.fn("getItemLabel")(function* (
 
 ---
 
-### `Effect.fn` vs `pipe` — la lisibilité avant tout
+### Réécrire un pipeline avec des générateurs
 
 Vous connaissez probablement le "Callback Hell" — des callbacks imbriqués sur plusieurs niveaux, impossible à lire :
 
@@ -465,7 +465,7 @@ const friends = yield* Effect.orElse(
 
 ---
 
-### Interopérabilité — `Option` et `Either` sont des Effects
+### Utiliser Option et Either dans un générateur
 
 `Option` et `Either` sont des sous-types d'`Effect` : les fonctions du module `Effect` les acceptent directement. On peut les utiliser avec `yield*` dans un générateur comme n'importe quel Effect.
 

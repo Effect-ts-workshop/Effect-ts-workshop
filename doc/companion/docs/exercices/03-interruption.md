@@ -12,7 +12,7 @@ Fichier à compléter : `packages/api/_exercices/3-interruption.spec.ts`
 
 ---
 
-## Interruption et `AbortSignal`
+## Propager l'interruption vers les APIs natives
 
 Les APIs Web (`fetch`, `XMLHttpRequest`) utilisent `AbortSignal` pour signaler une annulation. Effect peut propager son mécanisme d'interruption vers ces APIs via le signal disponible dans `Effect.tryPromise`.
 
@@ -82,7 +82,7 @@ const program = Effect.tryPromise({
 
 ---
 
-## `Effect.addFinalizer` — le nettoyage garanti
+## Garantir le nettoyage des ressources
 
 En JavaScript classique, si une exception surgit entre l'ouverture et la fermeture d'une ressource, la fermeture ne se produit jamais. `try/finally` est la réponse — mais ça ne couvre pas l'interruption.
 
@@ -176,7 +176,7 @@ yield* Effect.addFinalizer(() => deleteTempFile(path))
 
 ---
 
-## `Effect.acquireRelease` — coupler ouverture et fermeture
+## Coupler l'ouverture et la fermeture d'une ressource
 
 Quand une ressource a un cycle de vie clair (ouvrir / utiliser / fermer), `Effect.acquireRelease` couple explicitement les deux opérations. C'est l'équivalent Effect de `await using` (TypeScript 5.2) : dans les deux cas, l'ouverture et la fermeture sont définies au même endroit.
 

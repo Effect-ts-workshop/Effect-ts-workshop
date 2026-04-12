@@ -12,7 +12,7 @@ Fichier à compléter : `packages/api/_exercices/8-api.spec.ts`
 
 ---
 
-## Le contrat — `HttpApi`, `HttpApiGroup`, `HttpApiEndpoint`
+## Décrire le contrat de l'API
 
 Le contrat décrit la forme de l'API. Il ne contient aucune logique.
 
@@ -35,7 +35,7 @@ Ce contrat est la _source de vérité_ : le serveur l'implémente, le client le 
 
 ---
 
-## L'implémentation — `HttpApiBuilder.group`
+## Implémenter les handlers
 
 <!-- prettier-ignore -->
 ```typescript
@@ -54,7 +54,7 @@ Si `"sayHello"` n'existe pas dans le contrat `MyApi`, TypeScript signale une err
 
 ---
 
-## Le layer — `HttpLayerRouter`
+## Câbler le contrat et l'implémentation
 
 <!-- prettier-ignore -->
 ```typescript
@@ -68,7 +68,7 @@ Ce layer est ensuite converti en handler HTTP pour les tests — ou fourni à un
 
 ---
 
-## `HttpApiClient` — tester sans serveur
+## Tester l'API sans démarrer de serveur
 
 Pour les tests, `HttpLayerRouter.toWebHandler` crée un handler en mémoire. On le branche sur un `FetchHttpClient` personnalisé pour intercepter les requêtes :
 

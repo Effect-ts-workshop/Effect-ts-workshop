@@ -16,7 +16,7 @@ Fichier à compléter : `packages/api/_exercices/1-base.spec.ts`
 
 ## Partie 1 — FP utils
 
-### `pipe`
+### Composer une transformation pas à pas
 
 Imaginons deux fonctions :
 
@@ -103,7 +103,7 @@ const result = pipe(
 
 ---
 
-### `pipe` avec des curried functions
+### Simplifier le pipe avec des fonctions currifiées
 
 Il existe une façon d'écrire des fonctions qui s'intègrent encore plus naturellement dans un `pipe` : les **curried functions**.
 
@@ -219,7 +219,7 @@ Retenez cette distinction. Elle est au cœur de tout ce que vous ferez avec Effe
 
 ---
 
-### `Effect.succeed`
+### Envelopper une valeur dans un Effect
 
 La brique de base : envelopper une valeur dans un `Effect`.
 
@@ -283,7 +283,7 @@ const add = (a: number, b: number): Effect.Effect<number> => {
 
 ---
 
-### `Effect.map`
+### Transformer la valeur d'un Effect
 
 On a un `Effect` et on veut transformer la valeur à l'intérieur — sans en sortir. C'est le rôle de `map`.
 
@@ -350,7 +350,7 @@ const result = pipe(
 
 ---
 
-### `Effect.flatMap`
+### Enchaîner des transformations qui produisent un Effect
 
 Que se passe-t-il si la fonction qu'on passe à `map` renvoie elle-même un `Effect` ?
 
@@ -423,7 +423,7 @@ const result = pipe(
 
 ---
 
-### `Effect.promise`
+### Intégrer une opération asynchrone
 
 Pour intégrer du code asynchrone existant (`Promise`) dans Effect, on utilise `Effect.promise`.
 
@@ -491,7 +491,7 @@ const addWithDelay = (a: number, b: number): Effect.Effect<number> => {
 
 ---
 
-### `Effect.tryPromise`
+### Modéliser une opération asynchrone faillible
 
 `Effect.promise` suppose que la `Promise` ne peut jamais rejeter. Mais dans la réalité, la plupart des operations asynchrones peuvent échouer. Si on prend l'exemple de `fetch`, le réseau ou le serveur peut être indisponible.
 

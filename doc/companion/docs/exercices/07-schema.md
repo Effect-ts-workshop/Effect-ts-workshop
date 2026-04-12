@@ -12,7 +12,7 @@ Fichier à compléter : `packages/api/_exercices/7-schema.spec.ts`
 
 ---
 
-## `Schema.Struct` — valider un objet
+## Valider la structure d'un objet
 
 <!-- prettier-ignore -->
 ```typescript
@@ -164,7 +164,7 @@ const decodedData = pipe(dataDto, Schema.decodeSync(DataSchema))
 
 ---
 
-## `Arbitrary.make` — générer des données de test
+## Générer des données de test automatiquement
 
 Pour les tests property-based, `Arbitrary.make` génère automatiquement des données aléatoires conformes à un schema qui lui est fourni. On peut tester que l'on récupère bien des valeurs de même validité que les originales après sérialisation et désérialisation :
 
@@ -207,7 +207,7 @@ const arbitrary = Arbitrary.make(DataSchema)
 
 ---
 
-## Schemas personnalisés — `Schema.pattern` et `Schema.fromBrand`
+## Créer un schema personnalisé
 
 Pour valider une email, un UUID, un numéro de téléphone, on combine `Schema.pattern` (regex) avec `Schema.fromBrand` (type opaque) :
 

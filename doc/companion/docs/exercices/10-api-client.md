@@ -12,7 +12,7 @@ Fichier de référence : `packages/app/_exercices/10-api-client.spec.tsx`
 
 ---
 
-## `HttpApiClient.make` — client typé depuis le contrat
+## Consommer une API depuis le client
 
 `HttpApiClient.make` génère un client typé à partir du contrat. La structure reflète l'organisation en groupes :
 
@@ -64,7 +64,7 @@ Les tests de cette section sont déjà implémentés. Parcourez-les pour observe
 
 ---
 
-## `AtomHttpApi.Tag` — client réactif dans React
+## Rendre les appels API réactifs dans React
 
 Dans l'application, on n'appelle pas `HttpApiClient` directement dans les composants. `AtomHttpApi.Tag` l'encapsule dans un système d'Atoms réactifs :
 

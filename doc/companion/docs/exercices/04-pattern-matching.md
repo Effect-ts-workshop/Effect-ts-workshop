@@ -16,7 +16,7 @@ Fichier à compléter : `packages/api/_exercices/4-pattern-matching.spec.ts`
 
 ---
 
-## `Match.value` + `Match.when` + `Match.exhaustive`
+## Couvrir tous les cas possibles
 
 Le pattern de base : démarrer un match sur une valeur, définir les cas, clore avec `exhaustive`.
 
@@ -117,7 +117,7 @@ const getValue = (field: AnyField) =>
 
 ---
 
-## `Option.match` — valeurs optionnelles
+## Traiter une valeur optionnelle
 
 `Option` représente une valeur qui peut être présente (`Some`) ou absente (`None`). Il est ainsi possible de décrire une séquence au sein de laquelle les `Some` seront traités et les `None` ignorés. En un sens `Option` est une adaptation du _railway pattern_ au cas de l'absence de valeur. Chacun des cas peut ensuite être traité de façon différenciée.
 
@@ -188,7 +188,7 @@ const getValueAt = (index: number) =>
 
 ---
 
-## `Match.option` — résultat dans un `Option`
+## Retourner un résultat partiel
 
 Parfois, on ne _veut_ pas couvrir tous les cas — seulement certains. `Match.option` clôt le match en enveloppant le résultat dans un `Option` : `Some` si un cas a matché, `None` sinon.
 
@@ -243,7 +243,7 @@ const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
 
 ---
 
-## `Match.tag` — unions discriminées
+## Discriminer par tag
 
 Quand les variants d'une union ont une propriété `_tag`, `Match.tag` est plus concis que `Match.when({ _tag: "..." })` :
 
@@ -303,7 +303,7 @@ const describe = (notif: Notification) =>
 
 ---
 
-## `Match.orElse` — le cas par défaut
+## Définir un cas par défaut
 
 Quand on ne _peut_ pas couvrir tous les cas (type `string` ouvert, valeurs inconnues), `Match.orElse` joue le rôle du `default` dans un `switch/case` :
 
@@ -356,7 +356,7 @@ const getProcessingFee = (method: PaymentMethod): string =>
 
 ---
 
-## `Match.not` — exclure un cas
+## Exclure un cas spécifique
 
 Pour matcher "tout sauf X", `Match.not` exclut une valeur spécifique :
 
@@ -406,7 +406,7 @@ const isTrackable = (status: OrderStatus) =>
 
 ---
 
-## `Match.whenOr` — plusieurs valeurs, même branche
+## Regrouper plusieurs valeurs dans une même branche
 
 `Match.whenOr` est un raccourci pour plusieurs `Match.when` qui renvoient la même chose :
 
@@ -453,7 +453,7 @@ const canAccessDashboard = (role: Role) =>
 
 ---
 
-## Prédicats intégrés — `Match.null`, `Match.boolean`, `Match.number`, `Match.string`
+## Matcher sur des types primitifs
 
 Pour matcher sur des types primitifs, `Match` fournit des prédicats prêts à l'emploi :
 

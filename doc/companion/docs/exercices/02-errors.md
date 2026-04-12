@@ -12,7 +12,7 @@ Fichier à compléter : `packages/api/_exercices/2-errors.spec.ts`
 
 ---
 
-## `Effect.fail` — l'échec explicite
+## Modéliser un échec explicite
 
 Quand `Effect.succeed` crée un Effect qui réussit, `Effect.fail` crée un Effect qui échoue :
 
@@ -174,7 +174,7 @@ const fetch: Fetch = (input, init) =>
 
 ---
 
-## `Data.TaggedError` — des erreurs identifiables
+## Créer des erreurs identifiables
 
 Les classes d'erreur classiques ont un problème : impossible de les distinguer par leur type à l'exécution si on n'a que `instanceof`. `Data.TaggedError` ajoute une propriété `_tag` qui sert d'identifiant :
 
@@ -242,7 +242,7 @@ class HTTPResponseError extends Data.TaggedError("HTTPResponseError")<{
 
 ---
 
-## `Effect.catchTag` — attraper une erreur précise
+## Attraper une erreur précise
 
 `Effect.catchTag` intercepte une erreur par son `_tag` et permet de la gérer — sans toucher aux autres :
 
@@ -303,7 +303,7 @@ const program = pipe(
 
 ---
 
-## `Effect.catchTags` — attraper plusieurs erreurs d'un coup
+## Gérer plusieurs erreurs en une fois
 
 Quand on veut gérer plusieurs tags, `Effect.catchTags` évite d'enchaîner les `catchTag` :
 
@@ -354,7 +354,7 @@ const program = pipe(
 
 ---
 
-## `Effect.catchAll` — tout rattraper
+## Rattraper toutes les erreurs
 
 Quand on veut éliminer _toutes_ les erreurs typées d'un Effect, `Effect.catchAll` est le bon outil :
 
@@ -400,7 +400,7 @@ const program = pipe(
 
 ---
 
-## `Effect.catchAllDefect` — les erreurs inattendues
+## Se remettre d'une erreur inattendue
 
 Il existe deux catégories d'échecs dans Effect :
 

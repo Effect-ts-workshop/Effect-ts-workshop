@@ -113,7 +113,7 @@ const fetchJoke = () =>
 
 ---
 
-## `Context.GenericTag` — créer son propre service
+## Créer son propre service
 
 Pour définir un service maison, on crée un `Tag` — un identifiant unique qui permet à Effect de trouver l'implémentation dans le contexte :
 
@@ -208,7 +208,7 @@ const JokeServiceLive = Layer.succeed(JokeService, {
 
 ---
 
-## `Effect.Service` — la forme simplifiée
+## Simplifier la définition d'un service
 
 `Context.GenericTag` + `Layer.succeed` fonctionne, mais c'est verbeux. `Effect.Service` est la forme moderne qui regroupe tout en une classe :
 
@@ -297,7 +297,7 @@ class JokeService extends Effect.Service<JokeService>()("JokeService", {
 
 ---
 
-## `Service.DefaultWithoutDependencies` — tester sans dépendances réelles
+## Tester un service sans dépendances réelles
 
 Pour tester un service qui dépend d'un autre, `Layer.mock` permet de remplacer une dépendance par un double de test — sans modifier l'implémentation.
 

@@ -27,10 +27,10 @@ const result = pipe(
 <!-- prettier-ignore -->
 ```typescript
 pipe(
-  Match.value("chargement"),
-  Match.when("chargement", () => "⏳"),
-  Match.when("succès", () => "✅"),
-  Match.when("erreur", () => "❌"),
+  Match.value(status),
+  Match.when("loading", () => "⏳"),
+  Match.when("success", () => "✅"),
+  Match.when("error", () => "❌"),
   Match.exhaustive
 )
 ```
@@ -40,15 +40,15 @@ pipe(
 <!-- prettier-ignore -->
 ```typescript
 type State =
-  | { type: "vide" }
-  | { type: "données"; items: Item[] }
-  | { type: "erreur"; message: string }
+  | { type: "empty" }
+  | { type: "data"; items: Item[] }
+  | { type: "error"; message: string }
 
 pipe(
   Match.value(state),
-  Match.when({ type: "vide" }, () => "Rien à afficher"),
-  Match.when({ type: "données" }, ({ items }) => `${items.length} items`),
-  Match.when({ type: "erreur" }, ({ message }) => `Erreur : ${message}`),
+  Match.when({ type: "empty" }, () => "Rien à afficher"),
+  Match.when({ type: "data" }, ({ items }) => `${items.length} items`),
+  Match.when({ type: "error" }, ({ message }) => `Erreur : ${message}`),
   Match.exhaustive
 )
 ```
@@ -97,23 +97,7 @@ pipe(
 )
 ```
 
-### `Match.option` — résultat en `Option`
-
-`Match.option` clôt le match en enveloppant le résultat dans un `Option`. Si aucun cas ne correspond : `Option.none()`.
-
-<!-- prettier-ignore -->
-```typescript
-const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
-  pipe(
-    Match.value(stock),
-    Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
-    Match.option
-    // Option.some(2|5) si "in_stock"
-    // Option.none() pour "out_of_stock" et "discontinued"
-  )
-```
-
-### Gardes de type — `Match.null`, `Match.boolean`, `Match.number`, `Match.string`
+### Correspondance avec les primitives — `Match.null`, `Match.boolean`, `Match.number`, `Match.string`
 
 <!-- prettier-ignore -->
 ```typescript
@@ -146,6 +130,24 @@ pipe(
   Match.orElse(() => 0) // ✅ Gère tous les autres cas
 )
 ```
+
+
+### `Match.option` — résultat en `Option`
+
+`Match.option` clôt le match en enveloppant le résultat dans une `Option` (voir plus bas). Dans le cas nominal il renvoie `Option.some(result)` Si aucun cas ne correspond il renvoie `Option.none()`.
+
+<!-- prettier-ignore -->
+```typescript
+const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
+  pipe(
+    Match.value(stock),
+    Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
+    Match.option
+    // Option.some(2|5) si "in_stock"
+    // Option.none() pour "out_of_stock" et "discontinued"
+  )
+```
+
 
 ## Le type `Option`
 

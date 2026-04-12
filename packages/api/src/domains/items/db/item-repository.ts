@@ -1,7 +1,7 @@
 import { Model, SqlClient } from "@effect/sql"
 import { Effect, Schema } from "effect"
 import { InventoryItemIdSchema } from "shared/item"
-import { SqlLive } from "../utils/database/database"
+import { SqlLive } from "../../../utils/database/database"
 
 // type Item = typeof InventoryItemSchema.Type
 

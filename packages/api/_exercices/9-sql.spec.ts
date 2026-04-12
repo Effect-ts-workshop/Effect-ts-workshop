@@ -1,14 +1,12 @@
 import { Model, SqlClient } from "@effect/sql"
-import { eq } from "drizzle-orm"
 import type { InferInsertModel } from "drizzle-orm"
 import { ConfigProvider, Effect, Layer, pipe, Schema } from "effect"
 import { InventoryItemId, InventoryItemIdSchema } from "shared/item"
 import { GenericContainer, Wait } from "testcontainers"
 import { describe, expect, it as itBase } from "vitest"
-import { SqlLive } from "../database"
-import { Database, DatabaseLive } from "../database-drizzle"
-import type { items } from "../db/item.sql"
-import { MigratorLive } from "../migrator"
+import { SqlLive } from "../src/utils/database/database"
+import { Database, DatabaseLive } from "../src/utils/database/database-drizzle"
+import { MigratorLive } from "../src/utils/database/migrator"
 
 const it = itBase.extend("pgConfig", async ({}, { onCleanup }) => {
   const container = await new GenericContainer("postgres:18.1")

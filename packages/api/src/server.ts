@@ -6,16 +6,12 @@ import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base"
 import { Layer, pipe } from "effect"
 import { createServer } from "node:http"
 import { Api } from "shared/api"
-import { ItemRepository } from "./db/item-repository"
-import { ItemRepositoryDrizzle } from "./db/item-repository-drizzle"
-import { itemRoutesLive } from "./http"
-import { MigratorLive } from "./migrator"
+import { itemLayer } from "./domains/items/item-layer"
+import { MigratorLive } from "./utils/database/migrator"
 
 const apiRoutes = pipe(
   HttpLayerRouter.addHttpApi(Api),
-  Layer.provide(itemRoutesLive),
-  Layer.provide(ItemRepository.Default),
-  Layer.provide(ItemRepositoryDrizzle.Default)
+  Layer.provide(itemLayer)
 )
 
 // Create a /docs route for the API documentation

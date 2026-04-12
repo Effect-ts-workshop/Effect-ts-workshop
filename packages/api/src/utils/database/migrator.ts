@@ -7,7 +7,7 @@ import { SqlLive } from "./database"
 export const MigratorLive = pipe(
   PgMigrator.layer({
     loader: PgMigrator.fromFileSystem(
-      fileURLToPath(new URL("migrations", import.meta.url))
+      fileURLToPath(new URL("../../migrations", import.meta.url))
     )
   }),
   Layer.provide(SqlLive),

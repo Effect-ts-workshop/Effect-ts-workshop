@@ -4,8 +4,8 @@ import * as PgDrizzle from "drizzle-orm/effect-postgres"
 import { Config, Context, Effect, Layer, pipe } from "effect"
 import type { TypeOverrides } from "pg"
 import { types } from "pg"
+import { items } from "../../domains/items/db/item.sql"
 import { pgConfig } from "./database"
-import { items } from "./db/item.sql"
 
 export const SqlDrizzleLive = PgClient.layerConfig({
   ...pgConfig,

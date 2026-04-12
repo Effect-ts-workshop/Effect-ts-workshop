@@ -84,6 +84,22 @@ Services disponibles :
 
 </details>
 
+## Déroulement d'un exercice
+
+1. **Lancez les tests** en mode watch depuis la racine du projet :
+
+```bash
+npm run test
+```
+
+2. **Ouvrez le fichier de test** correspondant à la page du companion (indiqué en haut de chaque exercice).
+
+3. **Retirez le `.skip`** devant le test sur lequel vous travaillez — le test passe rouge.
+
+4. **Faites passer le test au vert.**
+
+5. Passez au test suivant.
+
 ## Conseils avant de commencer
 
 - Chaque exercice n'introduit **qu'un seul nouveau concept** à la fois.
@@ -102,10 +118,10 @@ Exactement comme une recette de cuisine n'est pas le plat. La recette décrit ce
 <!-- prettier-ignore -->
 ```typescript
 // Ceci ne fait rien — c'est juste une description
-const monEffect = Effect.succeed(42);
+const myEffect = Effect.succeed(42);
 
 // Ceci exécute la description et produit le résultat
-const résultat = Effect.runSync(monEffect); // 42
+const result = Effect.runSync(myEffect); // 42
 ```
 
 Cette distinction est fondamentale. Elle permet à Effect de composer des programmes complexes avant de les exécuter.

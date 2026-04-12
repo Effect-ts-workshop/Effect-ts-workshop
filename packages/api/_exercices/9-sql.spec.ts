@@ -37,7 +37,7 @@ const it = itBase.extend("pgConfig", async ({}, { onCleanup }) => {
 describe("Native effect module", () => {
   const databaseLayer = Layer.mergeAll(SqlLive, MigratorLive)
 
-  it("Should run raw sql", { timeout: 5_000 }, async ({ pgConfig }) => {
+  it.skip("Should run raw sql", { timeout: 5_000 }, async ({ pgConfig }) => {
     const getAll = Effect.fn("getAll")(function*() {
       const sql = yield* SqlClient.SqlClient
       // #start
@@ -62,7 +62,7 @@ describe("Native effect module", () => {
     }))
   })
 
-  it("Should operate CRUD easily", { timeout: 5_000 }, async ({ pgConfig }) => {
+  it.skip("Should operate CRUD easily", { timeout: 5_000 }, async ({ pgConfig }) => {
     class DbItem extends Model.Class<DbItem>("DbItem")({
       id: InventoryItemIdSchema,
       brand: Schema.String,
@@ -112,7 +112,7 @@ describe("Native effect module", () => {
 })
 
 describe("Drizzle effect integration", () => {
-  it("Simplify with query builder", { timeout: 5_000 }, async ({ pgConfig }) => {
+  it.skip("Simplify with query builder", { timeout: 5_000 }, async ({ pgConfig }) => {
     const testDatabaseLayer = Layer.mergeAll(
       DatabaseLive,
       Layer.mergeAll(SqlLive, MigratorLive)

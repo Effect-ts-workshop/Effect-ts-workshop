@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest"
 const TODO: any = {}
 
 describe("FP utils", () => {
-  it("pipe", () => {
+  it.skip("pipe", () => {
     const add = (a: number, b: number) => a + b
     const multiply = (a: number, b: number) => a * b
 
@@ -21,7 +21,7 @@ describe("FP utils", () => {
     expect(result).toEqual(40)
   })
 
-  it("curried function", () => {
+  it.skip("curried function", () => {
     const add = (a: number) => (b: number) => a + b
     const multiply = (a: number) => (b: number) => a * b
 
@@ -40,7 +40,7 @@ describe("FP utils", () => {
 })
 
 describe("Effect basics", () => {
-  it("Sync operation", () => {
+  it.skip("Sync operation", () => {
     const add = (a: number, b: number): Effect.Effect<number> => {
       const result = a + b
 
@@ -56,7 +56,7 @@ describe("Effect basics", () => {
     expect(Effect.runSync(program)).toEqual(10)
   })
 
-  it("Should transform effect value", () => {
+  it.skip("Should transform effect value", () => {
     const add = (a: number) => (b: number) => a + b
 
     const result = pipe(
@@ -71,7 +71,7 @@ describe("Effect basics", () => {
     expect(Effect.runSync(result)).toEqual(10)
   })
 
-  it("Should transform effect value and flatten to avoid Effect<Effect<number>>", () => {
+  it.skip("Should transform effect value and flatten to avoid Effect<Effect<number>>", () => {
     const add = (a: number) => (b: number) => Effect.succeed(a + b)
 
     const result = pipe(
@@ -86,7 +86,7 @@ describe("Effect basics", () => {
     expect(Effect.runSync(result)).toEqual(10)
   })
 
-  it("Async operation", async () => {
+  it.skip("Async operation", async () => {
     const add = (a: number, b: number) =>
       new Promise((resolve) => {
         setTimeout(() => resolve(a + b), 200)
@@ -104,7 +104,7 @@ describe("Effect basics", () => {
     await expect(Effect.runPromise(program)).resolves.toEqual(10)
   })
 
-  it("Async operation that could fail", async () => {
+  it.skip("Async operation that could fail", async () => {
     type Fetch = (
       ...args: Parameters<typeof baseFetch>
     ) => Effect.Effect<Response, Error>

@@ -13,7 +13,7 @@ describe("Atom", () => {
   describe("Atom core", () => {
     const r = Registry.make()
 
-    it("should create a state in a registry", () => {
+    it.skip("should create a state in a registry", () => {
       // #start
       const counter = TODO
       // #solution
@@ -23,7 +23,7 @@ describe("Atom", () => {
       expect(r.get(counter)).toEqual(0)
     })
 
-    it("should update a state", () => {
+    it.skip("should update a state", () => {
       const counter = Atom.make(0)
       // #start
       TODO(counter, 1)
@@ -34,7 +34,7 @@ describe("Atom", () => {
       expect(r.get(counter)).toEqual(1)
     })
 
-    it("should create a computed value", () => {
+    it.skip("should create a computed value", () => {
       const counter = Atom.make(0)
 
       // #start
@@ -48,7 +48,7 @@ describe("Atom", () => {
       expect(r.get(doubled)).toEqual(18)
     })
 
-    it("should tranform a value (like creating a computed value)", () => {
+    it.skip("should tranform a value (like creating a computed value)", () => {
       const counter = Atom.make(0)
 
       // #start
@@ -62,7 +62,7 @@ describe("Atom", () => {
       expect(r.get(doubled)).toEqual(18)
     })
 
-    it("should handle function to tranform value", () => {
+    it.skip("should handle function to tranform value", () => {
       const increment = (count: number) => count + 1
 
       // #start
@@ -75,7 +75,7 @@ describe("Atom", () => {
       expect(r.get(next)).toEqual(1)
     })
 
-    it("should handle effect", () => {
+    it.skip("should handle effect", () => {
       const effect = Effect.succeed(2)
 
       // #start
@@ -92,7 +92,7 @@ describe("Atom", () => {
       expect(value.value).toEqual(2)
     })
 
-    it("should be notified on value change", async () => {
+    it.skip("should be notified on value change", async () => {
       const listener = vi.fn()
       const counter = Atom.make(0)
 
@@ -107,7 +107,7 @@ describe("Atom", () => {
       expect(listener).toHaveBeenCalledWith(9)
     })
 
-    it("should keep alive a value even if there is no subscriber", async () => {
+    it.skip("should keep alive a value even if there is no subscriber", async () => {
       const initialAtom = Atom.make(0)
 
       // #start
@@ -125,7 +125,7 @@ describe("Atom", () => {
   })
 
   describe("Atom react", () => {
-    it("should read value from simple Atom", () => {
+    it.skip("should read value from simple Atom", () => {
       const atom = Atom.make(42)
 
       function TestComponent() {
@@ -142,7 +142,7 @@ describe("Atom", () => {
       expect(screen.getByTestId("value")).toHaveTextContent("42")
     })
 
-    it("should update when Atom value changes", async () => {
+    it.skip("should update when Atom value changes", async () => {
       const atom = Atom.make(0)
 
       function TestComponent() {
@@ -168,7 +168,7 @@ describe("Atom", () => {
       expect(screen.getByTestId("value")).toHaveTextContent("1")
     })
 
-    it("should integrate nicely with api client", async () => {
+    it.skip("should integrate nicely with api client", async () => {
       const mockClient = HttpClient.make((request) =>
         pipe(
           Effect.sleep(Duration.millis(100)),

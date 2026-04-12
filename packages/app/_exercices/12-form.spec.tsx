@@ -8,7 +8,7 @@ const TODO: any = {}
 
 describe("Form", () => {
   describe("Form core", () => {
-    it("should create simple form builder", () => {
+    it.skip("should create simple form builder", () => {
       // #start
       const MyFormBuilder = TODO
       // #solution
@@ -23,7 +23,7 @@ describe("Form", () => {
       })
     })
 
-    it("should create form builder with array field", () => {
+    it.skip("should create form builder with array field", () => {
       // #start
       const MyFormBuilder = TODO
       // #solution
@@ -39,7 +39,7 @@ describe("Form", () => {
   })
 
   describe("Form react", () => {
-    it("should integrate basic login", async () => {
+    it.skip("should integrate basic login", async () => {
       const onSubmit = vi.fn()
       // #start
       const loginFormBuilder = TODO

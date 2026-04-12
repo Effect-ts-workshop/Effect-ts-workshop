@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest"
 const TODO: any = {}
 
 describe("Interruption", () => {
-  it("could propagate interruption with AbortSignal", async () => {
+  it.skip("could propagate interruption with AbortSignal", async () => {
     const abortCallback = vi.fn()
     const slowFetch = vi.fn((_, init) =>
       new Promise((resolve, reject) => {
@@ -67,7 +67,7 @@ describe("addFinalizer — connexion base de données", () => {
 })
 
 describe("addFinalizer — lock distribué (multi-pods)", () => {
-  it("un seul pod exécute le job, l'autre est bloqué", async () => {
+  it.skip("un seul pod exécute le job, l'autre est bloqué", async () => {
     // Simule un Redis partagé entre tous les pods
     const sharedRedis = { locks: new Set<string>() }
 
@@ -117,7 +117,7 @@ describe("addFinalizer — lock distribué (multi-pods)", () => {
     expect(sharedRedis.locks.size).toBe(0) // lock libéré à la fin
   })
 
-  it("libère le lock si le job est interrompu", async () => {
+  it.skip("libère le lock si le job est interrompu", async () => {
     const sharedRedis = { locks: new Set<string>() }
 
     const releaseLock = (key: string) => Effect.sync(() => sharedRedis.locks.delete(key))
@@ -145,7 +145,7 @@ describe("addFinalizer — lock distribué (multi-pods)", () => {
 })
 
 describe("addFinalizer — fichier temporaire", () => {
-  it("supprime le fichier temporaire après utilisation", async () => {
+  it.skip("supprime le fichier temporaire après utilisation", async () => {
     // Simule un système de fichiers en mémoire
     const filesystem = new Set<string>()
 
@@ -184,7 +184,7 @@ describe("acquireRelease — garantie du release", () => {
     close: () => log.push("connection:closed")
   })
 
-  it("exécute le release après un succès", async () => {
+  it.skip("exécute le release après un succès", async () => {
     const log: Array<string> = []
 
     // acquireRelease couple explicitement l'ouverture et la fermeture
@@ -207,7 +207,7 @@ describe("acquireRelease — garantie du release", () => {
     expect(log).toContain("connection:closed") // connexion bien fermée
   })
 
-  it("exécute le release même si une erreur survient", async () => {
+  it.skip("exécute le release même si une erreur survient", async () => {
     const log: Array<string> = []
 
     // #start
@@ -233,7 +233,7 @@ describe("acquireRelease — garantie du release", () => {
     expect(log).toContain("connection:closed")
   })
 
-  it("exécute le release si le fiber est interrompu", async () => {
+  it.skip("exécute le release si le fiber est interrompu", async () => {
     const log: Array<string> = []
 
     const resource = Effect.acquireRelease(

@@ -10,7 +10,7 @@ const TODO: any = {}
  * - Avoiding Requirement Leakage
  */
 describe("Effect context", () => {
-  it("Using a service", async () => {
+  it.skip("Using a service", async () => {
     type Joke = { value: string; url: string }
     const fetchJoke = () =>
       pipe(
@@ -35,7 +35,7 @@ describe("Effect context", () => {
     })
   })
 
-  it("Creating your own service with live and test implementation", async () => {
+  it.skip("Creating your own service with live and test implementation", async () => {
     type JokeService = {
       getRandom: () => Effect.Effect<string>
     }
@@ -80,7 +80,7 @@ describe("Effect context", () => {
     )
   })
 
-  it("Simplifying service definitions with Effect.Service", async () => {
+  it.skip("Simplifying service definitions with Effect.Service", async () => {
     // #start
     const JokeService = TODO
     // #solution
@@ -109,7 +109,7 @@ describe("Effect context", () => {
     )
   })
 
-  it("Easily testing services", async () => {
+  it.skip("Easily testing services", async () => {
     class JokeService extends Effect.Service<JokeService>()("JokeService", {
       effect: pipe(
         HttpClient.HttpClient,

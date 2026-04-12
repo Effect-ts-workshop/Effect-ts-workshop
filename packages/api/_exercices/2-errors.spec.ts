@@ -6,7 +6,7 @@ import { describe, expect, expectTypeOf, it } from "vitest"
 const TODO: any = {}
 
 describe("Effect basics - Errors", () => {
-  it("should return failure explicitely", () => {
+  it.skip("should return failure explicitely", () => {
     function racineCarrée(n: number): Effect.Effect<number, Error> {
       if (n < 0) {
         // #start
@@ -26,7 +26,7 @@ describe("Effect basics - Errors", () => {
     expect(() => Effect.runSync(invalidProgram)).toThrow()
   })
 
-  it("should return multiple errors", async () => {
+  it.skip("should return multiple errors", async () => {
     class NetworkError extends Error {}
     class HTTPResponseError extends Error {}
 
@@ -64,7 +64,7 @@ describe("Effect basics - Errors", () => {
     await expect(Effect.runPromise(invalidProgram)).rejects.toThrow()
   })
 
-  it("should create tagged errors", async () => {
+  it.skip("should create tagged errors", async () => {
     // #start
     const NetworkError = TODO
     // #solution
@@ -82,7 +82,7 @@ describe("Effect basics - Errors", () => {
     expect(httpError).toMatchObject({ "_tag": "HTTPResponseError" })
   })
 
-  it("should catch single error", async () => {
+  it.skip("should catch single error", async () => {
     type HTTPResponseError = { readonly _tag: "HTTPResponseError" }
     type NetworkError = { readonly _tag: "NetworkError" }
     const getJoke = (): Effect.Effect<string, HTTPResponseError | NetworkError, never> =>
@@ -124,7 +124,7 @@ describe("Effect basics - Errors", () => {
     expect(Effect.runSync(program)).toEqual("Fallback joke")
   })
 
-  it("should all errors and always get a joke", async () => {
+  it.skip("should all errors and always get a joke", async () => {
     type UnknownException = { readonly _tag: "UnknownException" }
     type HTTPResponseError = { readonly _tag: "HTTPResponseError" }
     type NetworkError = { readonly _tag: "NetworkError" }
@@ -146,7 +146,7 @@ describe("Effect basics - Errors", () => {
 })
 
 describe("Effect defect", () => {
-  it("should handle unexpected error (defect)", async () => {
+  it.skip("should handle unexpected error (defect)", async () => {
     const trustMe = () => Effect.dieMessage("You are too naive")
 
     const program = pipe(

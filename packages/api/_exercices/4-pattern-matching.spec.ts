@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest"
 const TODO: any = {}
 
 describe("Pattern matching", () => {
-  it("should handle all possible values", () => {
+  it.skip("should handle all possible values", () => {
     type NumberField = { type: "number"; value: number }
     type TextField = { type: "text"; value: string }
     type SelectField = { type: "select"; multiple: false; value: string }
@@ -35,7 +35,7 @@ describe("Pattern matching", () => {
     expect(getValue({ type: "select", multiple: true, value: ["selected", "a", "lot"] })).toEqual("selected, a, lot")
   })
 
-  it("should handle optional value", () => {
+  it.skip("should handle optional value", () => {
     const allValues = ["you got me"]
 
     const getValueAt = (index: number) =>
@@ -56,7 +56,7 @@ describe("Pattern matching", () => {
     expect(getValueAt(42)).toEqual("DEFAULT")
   })
 
-  it("should wrap result in Option with Match.option (product availability)", () => {
+  it.skip("should wrap result in Option with Match.option (product availability)", () => {
     type StockStatus =
       | { status: "in_stock"; quantity: number }
       | { status: "out_of_stock" }
@@ -79,7 +79,7 @@ describe("Pattern matching", () => {
     expect(getDeliveryDays({ status: "discontinued" })).toEqual(Option.none())
   })
 
-  it("should match on _tag discriminated union (notifications)", () => {
+  it.skip("should match on _tag discriminated union (notifications)", () => {
     type EmailNotification = { _tag: "Email"; to: string; subject: string }
     type SmsNotification = { _tag: "Sms"; phone: string; body: string }
     type PushNotification = { _tag: "Push"; deviceId: string; title: string }
@@ -109,7 +109,7 @@ describe("Pattern matching", () => {
     )
   })
 
-  it("should use orElse as a fallback for unmatched cases (payment methods)", () => {
+  it.skip("should use orElse as a fallback for unmatched cases (payment methods)", () => {
     type PaymentMethod = "card" | "paypal" | "crypto" | "check" | string
 
     const getProcessingFee = (method: PaymentMethod): string =>
@@ -131,7 +131,7 @@ describe("Pattern matching", () => {
     expect(getProcessingFee("check")).toEqual("unknown method, default fee: 3%")
   })
 
-  it("should exclude a specific case with Match.not (order status)", () => {
+  it.skip("should exclude a specific case with Match.not (order status)", () => {
     type OrderStatus = "pending" | "processing" | "shipped" | "cancelled"
 
     const isTrackable = (status: OrderStatus) =>
@@ -151,7 +151,7 @@ describe("Pattern matching", () => {
     expect(isTrackable("cancelled")).toEqual(false)
   })
 
-  it("should match multiple conditions with whenOr (user roles)", () => {
+  it.skip("should match multiple conditions with whenOr (user roles)", () => {
     type Role = "viewer" | "editor" | "admin" | "superAdmin"
 
     const canAccessDashboard = (role: Role) =>
@@ -171,7 +171,7 @@ describe("Pattern matching", () => {
     expect(canAccessDashboard("superAdmin")).toEqual(true)
   })
 
-  it("should use built-in predicates to match on primitive types (form field validation)", () => {
+  it.skip("should use built-in predicates to match on primitive types (form field validation)", () => {
     type FieldValue = string | number | boolean | null
 
     const formatForDisplay = (value: FieldValue) =>

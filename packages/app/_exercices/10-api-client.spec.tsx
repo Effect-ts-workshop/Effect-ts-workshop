@@ -60,7 +60,7 @@ const TestHttpClient = pipe(FetchHttpClient.layer, Layer.provide(Layer.succeed(F
 // Si on renomme un endpoint dans shared/api.ts, le compilateur signale l'erreur ici.
 
 describe("HttpApiClient", () => {
-  it("appelle GET /items et retourne la liste typée", async () => {
+  it.skip("appelle GET /items et retourne la liste typée", async () => {
     const program = pipe(
       HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
       Effect.flatMap((client) => client.items.getAllItems()),
@@ -74,7 +74,7 @@ describe("HttpApiClient", () => {
     expect(result.items[1].brand).toBe("Specialized")
   })
 
-  it("appelle GET /items/:itemId et retourne un Option<InventoryItem>", async () => {
+  it.skip("appelle GET /items/:itemId et retourne un Option<InventoryItem>", async () => {
     const program = pipe(
       HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
       Effect.flatMap((client) => client.items.getItemById({ path: { itemId: ITEM_1.id } })),
@@ -91,7 +91,7 @@ describe("HttpApiClient", () => {
     }
   })
 
-  it("le contrat interdit les endpoints inexistants (vérification TypeScript)", () => {
+  it.skip("le contrat interdit les endpoints inexistants (vérification TypeScript)", () => {
     // "getItemByName" n'existe pas dans le contrat Api.
     // Essayez : supprimez le @ts-expect-error ligne 101 ci-dessous et observez l'erreur TypeScript.
     pipe(
@@ -102,7 +102,7 @@ describe("HttpApiClient", () => {
     )
   })
 
-  it("compose plusieurs appels avec Effect.all", async () => {
+  it.skip("compose plusieurs appels avec Effect.all", async () => {
     // Effect.all exécute les deux appels en parallèle par défaut
     const program = pipe(
       HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
@@ -140,7 +140,7 @@ class TestApiClient extends AtomHttpApi.Tag<TestApiClient>()("TestApiClient", {
 }) {}
 
 describe("AtomHttpApi.Tag", () => {
-  it("query résout en Result.Success avec les items", async () => {
+  it.skip("query résout en Result.Success avec les items", async () => {
     const allItemsAtom = TestApiClient.query("items", "getAllItems", {
       reactivityKeys: ["items"]
     })

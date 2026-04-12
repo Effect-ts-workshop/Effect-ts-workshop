@@ -4,9 +4,9 @@ sidebar_position: 11
 
 # Exercice 11 — Atom
 
-`AtomHttpApi.Tag` de l'exercice précédent gère automatiquement les états loading/success/error pour les appels API. Mais comment fait-il ça ?
+Gérer l'état d'une application React, c'est souvent choisir entre une variable globale (difficile à tester), du prop drilling (bruyant à propager) ou un store centralisé (verbeux à configurer).
 
-Tout repose sur une primitive : `Atom`. Un Atom est une unité de state réactive — quand sa valeur change, tous ses abonnés sont notifiés. Cet exercice explore le mécanisme de base, puis son intégration React.
+`Atom` est une primitive plus simple : une unité de state réactive et isolée. Quand sa valeur change, tous ses abonnés sont notifiés automatiquement. Cet exercice explore le mécanisme de base, puis son intégration React.
 
 Fichier à compléter : `packages/app/_exercices/11-atom.spec.tsx`
 
@@ -20,12 +20,12 @@ Un `Atom` est une unité de state. On le lit et le modifie via un `Registry` :
 
 <!-- prettier-ignore -->
 ```typescript
-const counter = Atom.make(0)
+const temperature = Atom.make(20)
 
 const r = Registry.make()
-r.get(counter)   // 0
-r.set(counter, 1)
-r.get(counter)   // 1
+r.get(temperature)    // 20
+r.set(temperature, 25)
+r.get(temperature)    // 25
 ```
 
 ### Exercice
@@ -62,6 +62,15 @@ const counter = Atom.make(0)
 
 ### `r.set` — mettre à jour un état
 
+`r.set` remplace la valeur courante d'un atom. Tous ses abonnés sont notifiés :
+
+<!-- prettier-ignore -->
+```typescript
+const score = Atom.make(0)
+r.set(score, 100)
+r.get(score) // 100
+```
+
 ### Exercice
 
 Mettez `counter` à `1` via le registry `r` :
@@ -93,11 +102,11 @@ Un atom peut _dériver_ sa valeur d'autres atoms. La fonction reçoit `get` pour
 
 <!-- prettier-ignore -->
 ```typescript
-const counter = Atom.make(0)
-const doubled = Atom.make((get) => get(counter) * 2)
+const price = Atom.make(100)
+const priceWithTax = Atom.make((get) => get(price) * 1.2)
 
-r.set(counter, 9)
-r.get(doubled) // 18 — recalculé automatiquement
+r.set(price, 50)
+r.get(priceWithTax) // 60 — recalculé automatiquement
 ```
 
 ### Exercice
@@ -133,8 +142,9 @@ const doubled = Atom.make((get) => get(counter) * 2)
 
 <!-- prettier-ignore -->
 ```typescript
-const doubled = Atom.map(counter, (v) => v * 2)
-// équivalent à Atom.make((get) => get(counter) * 2)
+const celsius = Atom.make(0)
+const fahrenheit = Atom.map(celsius, (c) => c * 9 / 5 + 32)
+// équivalent à Atom.make((get) => get(celsius) * 9 / 5 + 32)
 ```
 
 ### Exercice
@@ -166,11 +176,11 @@ const doubled = Atom.map(counter, (v) => v * 2)
 
 <!-- prettier-ignore -->
 ```typescript
-const increment = (count: number) => count + 1
-const next = Atom.fnSync(increment, { initialValue: 0 })
+const uppercase = (s: string) => s.toUpperCase()
+const label = Atom.fnSync(uppercase, { initialValue: "" })
 
-r.set(next, 0)    // appelle increment(0)
-r.get(next)       // 1
+r.set(label, "hello")   // appelle uppercase("hello")
+r.get(label)            // "HELLO"
 ```
 
 ### Exercice
@@ -206,10 +216,10 @@ Un atom peut contenir un `Effect`. Le registry l'exécute et stocke le résultat
 
 <!-- prettier-ignore -->
 ```typescript
-const counter = Atom.make(Effect.succeed(2))
+const configAtom = Atom.make(Effect.succeed({ debug: true }))
 
-const value: Result.Result<number, unknown> = r.get(counter)
-// Result.Success<number> si l'Effect a réussi
+const value: Result.Result<{ debug: boolean }, unknown> = r.get(configAtom)
+// Result.Success si l'Effect a réussi
 ```
 
 ### Exercice
@@ -245,8 +255,8 @@ Pour être notifié quand un atom change, on s'y abonne avec `r.subscribe` :
 
 <!-- prettier-ignore -->
 ```typescript
-r.subscribe(counter, (newValue) => {
-  console.log("nouvelle valeur :", newValue)
+r.subscribe(temperature, (newValue) => {
+  console.log("new value:", newValue)
 })
 ```
 
@@ -285,7 +295,8 @@ Par défaut, un atom sans abonné peut être garbage-collecté. `Atom.keepAlive`
 
 <!-- prettier-ignore -->
 ```typescript
-const aliveAtom = Atom.keepAlive(initialAtom)
+const temporaryAtom = Atom.make(0)
+const persistentAtom = Atom.keepAlive(temporaryAtom)
 ```
 
 ### Exercice
@@ -326,9 +337,11 @@ const aliveAtom = Atom.keepAlive(initialAtom)
 
 <!-- prettier-ignore -->
 ```typescript
-function TestComponent() {
-  const value = useAtomValue(atom)
-  return <div>{value}</div>
+const themeAtom = Atom.make("light")
+
+function ThemeDisplay() {
+  const theme = useAtomValue(themeAtom)
+  return <div>{theme}</div>
 }
 ```
 
@@ -362,12 +375,12 @@ const value = useAtomValue(atom)
 
 ### `useAtom` — lire et écrire
 
-`useAtom` retourne `[valeur, setter]` — comme `useState`, mais pour un atom partagé :
+`useAtom` retourne `[value, setter]` — comme `useState`, mais pour un atom partagé :
 
 <!-- prettier-ignore -->
 ```typescript
-const [value, setValue] = useAtom(atom)
-setValue((v) => v + 1) // mise à jour fonctionnelle
+const [isOpen, setIsOpen] = useAtom(modalAtom)
+setIsOpen(() => true) // mise à jour fonctionnelle
 ```
 
 ### Exercice
@@ -401,26 +414,26 @@ const [value, setValue] = useAtom(atom)
 
 ---
 
-### Intégration avec `AtomHttpApi.Tag`
+### `AtomHttpApi.Tag` — des atoms générés depuis une API
 
-`AtomHttpApi.Tag` crée automatiquement des atoms à partir des endpoints d'une API. L'état est géré par un `Result` :
+Maintenant qu'on comprend les atoms, on peut regarder ce que `AtomHttpApi.Tag` fait par-dessus : il crée automatiquement des atoms à partir des endpoints d'une API HTTP et gère les états `loading`, `success` et `error` via un `Result` :
 
 <!-- prettier-ignore -->
 ```typescript
-class DemoClient extends AtomHttpApi.Tag<DemoClient>()("DemoClient", {
-  api: Api,
+class WeatherClient extends AtomHttpApi.Tag<WeatherClient>()("WeatherClient", {
+  api: WeatherApi,
   httpClient: MockedHttpClient,
-  baseUrl: "http://my-url.mock"
+  baseUrl: "http://weather.mock"
 }) {}
 
-function TestComponent() {
+function ForecastComponent() {
   const result = useAtomValue(
-    DemoClient.query("items", "getAllItems", { reactivityKeys: ["items"] })
+    WeatherClient.query("forecast", "getToday", { reactivityKeys: ["forecast"] })
   )
 
   return Result.builder(result)
-    .onInitial(() => <div>Initial loading...</div>)
-    .onSuccess(({ items }) => <ul>{items.map(...)}</ul>)
+    .onInitial(() => <div>Loading...</div>)
+    .onSuccess(({ forecast }) => <div>{forecast.summary}</div>)
     .render()
 }
 ```

@@ -61,11 +61,11 @@ Pour des ressources qui doivent être libérées (connexions de base de données
 const DatabaseLayer = Layer.scoped(
   Database,
   Effect.gen(function* () {
-    const connexion = yield* Effect.acquireRelease(
+    const connection = yield* Effect.acquireRelease(
       openDatabase(),
-      (connexion) => closeDatabase(connexion)
+      (connection) => closeDatabase(connection)
     );
-    return { query: (sql) => connexion.execute(sql) };
+    return { query: (sql) => connection.execute(sql) };
   })
 );
 // Effect.acquireRelease garantit que closeDatabase est appelé à la fin
@@ -78,16 +78,16 @@ const DatabaseLayer = Layer.scoped(
 <!-- prettier-ignore -->
 ```typescript
 // Avant : dépendance non résolue
-const programme: Effect<Items, Err, HttpClient.HttpClient> = fetchItems
+const program: Effect<Items, Err, HttpClient.HttpClient> = fetchItems
 
 // Après : dépendance résolue
-const résolu: Effect<Items, Err> = pipe(
-  programme,
+const resolved: Effect<Items, Err> = pipe(
+  program,
   Effect.provide(FetchHttpClient.layer)
 )
 
 // Exécution possible !
-Effect.runPromise(résolu)
+Effect.runPromise(resolved)
 ```
 
 ## Composer des Layers

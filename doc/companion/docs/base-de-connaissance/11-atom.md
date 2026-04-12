@@ -126,7 +126,7 @@ import { useAtomValue } from "@effect-atom/atom-react";
 
 const counter = Atom.make(42);
 
-function MonComposant() {
+function MyComponent() {
   const value = useAtomValue(counter);
   return <div>{value}</div>;
 }
@@ -140,7 +140,7 @@ Le composant se re-rend automatiquement quand l'Atom change.
 ```typescript
 import { useAtom } from "@effect-atom/atom-react";
 
-function Compteur() {
+function Counter() {
   const [value, setValue] = useAtom(counter);
   return (
     <button onClick={() => setValue((v) => v + 1)}>
@@ -158,7 +158,7 @@ function Compteur() {
 ```typescript
 import { useAtomSet } from "@effect-atom/atom-react";
 
-function BoutonIncrément() {
+function IncrementButton() {
   const setValue = useAtomSet(counter);
   return <button onClick={() => setValue((v) => v + 1)}>+</button>;
 }

@@ -55,7 +55,7 @@ Either.right(42)           // Right — succès
 Either.left("erreur")      // Left — échec
 
 // Depuis une valeur nullable
-Either.fromNullable(valeur, () => "valeur manquante")
+Either.fromNullable(value, () => "valeur manquante")
 // null/undefined → Left("valeur manquante")
 // sinon → Right(valeur)
 
@@ -78,8 +78,8 @@ Either.isLeft(result)  // true si Left
 
 // Pattern matching
 Either.match(result, {
-  onLeft: (erreur) => `Erreur : ${erreur}`,
-  onRight: (valeur) => `Succès : ${valeur}`
+  onLeft: (error) => `Erreur : ${error}`,
+  onRight: (value) => `Succès : ${value}`
 })
 ```
 

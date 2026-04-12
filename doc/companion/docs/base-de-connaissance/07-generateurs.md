@@ -12,15 +12,15 @@ sidebar_position: 7
 ```typescript
 import { pipe } from "effect";
 
-const résultat = pipe(
-  valeurInitiale,
+const result = pipe(
+  initialValue,
   transformation1,
   transformation2,
   transformation3
 );
 
 // Équivalent à :
-const résultat = transformation3(transformation2(transformation1(valeurInitiale)));
+const result = transformation3(transformation2(transformation1(initialValue)));
 ```
 
 `pipe` se lit de haut en bas, dans l'ordre d'exécution. C'est plus lisible que l'imbrication.
@@ -33,10 +33,10 @@ const résultat = transformation3(transformation2(transformation1(valeurInitiale
 ```typescript
 import { pipe } from "effect"
 
-const résultat = pipe(
-  monEffect,
+const result = pipe(
+  myEffect,
   Effect.map((n) => n * 2),
-  Effect.catchTag("MonErreur", () => Effect.succeed(0))
+  Effect.catchTag("MyError", () => Effect.succeed(0))
 )
 ```
 
@@ -55,13 +55,13 @@ pipe(monEffect, Effect.map((n) => n * 2)) // data-last dans pipe (standard)
 <!-- prettier-ignore -->
 ```typescript
 // Avec pipe et flatMap
-const résultat = pipe(
+const result = pipe(
   fetchUser(id),
   Effect.flatMap((user) => fetchOrders(user.id))
 )
 
 // Avec Effect.gen — plus lisible pour les chaînes longues
-const résultat = Effect.gen(function* () {
+const result = Effect.gen(function* () {
   const user = yield* fetchUser(id);
   const orders = yield* fetchOrders(user.id);
   return { user, orders };
@@ -124,15 +124,15 @@ En pratique, on mélange les deux styles. Le bloc logique avec `Effect.gen`/`Eff
 
 <!-- prettier-ignore -->
 ```typescript
-const créerCommande = pipe(
-  Effect.fn("créerCommande")(function*(userId: string, articleId: string) {
+const createOrder = pipe(
+  Effect.fn("createOrder")(function*(userId: string, articleId: string) {
     const user = yield* getUser(userId)
     const article = yield* getArticle(articleId)
-    return yield* validerEtSauvegarder(user, article)
+    return yield* validateAndSave(user, article)
   }),
   Effect.catchTags({
-    UserNonTrouvé: () => Effect.fail(new CommandeImpossible()),
-    ArticleNonTrouvé: () => Effect.fail(new CommandeImpossible())
+    UserNotFound: () => Effect.fail(new ImpossibleOrder()),
+    ItemNotFound: () => Effect.fail(new ImpossibleOrder())
   })
 )
 ```

@@ -12,10 +12,10 @@ Le module `Match` d'Effect permet une correspondance de motifs **exhaustive** su
 ```typescript
 import { Match, pipe } from "effect"
 
-const résultat = pipe(
-  Match.value(uneValeur),
-  Match.when(condition1, gestionnaire1),
-  Match.when(condition2, gestionnaire2),
+const result = pipe(
+  Match.value(someValue),
+  Match.when(condition1, handler1),
+  Match.when(condition2, handler2),
   Match.exhaustive // force la couverture de tous les cas
 )
 ```
@@ -39,13 +39,13 @@ pipe(
 
 <!-- prettier-ignore -->
 ```typescript
-type État =
+type State =
   | { type: "vide" }
   | { type: "données"; items: Item[] }
   | { type: "erreur"; message: string }
 
 pipe(
-  Match.value(état),
+  Match.value(state),
   Match.when({ type: "vide" }, () => "Rien à afficher"),
   Match.when({ type: "données" }, ({ items }) => `${items.length} items`),
   Match.when({ type: "erreur" }, ({ message }) => `Erreur : ${message}`),
@@ -118,7 +118,7 @@ const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
 <!-- prettier-ignore -->
 ```typescript
 pipe(
-  Match.value(valeur),
+  Match.value(value),
   Match.when(Match.null, () => "—"),
   Match.when(Match.boolean, (b) => (b ? "Oui" : "Non")),
   Match.when(Match.number, (n) => `Nombre : ${n}`),
@@ -133,7 +133,7 @@ pipe(
 ```typescript
 // Match.exhaustive — compile seulement si tous les cas sont couverts
 pipe(
-  Match.value(état),
+  Match.value(state),
   Match.when("a", () => 1),
   // ❌ Ne compile pas si "b" n'est pas géré
   Match.exhaustive
@@ -141,7 +141,7 @@ pipe(
 
 // Match.orElse — fournit un cas par défaut
 pipe(
-  Match.value(état),
+  Match.value(state),
   Match.when("a", () => 1),
   Match.orElse(() => 0) // ✅ Gère tous les autres cas
 )
@@ -156,7 +156,7 @@ pipe(
 import { Option } from "effect";
 
 // Valeur présente
-const présent: Option.Option<number> = Option.some(42);
+const present: Option.Option<number> = Option.some(42);
 
 // Valeur absente
 const absent: Option.Option<number> = Option.none();
@@ -167,7 +167,7 @@ const absent: Option.Option<number> = Option.none();
 <!-- prettier-ignore -->
 ```typescript
 // Depuis une valeur nullable
-Option.fromNullable(valeur)         // undefined/null → Option.none()
+Option.fromNullable(value)          // undefined/null → Option.none()
 Option.fromNullable("hello")        // → Option.some("hello")
 Option.fromNullable(null)           // → Option.none()
 
@@ -183,17 +183,17 @@ Option.none()
 // Matcher le résultat
 Option.match(option, {
   onNone: () => "Pas de valeur",
-  onSome: (valeur) => `Valeur : ${valeur}`,
+  onSome: (value) => `Valeur : ${value}`,
 })
 
 // Extraire avec valeur par défaut
-Option.getOrElse(option, () => valeurParDéfaut)
+Option.getOrElse(option, () => defaultValue)
 
 // Transformer si présent
 Option.map(option, (v) => v * 2)
 
 // Enchaîner
-Option.flatMap(option, (v) => Option.fromNullable(autreChoix(v)))
+Option.flatMap(option, (v) => Option.fromNullable(otherChoice(v)))
 
 // Vérifier
 Option.isSome(option) // true si Some

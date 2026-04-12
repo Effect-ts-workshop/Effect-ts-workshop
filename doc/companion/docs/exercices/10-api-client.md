@@ -14,53 +14,179 @@ Fichier de référence : `packages/app/_exercices/10-api-client.spec.tsx`
 
 ## Consommer une API depuis le client
 
-`HttpApiClient.make` génère un client typé à partir du contrat. La structure reflète l'organisation en groupes :
+`HttpApiClient.make` génère un client typé à partir du contrat. La structure reflète l'organisation en groupes définis côté serveur :
 
 <!-- prettier-ignore -->
-```typescript
+```ts
 const program = pipe(
-  HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
-  Effect.flatMap((client) => client.items.getAllItems())
+  HttpApiClient.make(TodoApi, { baseUrl: "http://localhost" }),
+  Effect.flatMap((client) => client.tasks.getAll())
   //                                ^      ^
   //                           groupe   endpoint
 )
 ```
 
-Si `getAllItems` n'existe pas dans le contrat, TypeScript signale une erreur de compilation — pas à l'exécution.
+Le client retourné est lui-même un `Effect` — il faut `flatMap` pour l'utiliser.
 
-### Appeler plusieurs endpoints en parallèle
+### Récupérer la liste des items
 
-`Effect.all` exécute plusieurs Effects en parallèle et attend tous les résultats :
+Implémentez le `program` qui appelle `getAllItems` sur le groupe `items`.
 
-<!-- prettier-ignore -->
-```typescript
-const program = pipe(
-  HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
-  Effect.flatMap((client) =>
-    Effect.all({
-      list: client.items.getAllItems(),
-      single: client.items.getItemById({ path: { itemId: ITEM_1.id } })
-    })
-  )
-)
-```
+N'oubliez pas de fournir `TestHttpClient` avec `Effect.provide`.
 
-Les deux appels s'exécutent en parallèle. Le résultat est `{ list: ..., single: ... }`.
-
-### À lire et comprendre
-
-Les tests de cette section sont déjà implémentés. Parcourez-les pour observer :
-
-1. **GET /items** — retourne une liste typée `{ items: InventoryItem[] }`
-2. **GET /items/:itemId** — retourne `Option<InventoryItem>` (désérialisé automatiquement depuis `{ _tag: "Some", value: {...} }`)
-3. **Endpoint inexistant** — TypeScript refuse à la compilation avec `@ts-expect-error`
-4. **`Effect.all`** — deux appels en parallèle, un seul `runPromise`
+À vous de jouer !
 
 :::tip Ressources
 
 - [HTTP API](../base-de-connaissance/09-http-api.md)
 
 :::
+
+#### Indice 1
+
+<details>
+  <summary>Comment obtenir le client ?</summary>
+
+  `HttpApiClient.make(Api, { baseUrl: "http://localhost" })` renvoie un `Effect<client>`. Il faut `Effect.flatMap` pour accéder à ce client et appeler un endpoint.
+
+</details>
+
+#### Indice 2
+
+<details>
+  <summary>Comment fournir le layer HTTP ?</summary>
+
+  `HttpApiClient` a besoin d'un layer HTTP pour effectuer les requêtes. On le fournit en ajoutant `Effect.provide(TestHttpClient)` à la fin du pipe.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+<!-- prettier-ignore -->
+```ts
+const program = pipe(
+  HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
+  Effect.flatMap((client) => client.items.getAllItems()),
+  Effect.provide(TestHttpClient)
+)
+```
+
+</details>
+
+### Récupérer un item par son identifiant
+
+Implémentez le `program` qui appelle `getItemById`. L'identifiant est passé dans les paramètres de chemin (`path`).
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>Comment passer un paramètre de chemin ?</summary>
+
+  Les endpoints qui prennent un paramètre `:itemId` dans l'URL attendent un objet `{ path: { itemId: ... } }`.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+<!-- prettier-ignore -->
+```ts
+const program = pipe(
+  HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
+  Effect.flatMap((client) => client.items.getItemById({ path: { itemId: ITEM_1.id } })),
+  Effect.provide(TestHttpClient)
+)
+```
+
+</details>
+
+### Observer la sûreté du contrat
+
+Ce test illustre une propriété importante : TypeScript refuse à la compilation tout appel à un endpoint non déclaré dans le contrat.
+
+Remplacez le `TODO` par un appel à `client.items.getItemByName(...)`. Observez l'erreur TypeScript. Ajoutez ensuite `// @ts-expect-error` sur la ligne précédente pour signaler cet échec attendu.
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>Comment indiquer à TypeScript qu'on attend une erreur ?</summary>
+
+  `// @ts-expect-error` placé sur la ligne juste avant dit au compilateur : "la ligne suivante doit produire une erreur". Si elle n'en produit pas, c'est le commentaire lui-même qui devient une erreur.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+<!-- prettier-ignore -->
+```ts
+pipe(
+  HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
+  // @ts-expect-error -- getItemByName n'existe pas dans le contrat Api
+  Effect.flatMap((client) => client.items.getItemByName({ query: { name: "Devoxx" } })),
+  Effect.provide(TestHttpClient)
+)
+```
+
+</details>
+
+---
+
+## Appeler plusieurs endpoints en parallèle
+
+`Effect.all` exécute plusieurs Effects en parallèle et attend tous les résultats. Passé un objet, il renvoie un objet de même forme :
+
+<!-- prettier-ignore -->
+```ts
+const program = Effect.all({
+  user: Effect.succeed({ name: "Alice" }),
+  posts: Effect.succeed([{ title: "Hello" }])
+})
+// résultat : { user: { name: "Alice" }, posts: [...] }
+```
+
+Les deux Effects s'exécutent en parallèle. Un seul `runPromise` suffit pour obtenir les deux résultats.
+
+### Combiner une liste et un détail
+
+Implémentez l'argument de `Effect.all` pour appeler `getAllItems` et `getItemById` en parallèle. Le résultat doit avoir la forme `{ list: ..., single: ... }`.
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>Que passer à Effect.all ?</summary>
+
+  Les clés du résultat attendu sont `list` et `single`. Chaque valeur est un `Effect` retourné par le client — par exemple `client.items.getAllItems()`.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+<!-- prettier-ignore -->
+```ts
+Effect.all({
+  list: client.items.getAllItems(),
+  single: client.items.getItemById({ path: { itemId: ITEM_1.id } })
+})
+```
+
+</details>
 
 ---
 
@@ -69,10 +195,10 @@ Les tests de cette section sont déjà implémentés. Parcourez-les pour observe
 Dans l'application, on n'appelle pas `HttpApiClient` directement dans les composants. `AtomHttpApi.Tag` l'encapsule dans un système d'Atoms réactifs :
 
 <!-- prettier-ignore -->
-```typescript
+```ts
 class ApiClient extends AtomHttpApi.Tag<ApiClient>()("ApiClient", {
-  api: Api,
-  httpClient: SomHttpClientLayer,
+  api: TodoApi,
+  httpClient: FetchHttpClient.layer,
   baseUrl: "http://localhost"
 }) {}
 ```
@@ -82,9 +208,9 @@ Deux usages :
 **Query** — lit des données, se met à jour automatiquement quand les clés de réactivité changent :
 
 <!-- prettier-ignore -->
-```typescript
-const allItemsAtom = ApiClient.query("items", "getAllItems", {
-  reactivityKeys: ["items"]
+```ts
+const allItemsAtom = ApiClient.query("tasks", "getAll", {
+  reactivityKeys: ["tasks"]
 })
 
 function MyComponent() {
@@ -99,30 +225,50 @@ function MyComponent() {
 **Mutation** — déclenche un appel et invalide les queries concernées :
 
 <!-- prettier-ignore -->
-```typescript
-const removeItem = useAtomSet(ApiClient.mutation("items", "removeItemById"))
+```ts
+const removeTask = useAtomSet(ApiClient.mutation("tasks", "removeById"))
 ```
 
-### À lire et comprendre
+### Déclarer un client API réactif
 
-Le test `"query résout en Result.Success avec les items"` montre le cycle complet :
+Déclarez `TestApiClient` en étendant `AtomHttpApi.Tag`. Utilisez `Api` comme contrat, `TestHttpClient` comme layer HTTP, et `"http://localhost"` comme `baseUrl`.
 
-1. L'atom démarre en état initial (loading)
-2. La query s'exécute automatiquement au montage du composant
-3. L'atom passe en `Result.Success` quand la réponse arrive
-4. `useAtomValue` re-render le composant avec les données
+Pensez également à décommenter `AtomHttpApi` dans l'import en tête de fichier.
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>Quelle est la syntaxe de déclaration ?</summary>
+
+  ```ts
+  class MonClient extends AtomHttpApi.Tag<MonClient>()("MonClient", {
+    api: ...,
+    httpClient: ...,
+    baseUrl: ...
+  }) {}
+  ```
+
+  Le nom passé en paramètre (`"MonClient"`) est un identifiant unique utilisé en interne par le registre.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
 <!-- prettier-ignore -->
-```typescript
-function TestComponent() {
-  const result = useAtomValue(allItemsAtom)
-
-  if (Result.isSuccess(result)) {
-    return <div data-testid="count">{result.value.items.length}</div>
-  }
-  return <div data-testid="loading">loading</div>
-}
+```ts
+class TestApiClient extends AtomHttpApi.Tag<TestApiClient>()("TestApiClient", {
+  api: Api,
+  httpClient: TestHttpClient,
+  baseUrl: "http://localhost"
+}) {}
 ```
+
+</details>
 
 ---
 

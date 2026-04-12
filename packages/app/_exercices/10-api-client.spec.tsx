@@ -1,4 +1,5 @@
-import { AtomHttpApi, RegistryProvider, Result, useAtomValue } from "@effect-atom/atom-react"
+import { //AtomHttpApi, 
+RegistryProvider, Result, useAtomValue } from "@effect-atom/atom-react"
 import { FetchHttpClient, HttpApiClient } from "@effect/platform"
 import { render, screen, waitFor } from "@testing-library/react"
 import { Effect, Layer, Option, pipe } from "effect"
@@ -58,14 +59,20 @@ const TestHttpClient = pipe(FetchHttpClient.layer, Layer.provide(Layer.succeed(F
 // HttpApiClient.make génère un client typé à partir du contrat.
 // La structure reflète l'organisation en groupes : client.items.getAllItems()
 // Si on renomme un endpoint dans shared/api.ts, le compilateur signale l'erreur ici.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const TODO: any = {}
 
 describe("HttpApiClient", () => {
   it.skip("appelle GET /items et retourne la liste typée", async () => {
-    const program = pipe(
-      HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
-      Effect.flatMap((client) => client.items.getAllItems()),
-      Effect.provide(TestHttpClient)
-    )
+    // #start
+    const program = TODO
+    // #solution
+    // const program = pipe(
+    //   HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
+    //   Effect.flatMap((client) => client.items.getAllItems()),
+    //   Effect.provide(TestHttpClient)
+    // )
+    // #end
 
     const result = await Effect.runPromise(program)
 
@@ -75,11 +82,15 @@ describe("HttpApiClient", () => {
   })
 
   it.skip("appelle GET /items/:itemId et retourne un Option<InventoryItem>", async () => {
-    const program = pipe(
-      HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
-      Effect.flatMap((client) => client.items.getItemById({ path: { itemId: ITEM_1.id } })),
-      Effect.provide(TestHttpClient)
-    )
+    // #start
+    const program = TODO
+    // #solution
+    // const program = pipe(
+    //   HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
+    //   Effect.flatMap((client) => client.items.getItemById({ path: { itemId: ITEM_1.id } })),
+    //   Effect.provide(TestHttpClient)
+    // )
+    // #end
 
     const result = await Effect.runPromise(program)
 
@@ -96,8 +107,12 @@ describe("HttpApiClient", () => {
     // Essayez : supprimez le @ts-expect-error ligne 101 ci-dessous et observez l'erreur TypeScript.
     pipe(
       HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
+      // #start
+      Effect.flatMap(() => TODO),
+      // #solution
       // @ts-expect-error -- getItemByName n'existe pas dans le contrat Api
-      Effect.flatMap((client) => client.items.getItemByName({ query: { name: "Devoxx" } })),
+      // Effect.flatMap((client) => client.items.getItemByName({ query: { name: "Devoxx" } })),
+      // #end
       Effect.provide(TestHttpClient)
     )
   })
@@ -107,10 +122,14 @@ describe("HttpApiClient", () => {
     const program = pipe(
       HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
       Effect.flatMap((client) =>
-        Effect.all({
-          list: client.items.getAllItems(),
-          single: client.items.getItemById({ path: { itemId: ITEM_1.id } })
-        })
+        // #start
+        Effect.all(TODO)
+        // #solution
+        // Effect.all({
+        //   list: client.items.getAllItems(),
+        //   single: client.items.getItemById({ path: { itemId: ITEM_1.id } })
+        // })
+        // #end
       ),
       Effect.provide(TestHttpClient)
     )
@@ -133,14 +152,18 @@ describe("HttpApiClient", () => {
 //   useAtomValue(ApiClient.query("items", "getAllItems", { reactivityKeys: ["items"] }))
 //   useAtomSet(ApiClient.mutation("items", "removeItemById"))
 
-class TestApiClient extends AtomHttpApi.Tag<TestApiClient>()("TestApiClient", {
-  api: Api,
-  httpClient: TestHttpClient,
-  baseUrl: "http://localhost"
-}) {}
-
 describe("AtomHttpApi.Tag", () => {
   it.skip("query résout en Result.Success avec les items", async () => {
+    // #start
+    class TestApiClient extends TODO
+    // #solution
+    // class TestApiClient extends AtomHttpApi.Tag<TestApiClient>()("TestApiClient", {
+    //   api: Api,
+    //   httpClient: TestHttpClient,
+    //   baseUrl: "http://localhost"
+    // }) {}
+    // #end
+
     const allItemsAtom = TestApiClient.query("items", "getAllItems", {
       reactivityKeys: ["items"]
     })

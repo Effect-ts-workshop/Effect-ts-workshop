@@ -52,7 +52,7 @@ const findByBrand = Effect.fn("findByBrand")(function*(brand: string) {
 })
 ```
 
-Le résultat est un tableau de lignes brutes. Le type est `ReadonlyArray<unknown>` — à valider avec Schema si besoin.
+Le résultat est un tableau de lignes brutes. Le type est `ReadonlyArray<unknown>` — à valider avec `Schema` si besoin.
 
 ---
 
@@ -127,7 +127,7 @@ const findByBrand = Effect.fn("findByBrand")(function*(brand: string) {
 })
 ```
 
-`db` est une instance Drizzle wrappée dans Effect : toutes les opérations retournent des Effects, pas des Promises.
+Ici `db` est une instance Drizzle wrappée dans Effect : toutes les opérations retournent des Effects, pas des Promises.
 
 ### Schéma Drizzle
 
@@ -150,7 +150,7 @@ export const items = pgTable("items", {
 
 ## Setup des tests avec `testcontainers`
 
-Les tests SQL démarrent un vrai conteneur PostgreSQL via `testcontainers` — pas de mock en mémoire. Cela garantit que les requêtes fonctionnent contre une vraie base.
+Les tests SQL démarrent un vrai conteneur PostgreSQL via `testcontainers` — pas de mock en mémoire. Cela garantit que les requêtes fonctionnent avec une vraie base.
 
 <!-- prettier-ignore -->
 ```typescript

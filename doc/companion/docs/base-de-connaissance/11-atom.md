@@ -16,7 +16,7 @@ C'est l'équivalent d'un `signal` (SolidJS), d'un `atom` (Jotai) ou d'un `ref` (
 
 ## La Registry
 
-Tous les Atoms vivent dans une **Registry**. C'est le conteneur qui stocke les valeurs et gère les abonnements.
+Tous les Atoms vivent dans un **Registry**. C'est le conteneur qui stocke les valeurs et gère les abonnements.
 
 <!-- prettier-ignore -->
 ```typescript

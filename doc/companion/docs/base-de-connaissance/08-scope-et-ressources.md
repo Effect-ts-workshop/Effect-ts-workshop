@@ -59,7 +59,7 @@ const program = Effect.gen(function* () {
 });
 ```
 
-Le `exit` permet d'adapter le cleanup selon le résultat — typiquement : commit ou rollback d'une transaction.
+Le `exit` permet d'adapter le cleanup selon le résultat — typiquement : le commit ou le rollback d'une transaction.
 
 ## `Effect.acquireRelease` — paire explicite
 

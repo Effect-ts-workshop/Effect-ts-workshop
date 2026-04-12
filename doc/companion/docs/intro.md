@@ -18,6 +18,23 @@ Effect-TS répond à ces trois problèmes en un seul concept : le type `Effect`.
 
 Le repository contient une application fullstack complète (API REST + frontend React) à titre d'exemple. À la fin de l'atelier, vous aurez toutes les clés pour en construire une similaire.
 
+<details>
+  <summary>Lancer l'application d'exemple (API + Frontend)</summary>
+
+```bash
+docker-compose up -d   # Lance PostgreSQL
+npm run dev            # Lance l'API et l'app
+```
+
+Services disponibles :
+
+- API : http://localhost:3000
+- App : http://localhost:5173
+- Documentation API : http://localhost:3000/docs
+- Traces : http://localhost:9999 (admin@signoz.local / admin123)
+
+</details>
+
 ## Comment est organisé cet atelier ?
 
 L'atelier est divisé en **3 grandes sections** :
@@ -66,23 +83,6 @@ Une fois le repository cloné :
 ```bash
 npm install
 ```
-
-<details>
-  <summary>Lancer l'application d'exemple (API + Frontend)</summary>
-
-```bash
-docker-compose up -d   # Lance PostgreSQL
-npm run dev            # Lance l'API et l'app
-```
-
-Services disponibles :
-
-- API : http://localhost:3000
-- App : http://localhost:5173
-- Documentation API : http://localhost:3000/docs
-- Traces : http://localhost:9999 (admin@signoz.local / admin123)
-
-</details>
 
 ## Déroulement d'un exercice
 

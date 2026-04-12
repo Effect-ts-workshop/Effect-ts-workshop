@@ -19,8 +19,10 @@ Either.right(42)          // Either<number, never>
 Either.left("pas trouvé") // Either<never, string>
 ```
 
+
 La convention : `Right` = bien, `Left` = problème. C'est l'inverse de l'ordre alphabétique — mnémotechnique : `Right` = correct.
 
+`Either<A,E>` permet d'implémenter facilement le _railway pattern_ avec d'un côté le _happy path_ (`Right`) et de l'autre le canal des erreurs (`Left`)
 ---
 
 ## Quand utiliser `Either` plutôt qu'`Effect` ?
@@ -57,7 +59,7 @@ Either.left("erreur")      // Left — échec
 // Depuis une valeur nullable
 Either.fromNullable(value, () => "valeur manquante")
 // null/undefined → Left("valeur manquante")
-// sinon → Right(valeur)
+// sinon → Right(value)
 
 // Depuis un prédicat
 Either.liftPredicate(
@@ -87,7 +89,7 @@ Either.match(result, {
 
 ## Transformer un `Either`
 
-Toutes les transformations sont **right-biased** : elles s'appliquent à `Right` et laissent `Left` intact.
+Toutes les transformations sont **right-biased** : elles s'appliquent principalement à `Right` et laissent `Left` intact (sauf exceptions).
 
 <!-- prettier-ignore -->
 ```typescript

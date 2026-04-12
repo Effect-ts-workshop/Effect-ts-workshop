@@ -40,7 +40,7 @@ const result = pipe(
 )
 ```
 
-La plupart des fonctions Effect ont une signature **curryfiée** — elles attendent la valeur en dernier, ce qui les rend directement utilisables dans `pipe` :
+La plupart des fonctions Effect ont une signature **curryfiée** — les paramètres autres que la valeur à traiter sont _appliqués partiellement_ - elles attendent donc la valeur en dernier, ce qui les rend directement utilisables dans `pipe` :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -71,7 +71,7 @@ const result = Effect.gen(function* () {
 ### `yield*` fait deux choses
 
 1. **Extrait la valeur** : `const valeur = yield* Effect.succeed(42)` → `valeur = 42`
-2. **Propage les erreurs** : si l'Effect échoue, l'erreur remonte sur le rail d'erreur sans interrompre votre code
+2. **Propage les erreurs** : si l'Effect échoue, l'erreur descend le canal (rail) d'erreur sans interrompre votre code
 
 ### Équivalences
 

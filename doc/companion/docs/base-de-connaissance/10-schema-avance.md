@@ -10,7 +10,7 @@ Un `Schema` dans Effect est une description de la forme d'une donnée. Il rempla
 
 - **Zod** — validation de données inconnues
 - **class-transformer** — sérialisation/désérialisation
-- **fast-check** — génération de données pour les tests
+- **Test data builder** — génération de données pour les tests (cf _property-based testing_)
 
 La différence clé : un seul Schema fait les trois.
 
@@ -60,7 +60,7 @@ const result = Schema.decodeUnknownEither(UserSchema, { errors: "all" })({})
 
 `{ errors: "all" }` reporte **toutes** les erreurs en une seule fois.
 
-Pour un traitement programmatique (formulaires), `ParseResult.ArrayFormatter` produit un tableau :
+Pour un traitement programmatique (formulaires), `ParseResult.ArrayFormatter` produit un tableau à partir du message d'erreur :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -70,12 +70,12 @@ const errors = Either.isLeft(result)
   ? ParseResult.ArrayFormatter.formatErrorSync(result.left)
   : [];
 
-// errors[0] → { path: ["name"], message: "is missing" }
+// errors[0] → { path: ["name", "age"], message: "is missing" }
 ```
 
 ## Codec : Encode / Decode
 
-Nous utilisons le mot Codec pour regrouper les deux opérations inverses encode (transformer une valeur typée vers une représentation externe, ex: JSON) et decode (parser/valider une donnée brute vers un type sûr), garantissant ainsi une cohérence bidirectionnelle.
+Nous utilisons le mot Codec pour regrouper les deux opérations inverses (1) encode (transformer une valeur typée vers une représentation externe, ex: JSON) et (2) decode (parser/valider une donnée brute vers un type sûr), garantissant ainsi une cohérence bidirectionnelle.
 
 Certains types ont une forme **sérialisée** (JSON) différente de leur forme **TypeScript**. `Schema.Date` en est l'exemple canonique :
 
@@ -114,21 +114,25 @@ Le voyage aller-retour `encode → decode` produit une valeur identique à l'ori
 import { Arbitrary, Schema } from "effect";
 import fc from "fast-check";
 
-const PersonSchema = Schema.Struct({
-  name: Schema.NonEmptyTrimmedString,
-  age: Schema.Number.pipe(Schema.between(0, 120))
+const GuestSchema = Schema.Struct({
+  name: Schema.String,
 });
 
-const arbitrary = Arbitrary.make(PersonSchema);
+const EventSchema = Schema.Struct({
+  date: Schema.Date,
+  guests: Schema.Array(GuestSchema)
+});
+
+const arbitrary = Arbitrary.make(EventSchema)
 
 fc.assert(
-  fc.property(arbitrary, (person) => {
-    // Cette propriété doit tenir pour toutes les valeurs générées
-    const dto = Schema.encodeSync(PersonSchema)(person);
-    const decoded = Schema.decodeSync(PersonSchema)(dto);
-    expect(person).toEqual(decoded);
+  fc.property(arbitrary, (event) => {
+    // event est garanti par génération comme valide selon EventSchema — 
+    const dto = pipe(event, Schema.encodeSync(EventSchema))
+    const back = pipe(dto, Schema.decodeSync(EventSchema))
+    expect(event).toEqual(back)
   })
-);
+)
 ```
 
 :::tip Pourquoi c'est puissant ?
@@ -144,22 +148,21 @@ Au lieu de tester 3 cas manuels, on vérifie qu'une **propriété tient pour des
 import { Brand, Schema, pipe } from "effect";
 
 // Définir le brand
-type Email = string & Brand.Brand<"email">;
-const Email = Brand.nominal<Email>();
+type Port = number & Brand.Brand<"Port">
+const Port = Brand.nominal<Port>()
 
-// Construire le Schema
-const EmailSchema = pipe(
-  Schema.String,
-  Schema.pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/),
-  Schema.fromBrand(Email)
-);
+const PortSchema = pipe(
+  Schema.Int,                      // entier uniquement
+  Schema.between(1, 65535),        // plage valide
+  Schema.fromBrand(Port)           // retourne un type Port (opaque)
+)
 
-const email = Schema.decodeUnknownSync(EmailSchema)("alice@example.com");
-// email est de type Email (pas juste string)
-// Impossible de passer une string ordinaire où Email est attendu
+const port = Schema.decodeUnknownSync(PortSchema)(80);
+// port est de type Port (pas juste number)
+// Impossible de passer une nombre qui ne soit pas un n° de port valide
 ```
 
-Cela empêche de mélanger accidentellement un `string` quelconque avec un `Email` validé.
+Cela empêche de mélanger accidentellement un `number` quelconque avec un `Port` validé.
 
 ## Annotations
 

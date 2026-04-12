@@ -75,6 +75,8 @@ const errors = Either.isLeft(result)
 
 ## Codec : Encode / Decode
 
+Nous utilisons le mot Codec pour regrouper les deux opérations inverses encode (transformer une valeur typée vers une représentation externe, ex: JSON) et decode (parser/valider une donnée brute vers un type sûr), garantissant ainsi une cohérence bidirectionnelle.
+
 Certains types ont une forme **sérialisée** (JSON) différente de leur forme **TypeScript**. `Schema.Date` en est l'exemple canonique :
 
 ```

@@ -191,9 +191,10 @@ describe("acquireRelease — garantie du release", () => {
     // #start
     const resource = TODO
     // #solution
-    //   const resource = Effect.acquireRelease(
-    // Effect.sync(() => makeConnection(log)), // acquire : ouvre la connexion
-    //  (conn) => Effect.sync(() => conn.close()) // release : toujours exécuté)
+    // const resource = Effect.acquireRelease(
+    //   Effect.sync(() => makeConnection(log)), // acquire : ouvre la connexion
+    //   (conn) => Effect.sync(() => conn.close()) // release : toujours exécuté
+    // )
     // #end
 
     const program = Effect.gen(function*() {

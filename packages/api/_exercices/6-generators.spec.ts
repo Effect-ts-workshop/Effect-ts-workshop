@@ -105,8 +105,10 @@ describe("JS generators – bases", () => {
     const pipeResult = pipe(20, add(18), add(4))
 
     const genPipe = (fn: () => Generator) => {
-      const done = false
-      const previousResult = undefined
+      // eslint-disable-next-line prefer-const
+      let done = false
+      // eslint-disable-next-line prefer-const
+      let previousResult = undefined
       const gen = fn()
       do {
         // #start

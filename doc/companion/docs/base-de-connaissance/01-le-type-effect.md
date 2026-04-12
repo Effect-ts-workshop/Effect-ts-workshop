@@ -11,9 +11,9 @@ sidebar_position: 1
 Effect.Effect<Succès, Erreur, Contexte>
 ```
 
-Un `Effect` est une **description** d'un programme. Il n'exécute rien par lui-même — c'est comme une recette de cuisine. Le plat n'existe que quand on la cuisine.
+Un `Effect` est une **description** d'un programme. Il n'exécute rien par lui-même — c'est comme une recette de cuisine. Le plat n'existe que si l'on dispose des ingrédients et qu'on le cuisine.
 
-Les trois paramètres de type décrivent tout ce que le programme peut faire :
+Les trois paramètres de type `Effect` décrivent tout ce que le programme peut faire :
 
 | Paramètre  | Valeur par défaut | Signification                                       |
 | ---------- | ----------------- | --------------------------------------------------- |
@@ -31,11 +31,11 @@ Les trois paramètres de type décrivent tout ce que le programme peut faire :
 Effect.Effect<number>
 // équivalent à Effect.Effect<number, never, never>
 
-// Produit un string, peut échouer avec ErreurRéseau
-Effect.Effect<string, ErreurRéseau>
+// Produit un string, peut échouer avec une erreur réseau
+Effect.Effect<string, NetworkError>
 
 // Produit un Item, peut échouer de deux façons, a besoin d'un HttpClient
-Effect.Effect<Item, ErreurRéseau | NonTrouvé, HttpClient.HttpClient>
+Effect.Effect<Item, NetworkError | NotFound, HttpClient.HttpClient>
 ```
 
 ## Créer des Effects
@@ -49,12 +49,8 @@ const ok = Effect.succeed(42);
 // Type : Effect<number>
 
 // Erreur immédiate
-const ko = Effect.fail(new MonErreur());
+const ko = Effect.fail(new MyError());
 // Type : Effect<never, MonErreur>
-
-// Calcul synchrone (peut lancer des exceptions — elles deviennent des défauts)
-const calcul = Effect.sync(() => Math.random());
-// Type : Effect<number>
 ```
 
 ### Calculs synchrones
@@ -77,20 +73,20 @@ const parse = Effect.try({
 
 `Effect.sync` est l'équivalent de `Effect.succeed` pour un calcul (pas une valeur déjà calculée). `Effect.try` est l'équivalent de `Effect.tryPromise` pour le code synchrone.
 
-### À partir de Promises
+### À partir de Promesses
 
 <!-- prettier-ignore -->
 ```typescript
-// Sans gestion d'erreur (exceptions → défauts)
+// Sans gestion d'erreur (les exceptions sont des _defects_)
 const p1 = Effect.promise(() => fetch("/api"));
 // Type : Effect<Response>
 
-// Avec gestion d'erreur (exceptions → erreurs typées)
+// Avec gestion d'erreur (les exceptions sont des erreurs typées)
 const p2 = Effect.tryPromise({
   try: () => fetch("/api"),
-  catch: (e) => new ErreurRéseau({ message: String(e) }),
+  catch: (e) => new NetworkError({ message: String(e) }),
 });
-// Type : Effect<Response, ErreurRéseau>
+// Type : Effect<Response, NetworkError>
 ```
 
 ### Asynchrone avec durée
@@ -99,7 +95,7 @@ const p2 = Effect.tryPromise({
 ```typescript
 import { Duration } from "effect";
 
-const attente = Effect.sleep(Duration.seconds(2));
+const wait = Effect.sleep(Duration.seconds(2));
 // Type : Effect<void>
 ```
 
@@ -137,43 +133,42 @@ Effect.flatMap(fn)
 // Chaîner un Effect ou une valeur directe
 Effect.andThen(fn)
 
-// Effet secondaire sans changer la valeur
+// Effet secondaire sans changer la valeur par exemple Effect.tap(Effect.log)
 Effect.tap(fn)
-
-// Logger la valeur (pratique pour déboguer)
-Effect.tap(Effect.log)
 ```
 
 ### Récupération sur échec
 
 <!-- prettier-ignore -->
 ```typescript
-// Fallback si l'Effect échoue — remplacer par un autre Effect
+// Si l'Effect échoue on peut le remplacer par un autre Effect
 pipe(
   fetchJoke(),
   Effect.orElse(() => Effect.succeed("Blague par défaut"))
 )
 // Si fetchJoke() échoue → "Blague par défaut"
-// Si fetchJoke() réussit → sa valeur originale
+// Si fetchJoke() réussit → la valeur qu'il renvoie
 
-// Fallback avec une valeur simple (raccourci)
+// Ou dans sa version abrégée
 pipe(
   fetchJoke(),
   Effect.orElseSucceed(() => "Blague par défaut")
 )
 ```
 
-`Effect.orElse` est différent de `Effect.catchAll` : il remplace l'Effect entier sans inspecter l'erreur. `Effect.catchAll` reçoit l'erreur en argument et permet de la traiter.
+`Effect.orElse` est différent de `Effect.catchAll` : 
+* `Effect.orElse` remplace l'Effect entier sans inspecter l'erreur.
+* `Effect.catchAll` reçoit l'erreur en argument et permet de la traiter.
 
 ## Combiner des Effects
 
-### `Effect.all` — plusieurs Effects en parallèle
+### `Effect.all` — déclarer plusieurs Effects en parallèle
 
 <!-- prettier-ignore -->
 ```typescript
 import { Effect, pipe } from "effect"
 
-// Objet — structure préservée dans le résultat
+// La structure de l'objet sera préservée dans le résultat
 const program = pipe(
   Effect.all({
     users: fetchUsers(),
@@ -182,12 +177,12 @@ const program = pipe(
   // → { users: User[], config: Config }
 )
 
-// Tableau
+// De même avec un ableau
 const results = yield* Effect.all([effect1, effect2, effect3])
-// → [résultat1, résultat2, résultat3]
+// → [result1, results2, result3]
 ```
 
-Par défaut, les Effects s'exécutent en parallèle. Si l'un échoue, les autres sont interrompus.
+Par défaut, lorsque les Effects s'exécutent en parallèle, si l'un échoue, les autres sont interrompus.
 
 <!-- prettier-ignore -->
 ```typescript

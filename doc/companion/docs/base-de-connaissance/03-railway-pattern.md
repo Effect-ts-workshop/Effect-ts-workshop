@@ -18,8 +18,8 @@ Entrée ──────────<
 
 Un Effect voyage toujours sur l'une des deux voies. Le type `Effect<A, E>` dit :
 
-- Voie succès → produit une valeur `A`
-- Voie erreur → transporte une erreur `E`
+- Voie du succès → produit une valeur de type `A`
+- Voie erreur → transporte une erreur de type `E`
 
 ## Aiguillage automatique
 
@@ -29,16 +29,16 @@ Si un Effect est sur la voie d'erreur, les transformations suivantes sont **igno
 
 <!-- prettier-ignore -->
 ```typescript
-const résultat = pipe(
-  diviser(10, 0), // ❌ Erreur → DivisionParZéro
+const result = pipe(
+  divide(10, 0), // ❌ Erreur → DivisionByZero
   Effect.map((n) => n * 100), // Ignoré — on est sur la voie erreur
   Effect.map((n) => n + 1),   // Ignoré — idem
   Effect.map((n) => String(n)) // Ignoré — idem
 )
-// L'erreur DivisionParZéro est propagée jusqu'à la fin
+// L'erreur DivisionByZero est propagée jusqu'à la fin
 ```
 
-C'est exactement le comportement de `async/await` avec les Promises — une exception ignore tous les `.then()` suivants.
+C'est exactement le comportement de `async/await` avec les Promesses — une exception ignore tous les `.then()` suivants.
 
 ## Changer de voie
 
@@ -46,14 +46,14 @@ C'est exactement le comportement de `async/await` avec les Promises — une exce
 
 <!-- prettier-ignore -->
 ```typescript
-Effect.fail(new MonErreur())   // Bascule sur la voie erreur
+Effect.fail(new MyError())   // Bascule sur la voie erreur
 ```
 
 ### Voie erreur → voie succès
 
 <!-- prettier-ignore -->
 ```typescript
-Effect.catchTag("MonErreur", () => Effect.succeed(valeurDeRécupération))
+Effect.catchTag("MyError", () => Effect.succeed(recoveryValue))
 // Bascule sur la voie succès avec une valeur de récupération
 ```
 
@@ -61,24 +61,24 @@ Effect.catchTag("MonErreur", () => Effect.succeed(valeurDeRécupération))
 
 <!-- prettier-ignore -->
 ```typescript
-Effect.catchTag("ErreurA", () => Effect.fail(new ErreurB()))
+Effect.catchTag("ErrorA", () => Effect.fail(new ErrorB()))
 // Reste sur la voie erreur, mais avec un type d'erreur différent
 ```
 
 ## Visualisation complète
 
 ```
-diviser(10, 2)
+divide(10, 2)
    ✅ → 5
 
-diviser(10, 0)
-   ❌ → DivisionParZéro
+divide(10, 0)
+   ❌ → DivisionByZero
 
 pipe(
-  diviser(10, 0),
-  Effect.catchTag("DivisionParZéro", () => Effect.succeed(0))
+  divide(10, 0),
+  Effect.catchTag("DivisionByZero", () => Effect.succeed(0))
 )
-   ❌ → DivisionParZéro
+   ❌ → DivisionByZero
      ↓ catchTag
    ✅ → 0
 ```
@@ -91,23 +91,23 @@ Le Railway Pattern rend la gestion d'erreurs **composable** et **prévisible** :
 
 2. **Exhaustif** : TypeScript vérifie que vous gérez toutes les erreurs déclarées. Rien n'est oublié silencieusement.
 
-3. **Lisible** : Le chemin heureux est visible directement. Les erreurs sont gérées séparément, sans polluer la logique principale.
+3. **Lisible** : Le cas nominal (_happy path_) est visible directement. Les erreurs sont gérées séparément, sans polluer la logique principale.
 
 <!-- prettier-ignore -->
 ```typescript
 // Code Effect — logique principale et erreurs bien séparées
-const créerCommande = (userId: string, articleId: string) =>
+const createOrder = (userId: string, articleId: string) =>
   pipe(
     Effect.gen(function*() {
-      const utilisateur = yield* getUtilisateur(userId)  // peut échouer
-      const article = yield* getArticle(articleId)        // peut échouer
-      const commande = yield* validerCommande(utilisateur, article) // peut échouer
-      return yield* sauvegarderCommande(commande)
+      const user = yield* getUser(userId)              // peut échouer
+      const article = yield* getArticle(articleId)     // peut échouer
+      const order = yield* validateOrder(user, article) // peut échouer
+      return yield* saveOrder(order)
     }),
     Effect.catchTags({
-      UtilisateurNonTrouvé: () => Effect.fail(new CommandeImpossible("Utilisateur inconnu")),
-      ArticleNonTrouvé: () => Effect.fail(new CommandeImpossible("Article indisponible")),
-      StockInsuffisant: () => Effect.fail(new CommandeImpossible("Stock épuisé"))
+      UserNotFound: () => Effect.fail(new ImpossibleOrder("Utilisateur inconnu")),
+      ItemNotFound: () => Effect.fail(new ImpossibleOrder("Article indisponible")),
+      InsufficientStock: () => Effect.fail(new ImpossibleOrder("Stock épuisé"))
     })
   )
 ```

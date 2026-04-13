@@ -1,7 +1,7 @@
 import { Data, Effect, pipe } from "effect"
+import { TODO } from "shared/utils"
 import type { Response } from "undici"
 import { fetch as baseFetch } from "undici"
-import { TODO } from "shared/utils"
 import { describe, expect, expectTypeOf, it } from "vitest"
 
 describe("Effect basics - Errors", () => {
@@ -57,7 +57,7 @@ describe("Effect basics - Errors", () => {
       )
 
     const program = fetch("https://api.chucknorris.io/jokes/random")
-    const invalidProgram = fetch("https://fail")
+    const invalidProgram = fetch("https:/fail")
 
     await expect(Effect.runPromise(program)).resolves.toMatchObject({ status: 200 })
     await expect(Effect.runPromise(invalidProgram)).rejects.toThrow()

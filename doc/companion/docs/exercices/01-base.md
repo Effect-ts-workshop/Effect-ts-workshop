@@ -114,7 +114,7 @@ Au lieu de prendre tous les arguments en une fois, une curried function les pren
 // Fonction normale — tous les arguments d'un coup
 const prefix = (p: string, s: string) => p + s;
 
-// Curried — un argument à la fois
+// Currified — un argument à la fois
 const prefix = (p: string) => (s: string) => p + s;
 ```
 

@@ -21,7 +21,7 @@ describe("FP utils", () => {
     expect(result).toEqual(40)
   })
 
-  it.skip("curried function", () => {
+  it.skip("currified function", () => {
     const add = (a: number) => (b: number) => a + b
     const multiply = (a: number) => (b: number) => a * b
 

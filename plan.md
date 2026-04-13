@@ -52,7 +52,7 @@
 
 ## 3. Structure type d'un exercice
 
-```markdown
+````markdown
 ---
 sidebar_position: N
 ---
@@ -68,7 +68,7 @@ sidebar_position: N
 <!-- prettier-ignore -->
 ```ts
 // exemple minimal qui montre le problème
-```
+````
 
 [Explication de la solution conceptuelle en 2-3 phrases.]
 
@@ -94,7 +94,7 @@ sidebar_position: N
 <details>
   <summary>[Question / titre qui oriente sans spoiler]</summary>
 
-  [Texte + éventuellement un extrait de code qui met sur la piste]
+[Texte + éventuellement un extrait de code qui met sur la piste]
 
 </details>
 
@@ -103,7 +103,7 @@ sidebar_position: N
 <details>
   <summary>[...]</summary>
 
-  [...]
+[...]
 
 </details>
 
@@ -158,10 +158,11 @@ const result = pipe(
 
 Compléter le `pipe` en ajoutant la transformation `multiply(a, 4)` sur le résultat de `add(4, 6)`.
 
-**Indice 1** — *Que fait-on du résultat de `add(4, 6)` ?*
+**Indice 1** — _Que fait-on du résultat de `add(4, 6)` ?_
 `pipe` passe le résultat de chaque étape à la suivante. La première étape produit `10`. Il faut une fonction qui prend `10` et renvoie `40`.
 
 **Solution :**
+
 <!-- prettier-ignore -->
 ```ts
 const result = pipe(
@@ -183,7 +184,7 @@ Une `curried function` est une fonction qui, au lieu de prendre tous ses argumen
 // Fonction normale
 const add = (a: number, b: number) => a + b
 
-// Curried
+// Currified
 const add = (a: number) => (b: number) => a + b
 ```
 
@@ -202,10 +203,11 @@ const result = pipe(
 
 Compléter le `pipe` en ajoutant `multiply(4)` après `add(6)`.
 
-**Indice 1** — *`add(6)` est une fonction, pas un nombre*
+**Indice 1** — _`add(6)` est une fonction, pas un nombre_
 `add(6)` renvoie une fonction. `pipe` va l'appeler avec le résultat de l'étape précédente (`10`). Il suffit de faire la même chose avec `multiply`.
 
 **Solution :**
+
 <!-- prettier-ignore -->
 ```ts
 const result = pipe(
@@ -224,6 +226,7 @@ const result = pipe(
 Avant de coder, une minute pour comprendre _pourquoi_ Effect existe.
 
 En JavaScript, une fonction peut :
+
 - renvoyer une valeur
 - lancer une exception
 - déclencher une opération asynchrone
@@ -263,10 +266,11 @@ Ce n'est pas "juste un wrapper" — c'est la façon de dire "ce programme, quand
 
 La fonction `add` renvoie la somme, mais la signature attend un `Effect.Effect<number>`. Il faut envelopper le résultat avec `Effect.succeed`.
 
-**Indice 1** — *Quand une fonction renvoie un `Effect`*
+**Indice 1** — _Quand une fonction renvoie un `Effect`_
 `Effect.succeed` prend une valeur et renvoie un `Effect` qui contient cette valeur. C'est l'équivalent de `Promise.resolve` mais pour Effect.
 
 **Solution :**
+
 <!-- prettier-ignore -->
 ```ts
 const add = (a: number, b: number): Effect.Effect<number> => {
@@ -302,10 +306,11 @@ pipe(
 
 Transformer l'`Effect.succeed(2)` avec `add(8)` en utilisant `Effect.map`.
 
-**Indice 1** — *`add` est déjà une curried function*
+**Indice 1** — _`add` est déjà une curried function_
 `add(8)` renvoie une fonction `(b: number) => 8 + b`. C'est exactement ce qu'attend `Effect.map` : une fonction qui transforme la valeur.
 
 **Solution :**
+
 <!-- prettier-ignore -->
 ```ts
 const result = pipe(
@@ -348,10 +353,11 @@ Règle mnémotechnique : si la fonction passée renvoie un `Effect`, utilise `fl
 
 Remplacer `map` par `flatMap` puisque `add` renvoie maintenant un `Effect.succeed`.
 
-**Indice 1** — *Regarder le type de retour de `add`*
+**Indice 1** — _Regarder le type de retour de `add`_
 `add` renvoie `Effect.succeed(a + b)`, donc un `Effect`. Si on utilise `map`, on obtient `Effect<Effect<number>>`. Il faut "aplatir".
 
 **Solution :**
+
 <!-- prettier-ignore -->
 ```ts
 const result = pipe(
@@ -381,10 +387,11 @@ Effect.promise(() => fetch("https://api.example.com"))
 
 Envelopper l'appel `add(a, b)` (qui renvoie une `Promise`) dans `Effect.promise`.
 
-**Indice 1** — *Une fonction qui renvoie une Promise*
+**Indice 1** — _Une fonction qui renvoie une Promise_
 `Effect.promise` attend `() => Promise<T>`. Donc `() => add(a, b)` est exactement ce qu'il faut.
 
 **Solution :**
+
 <!-- prettier-ignore -->
 ```ts
 const addWithDelay = (a: number, b: number): Effect.Effect<number> => {
@@ -419,7 +426,8 @@ C'est la différence fondamentale avec `Promise` : l'erreur n'est plus un "throw
 
 Implémenter `fetch` en utilisant `Effect.tryPromise`, avec `baseFetch` pour la `Promise` et une `new Error("meh")` pour le catch.
 
-**Indice 1** — *La structure de `tryPromise`*
+**Indice 1** — _La structure de `tryPromise`_
+
 <!-- prettier-ignore -->
 ```ts
 Effect.tryPromise({
@@ -428,10 +436,11 @@ Effect.tryPromise({
 })
 ```
 
-**Indice 2** — *Quel `fetch` appeler ?*
+**Indice 2** — _Quel `fetch` appeler ?_
 `baseFetch` est importé de `undici`. C'est lui qui doit être appelé dans `try`, avec les arguments `input` et `init` déjà disponibles dans la closure.
 
 **Solution :**
+
 <!-- prettier-ignore -->
 ```ts
 const fetch: Fetch = (input, init) => {
@@ -446,11 +455,11 @@ const fetch: Fetch = (input, init) => {
 
 ## 5. Conventions de fichiers
 
-| Fichier doc | Fichier spec de référence |
-|---|---|
+| Fichier doc            | Fichier spec de référence                |
+| ---------------------- | ---------------------------------------- |
 | `exercices/01-base.md` | `packages/api/_exercices/1-base.spec.ts` |
-| `exercices/02-*.md` | `packages/api/_exercices/2-*.spec.ts` |
-| … | … |
+| `exercices/02-*.md`    | `packages/api/_exercices/2-*.spec.ts`    |
+| …                      | …                                        |
 
 Chaque page doc correspond à **un seul fichier spec**. On ne mélange pas deux spec dans une même page.
 

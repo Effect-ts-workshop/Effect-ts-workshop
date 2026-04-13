@@ -47,6 +47,11 @@ const config: Config = {
           sidebarId: "tutorialSidebar",
           position: "left",
           label: "Workshop"
+        },
+        {
+          href: "https://effect-ts-workshop.github.io/Effect-ts-workshop",
+          label: "GitHub",
+          position: "right"
         }
       ]
     },

@@ -39,8 +39,6 @@ Services disponibles :
 
 <p className="font--industrial" style={{fontSize: "1.4rem"}}>[https://urls.fr/aniNPv](https://effect-ts-workshop.github.io/Effect-ts-workshop/)</p>
 
-<p className="font--industrial" style={{fontSize: "1.4rem"}}>[Github](https://github.com/Effect-ts-workshop/Effect-ts-workshop)</p>
-
 ## Comment est organisé cet atelier ?
 
 L'atelier est divisé en **3 grandes sections** :

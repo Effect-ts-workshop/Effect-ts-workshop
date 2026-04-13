@@ -4,27 +4,29 @@ import { describe, expect, it } from "vitest"
 
 const TODO: any = {}
 
-describe("FP utils", () => {
-  it.skip("pipe", () => {
+describe("functional programming utils", () => {
+  it("currified function", () => {
+    // Partial application of function parameters so that we end up with unary functions
     const add = (a: number, b: number) => a + b
     const multiply = (a: number, b: number) => a * b
 
-    const result = pipe(
-      add(4, 6),
-      // #start
-      TODO
-      // #solution
-      // (a) => multiply(a, 4)
-      // #end
-    )
+    // #start
+    const currifiedAdd = TODO
+    const currifiedMultiply = TODO
+    // #solution
+    // const currifiedAdd = (a: number) => (b: number) => a + b
+    // const currifiedMultiply = (a: number) => (b: number) => a * b
 
-    expect(result).toEqual(40)
+    // #end
+
+    expect(add(4, 6)).toEqual(currifiedAdd(4)(6))
+    expect(multiply(4, 6)).toEqual(currifiedMultiply(4)(6))
   })
-
-  it.skip("currified function", () => {
+  it.skip("pipe", () => {
     const add = (a: number) => (b: number) => a + b
     const multiply = (a: number) => (b: number) => a * b
 
+    // Unary functions allow composition by chaining functions within a pipe
     const result = pipe(
       4,
       add(6),
@@ -87,7 +89,7 @@ describe("Effect basics", () => {
   })
 
   it.skip("Async operation", async () => {
-    const add = (a: number, b: number) =>
+    const add = (a: number, b: number): Promise<number> =>
       new Promise((resolve) => {
         setTimeout(() => resolve(a + b), 200)
       })

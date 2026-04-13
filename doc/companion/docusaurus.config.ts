@@ -49,7 +49,7 @@ const config: Config = {
           label: "Workshop"
         },
         {
-          href: "https://effect-ts-workshop.github.io/Effect-ts-workshop",
+          href: "https://github.com/Effect-ts-workshop/Effect-ts-workshop",
           label: "GitHub",
           position: "right"
         }

@@ -35,9 +35,11 @@ Services disponibles :
 
 </details>
 
-## Rejoindre Effect-TS Workshop Companion
+## Rejoindre Effect-TS Workshop Companion et le repo d'exercices
 
 <p className="font--industrial" style={{fontSize: "1.4rem"}}>[https://urls.fr/aniNPv](https://effect-ts-workshop.github.io/Effect-ts-workshop/)</p>
+
+<p className="font--industrial" style={{fontSize: "1.4rem"}}>[Github](https://github.com/Effect-ts-workshop/Effect-ts-workshop)</p>
 
 ## Comment est organisé cet atelier ?
 

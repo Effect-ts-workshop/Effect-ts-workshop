@@ -14,13 +14,13 @@ import { pipe } from "effect";
 
 const result = pipe(
   initialValue,
-  transformation1,
-  transformation2,
-  transformation3
+  transform1,
+  transform2,
+  transform3
 );
 
 // Équivalent à :
-const result = transformation3(transformation2(transformation1(initialValue)));
+const result = transform3(transform2(transform1(initialValue)));
 ```
 
 `pipe` se lit de haut en bas, dans l'ordre d'exécution. C'est plus lisible que l'imbrication.
@@ -44,8 +44,8 @@ La plupart des fonctions Effect ont une signature **curryfiée** — les paramè
 
 <!-- prettier-ignore -->
 ```typescript
-Effect.map(monEffect, (n) => n * 2)       // data-first (rare)
-pipe(monEffect, Effect.map((n) => n * 2)) // data-last dans pipe (standard)
+Effect.map(myEffect, (n) => n * 2)       // data-first (rare)
+pipe(myEffect, Effect.map((n) => n * 2)) // data-last dans pipe (standard)
 ```
 
 ## `Effect.gen` — générateurs
@@ -78,12 +78,12 @@ const result = Effect.gen(function* () {
 <!-- prettier-ignore -->
 ```typescript
 // pipe + flatMap
-pipe(a, Effect.flatMap((va) => pipe(b, Effect.flatMap((vb) => ...))))
+pipe(a, Effect.flatMap((valueA) => pipe(b, Effect.flatMap((valueB) => ...))))
 
 // Effect.gen — identique mais lisible
 Effect.gen(function* () {
-  const va = yield* a;
-  const vb = yield* b;
+  const valueA = yield* a;
+  const valueB = yield* b;
   // ...
 })
 ```

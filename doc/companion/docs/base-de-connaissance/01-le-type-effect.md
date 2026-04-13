@@ -8,20 +8,20 @@ sidebar_position: 1
 
 <!-- prettier-ignore -->
 ```typescript
-Effect.Effect<Succès, Erreur, Contexte>
+Effect.Effect<Value, Error, Context>
 ```
 
 Un `Effect` est une **description** d'un programme. Il n'exécute rien par lui-même — c'est comme une recette de cuisine. Le plat n'existe que si l'on dispose des ingrédients et qu'on le cuisine.
 
 Les trois paramètres de type `Effect` décrivent tout ce que le programme peut faire :
 
-| Paramètre  | Valeur par défaut | Signification                                       |
-| ---------- | ----------------- | --------------------------------------------------- |
-| `Succès`   | —                 | Le type de la valeur produite si tout va bien       |
-| `Erreur`   | `never`           | Les types d'erreurs **typées** qui peuvent survenir |
-| `Contexte` | `never`           | Les services/dépendances dont le programme a besoin |
+| Paramètre | Valeur par défaut | Signification                                       |
+| --------- | ----------------- | --------------------------------------------------- |
+| `Value`   | —                 | Le type de la valeur produite si tout va bien       |
+| `Error`   | `never`           | Les types d'erreurs **typées** qui peuvent survenir |
+| `Context` | `never`           | Les services/dépendances dont le programme a besoin |
 
-`never` signifie "jamais" — `Erreur = never` veut dire "ne peut pas échouer", `Contexte = never` veut dire "n'a pas besoin de dépendances". Dans la documentation officielle, vous retrouvez la syntaxe anglaise `Effect<A, E, R>`
+`never` signifie "jamais" — `Error = never` veut dire "ne peut pas échouer", `Context = never` veut dire "n'a pas besoin de dépendances". Dans la documentation officielle, vous retrouvez la syntaxe abrégée `Effect<A, E, R>`
 
 ## Exemples de types
 
@@ -50,7 +50,11 @@ const ok = Effect.succeed(42);
 
 // Erreur immédiate
 const ko = Effect.fail(new MyError());
-// Type : Effect<never, MonErreur>
+// Type : Effect<never, MyError>
+
+// Calcul synchrone (peut lancer des exceptions — elles deviennent des défauts)
+const calcul = Effect.sync(() => Math.random());
+// Type : Effect<number>
 ```
 
 ### Calculs synchrones
@@ -106,13 +110,13 @@ Un Effect ne fait rien jusqu'à ce qu'on l'exécute. Effect fournit plusieurs "r
 <!-- prettier-ignore -->
 ```typescript
 // Pour les Effects entièrement synchrones
-const valeur = Effect.runSync(monEffect);
+const value = Effect.runSync(myEffect);
 
 // Pour les Effects potentiellement asynchrones
-const promesse = Effect.runPromise(monEffect);
+const promise = Effect.runPromise(myEffect);
 
 // Pour les Effects avec résultat sous forme d'Exit (succès ou échec)
-const exit = Effect.runSyncExit(monEffect);
+const exit = Effect.runSyncExit(myEffect);
 // Exit.Success<A> | Exit.Failure<E>
 ```
 
@@ -156,9 +160,10 @@ pipe(
 )
 ```
 
-`Effect.orElse` est différent de `Effect.catchAll` : 
-* `Effect.orElse` remplace l'Effect entier sans inspecter l'erreur.
-* `Effect.catchAll` reçoit l'erreur en argument et permet de la traiter.
+`Effect.orElse` est différent de `Effect.catchAll` :
+
+- `Effect.orElse` remplace l'Effect entier sans inspecter l'erreur.
+- `Effect.catchAll` reçoit l'erreur en argument et permet de la traiter.
 
 ## Combiner des Effects
 

@@ -14,7 +14,7 @@ Au sens d'`Effect` les _failures_ dont des erreurs **attendues et typées**. Ell
 
 <!-- prettier-ignore -->
 ```typescript
-class ArticleNonTrouvé extends Data.TaggedError("ArticleNotFound")<{
+class ArticleNotFound extends Data.TaggedError("ArticleNotFound")<{
   id: string;
 }> {}
 
@@ -39,6 +39,7 @@ const myEffect = Effect.promise(() => computationThatMayFail());
 ```
 
 Les _defects_ sont donc :
+
 - **Invisibles** dans le type (`Effect<A>`, même si ça peut bugger)
 - Non récupérables avec `catchTag`
 - Récupérables seulement avec `Effect.catchAllDefect` (traitement d'urgence)
@@ -100,8 +101,8 @@ const safe = pipe(
 <!-- prettier-ignore -->
 ```typescript
 const sûr = pipe(
-  monEffect,
-  Effect.catchAll((_erreur) => Effect.succeed(valeurParDéfaut))
+  myEffect,
+  Effect.catchAll((_error) => Effect.succeed(defaultValue))
 )
 ```
 
@@ -118,10 +119,10 @@ Le tag est la chaîne passée à `Data.TaggedError("MonTag")`. Effect l'utilise 
 
 <!-- prettier-ignore -->
 ```typescript
-class MonErreur extends Data.TaggedError("MonErreur")<{}> {}
+class MyError extends Data.TaggedError("MyError")<{}> {}
 
-const e = new MonErreur();
-console.log(e._tag); // "MonErreur"
+const e = new MyError();
+console.log(e._tag); // "MyError"
 ```
 
 :::tip Convention de nommage

@@ -174,7 +174,8 @@ function IncrementButton() {
 ```typescript
 // Ce que AtomHttpApi.Tag fait en interne (simplifié)
 const allItemsAtom = Atom.make(
-  HttpApiClient.make(Api, { baseUrl }).pipe(
+  pipe(
+    HttpApiClient.make(Api, { baseUrl }),
     Effect.flatMap((client) => client.items.getAllItems())
   )
 );

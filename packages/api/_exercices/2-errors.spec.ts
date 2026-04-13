@@ -119,7 +119,7 @@ describe("Effect basics - Errors", () => {
       // #end
     )
 
-    expectTypeOf(program).toExtend<Effect.Effect<string, UnknownException, never>>()
+    expectTypeOf(program).toEqualTypeOf<Effect.Effect<string, UnknownException, never>>()
     expect(Effect.runSync(program)).toEqual("Fallback joke")
   })
 

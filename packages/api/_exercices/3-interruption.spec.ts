@@ -224,7 +224,7 @@ describe("acquireRelease — garantie du release", () => {
 
     const program = Effect.gen(function*() {
       const conn = yield* resource
-      return yield* conn.query()
+      return yield* conn.query("SELECT 1")
     })
 
     await Effect.runPromise(Effect.scoped(program)).catch(() => {})

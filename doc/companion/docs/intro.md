@@ -35,6 +35,10 @@ Services disponibles :
 
 </details>
 
+## Rejoindre Effect-TS Workshop Companion
+
+<p className="font--industrial" style={{fontSize: "1.4rem"}}>[https://urls.fr/aniNPv](https://effect-ts-workshop.github.io/Effect-ts-workshop/)</p>
+
 ## Comment est organisé cet atelier ?
 
 L'atelier est divisé en **3 grandes sections** :

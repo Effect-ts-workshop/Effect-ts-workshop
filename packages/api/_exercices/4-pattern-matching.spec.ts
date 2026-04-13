@@ -1,7 +1,6 @@
 import { Array, Match, Option, pipe } from "effect"
+import { TODO } from "shared/utils"
 import { describe, expect, it } from "vitest"
-
-const TODO: any = {}
 
 describe("Pattern matching", () => {
   it.skip("should handle all possible values", () => {

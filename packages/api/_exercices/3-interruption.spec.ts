@@ -1,7 +1,6 @@
 import { Data, Effect, Exit, Fiber } from "effect"
+import { TODO } from "shared/utils"
 import { describe, expect, it, vi } from "vitest"
-
-const TODO: any = {}
 
 describe("Interruption", () => {
   it.skip("could propagate interruption with AbortSignal", async () => {

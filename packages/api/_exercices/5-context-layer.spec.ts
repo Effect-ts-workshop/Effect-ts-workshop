@@ -1,9 +1,8 @@
 import { HttpClient } from "@effect/platform"
 import { NodeHttpClient } from "@effect/platform-node"
 import { Effect, Layer, pipe } from "effect"
+import { TODO } from "shared/utils"
 import { describe, expect, expectTypeOf, it } from "vitest"
-
-const TODO: any = {}
 
 /**
  * Key points to document:

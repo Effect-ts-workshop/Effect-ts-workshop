@@ -1,9 +1,8 @@
 import { Data, Effect, pipe } from "effect"
 import type { Response } from "undici"
 import { fetch as baseFetch } from "undici"
+import { TODO } from "shared/utils"
 import { describe, expect, expectTypeOf, it } from "vitest"
-
-const TODO: any = {}
 
 describe("Effect basics - Errors", () => {
   it.skip("should return failure explicitely", () => {

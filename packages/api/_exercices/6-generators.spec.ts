@@ -4,9 +4,8 @@ import { Array, Data, Effect, pipe } from "effect"
 import { UnknownException } from "effect/Cause"
 import { TaggedError } from "effect/Data"
 import { randomUUID } from "node:crypto"
+import { TODO } from "shared/utils"
 import { describe, expect, expectTypeOf, it, vi } from "vitest"
-
-const TODO: any = {}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PARTIE 1 – Générateurs JavaScript classiques

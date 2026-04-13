@@ -3,8 +3,7 @@ import { describe, expect, expectTypeOf, it } from "vitest"
 
 import type { ParseOptions } from "effect/SchemaAST"
 import fc, { toStringMethod } from "fast-check"
-
-const TODO: any = {}
+import { TODO } from "shared/utils"
 
 describe("Schema", () => {
   it.skip("should validate data of all sort", () => {

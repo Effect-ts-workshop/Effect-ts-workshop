@@ -1,10 +1,8 @@
 import { FormBuilder, FormReact } from "@lucas-barake/effect-form-react"
 import { act, fireEvent, render, screen } from "@testing-library/react"
 import { Option, Schema } from "effect"
+import { TODO } from "shared/utils"
 import { describe, expect, it, vi } from "vitest"
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const TODO: any = {}
 
 describe("Form", () => {
   describe("Form core", () => {

@@ -4,10 +4,8 @@ import { act, render, screen, waitFor } from "@testing-library/react"
 import { Duration, Effect, Layer, pipe } from "effect"
 import { randomUUID } from "node:crypto"
 import { Api } from "shared/api"
+import { TODO } from "shared/utils"
 import { describe, expect, it, vi } from "vitest"
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const TODO: any = {}
 
 describe("Atom", () => {
   describe("Atom core", () => {

@@ -8,6 +8,7 @@ import { render, screen, waitFor } from "@testing-library/react"
 import { Effect, Layer, Option, pipe } from "effect"
 import { Api } from "shared/api"
 import { InventoryItemId } from "shared/item"
+import { TODO } from "shared/utils"
 import { describe, expect, it } from "vitest"
 
 // L'exercice 8 montrait comment définir et tester une API côté serveur (Node.js).
@@ -62,9 +63,6 @@ const TestHttpClient = pipe(FetchHttpClient.layer, Layer.provide(Layer.succeed(F
 // HttpApiClient.make génère un client typé à partir du contrat.
 // La structure reflète l'organisation en groupes : client.items.getAllItems()
 // Si on renomme un endpoint dans shared/api.ts, le compilateur signale l'erreur ici.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const TODO: any = {}
-
 describe("HttpApiClient", () => {
   it.skip("appelle GET /items et retourne la liste typée", async () => {
     // #start

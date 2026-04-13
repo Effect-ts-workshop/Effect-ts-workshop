@@ -7,9 +7,8 @@ import {
   HttpLayerRouter
 } from "@effect/platform"
 import { Effect, Layer, pipe, Schema } from "effect"
+import { TODO } from "shared/utils"
 import { describe, expect, it } from "vitest"
-
-const TODO: any = {}
 
 describe("Api  Effect - serveur", () => {
   it.skip("HttpApiClient pour appeler l'API de façon typée", async () => {

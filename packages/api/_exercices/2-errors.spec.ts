@@ -65,7 +65,7 @@ describe("Effect basics - Errors", () => {
 
   it.skip("should create tagged errors", async () => {
     // #start
-    const NetworkError = TODO
+    class NetworkError extends TODO {}
     // #solution
     // class NetworkError extends Data.TaggedError("NetworkError")<{ error: unknown }> {}
     // #end

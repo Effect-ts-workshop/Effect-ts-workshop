@@ -82,6 +82,7 @@ Des fiches de référence pour chaque concept abordé. Chaque exercice y renvoie
 - Un éditeur de code (VS Code recommandé)
 - Docker installé et démarré (requis pour l'exercice 9 — SQL)
 - Désactiver vos VPN (pour les tests qui utilisent des fetchs)
+  Nous vous recommandons de ne pas utiliser d'IA (Cursor, Copilot, Claude), n'hésitez pas à pairer.
 
 ## Installation
 

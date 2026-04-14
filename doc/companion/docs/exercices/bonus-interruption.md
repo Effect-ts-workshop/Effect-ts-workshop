@@ -112,7 +112,6 @@ Effect.runPromise(Effect.scoped(program))
 Implémentez `Effect.addFinalizer` dans chacun des tests suivants :
 
 - **Connexion base de données** (`it.skip`) : retirez le `.skip` pour activer le test, puis enregistrez la fermeture de la connexion comme finalizer.
-- **Lock distribué** (deux tests) : dans `runJobIfAvailable` et dans `longJob`, libérez le lock via `releaseLock` dès que l'acquisition réussit.
 - **Fichier temporaire** : supprimez le fichier temporaire à la fin du scope via `deleteTempFile`.
 
 Dans chaque cas, la structure est la même :
@@ -142,7 +141,7 @@ yield* Effect.addFinalizer(() => /* l'action de nettoyage */)
 yield* Effect.addFinalizer(() => Effect.sync(() => conn.close()))
 ```
 
-Certains helpers comme `releaseLock` ou `deleteTempFile` renvoient déjà un `Effect` — pas besoin de les envelopper.
+Certains helpers comme `deleteTempFile` renvoient déjà un `Effect` — pas besoin de les envelopper.
 
 </details>
 
@@ -156,13 +155,6 @@ Certains helpers comme `releaseLock` ou `deleteTempFile` renvoient déjà un `Ef
 <!-- prettier-ignore -->
 ```typescript
 yield* Effect.addFinalizer(() => Effect.sync(() => connection.close()))
-```
-
-**Lock distribué** (même solution pour les deux tests)
-
-<!-- prettier-ignore -->
-```typescript
-yield* Effect.addFinalizer(() => releaseLock("job:send-emails"))
 ```
 
 **Fichier temporaire**

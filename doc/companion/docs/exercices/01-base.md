@@ -356,13 +356,13 @@ Que se passe-t-il si la fonction qu'on passe à `map` renvoie elle-même un `Eff
 
 <!-- prettier-ignore -->
 ```typescript
-const normalize = (s: string) => Effect.succeed(s.trim().toLowerCase());
-//                                ^
-//                         renvoie un Effect !
+const double = (n: number) => Effect.succeed(n * 2);
+//                            ^
+//                     renvoie un Effect !
 
 pipe(
-  Effect.succeed("  Alice  "),
-  Effect.map(normalize), // ← produit Effect<Effect<string>> 😱
+  Effect.succeed(5),
+  Effect.map(double), // ← produit Effect<Effect<number>> 😱
 );
 ```
 
@@ -371,8 +371,8 @@ On se retrouve avec un `Effect` imbriqué dans un autre. `flatMap` règle ça : 
 <!-- prettier-ignore -->
 ```typescript
 pipe(
-  Effect.succeed("  Alice  "),
-  Effect.flatMap(normalize), // ← Effect<string> ✓
+  Effect.succeed(5),
+  Effect.flatMap(double), // ← Effect<number> ✓
 );
 ```
 
@@ -380,18 +380,18 @@ Règle simple : si la fonction renvoie un `Effect`, utilisez `flatMap`. Si elle 
 
 #### Exercice
 
-`add` renvoie maintenant un `Effect.succeed`. Remplacez `map` par `flatMap` :
+`greet` renvoie un `Effect.succeed`. Utilisez `flatMap` pour obtenir `"Hello, World!"` :
 
 <!-- prettier-ignore -->
 ```typescript
-const add = (a: number) => (b: number) => Effect.succeed(a + b);
+const greet = (greeting: string) => (name: string) => Effect.succeed(`${greeting}, ${name}!`);
 
 const result = pipe(
-  Effect.succeed(2),
+  Effect.succeed("World"),
   // À compléter
 );
 
-expect(Effect.runSync(result)).toEqual(10);
+expect(Effect.runSync(result)).toEqual("Hello, World!");
 ```
 
 À vous de jouer !
@@ -399,11 +399,11 @@ expect(Effect.runSync(result)).toEqual(10);
 #### Indice 1
 
 <details>
-  <summary>Regardez le type de retour de `add`</summary>
+  <summary>Regardez le type de retour de `greet`</summary>
 
-`add(8)` renvoie `(b: number) => Effect.succeed(8 + b)`. La transformation renvoie un `Effect`.
+`greet("Hello")` renvoie une fonction `(name: string) => Effect.succeed(...)`. La transformation renvoie un `Effect`.
 
-Avec `map`, TypeScript inférerait `Effect<Effect<number>>`. Avec `flatMap`, il aplatit : `Effect<number>`.
+Avec `map`, TypeScript inférerait `Effect<Effect<string>>`. Avec `flatMap`, il aplatit : `Effect<string>`.
 
 </details>
 
@@ -415,7 +415,8 @@ Avec `map`, TypeScript inférerait `Effect<Effect<number>>`. Avec `flatMap`, il 
 <!-- prettier-ignore -->
 ```typescript
 const result = pipe(
-  Effect.succeed(2),Effect.flatMap(add(8))
+  Effect.succeed("World"),
+  Effect.flatMap(greet("Hello"))
 );
 ```
 

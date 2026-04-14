@@ -23,6 +23,7 @@ describe("functional programming utils", () => {
     expect(add(4, 6)).toEqual(currifiedAdd(4)(6))
     expect(multiply(4, 6)).toEqual(currifiedMultiply(4)(6))
   })
+
   it.skip("pipe", () => {
     const add = (a: number) => (b: number) => a + b
     const multiply = (a: number) => (b: number) => a * b
@@ -62,7 +63,7 @@ describe("Effect basics", () => {
   it.skip("Should transform effect value", () => {
     const add = (a: number) => (b: number) => a + b
 
-    const result = pipe(
+    const result: Effect.Effect<string> = pipe(
       Effect.succeed(2),
       // #start
       TODO(add(8))
@@ -74,19 +75,19 @@ describe("Effect basics", () => {
     expect(Effect.runSync(result)).toEqual(10)
   })
 
-  it.skip("Should transform effect value and flatten to avoid Effect<Effect<number>>", () => {
-    const add = (a: number) => (b: number) => Effect.succeed(a + b)
+  it.skip("Should transform effect value and flatten to avoid Effect<Effect<string>>", () => {
+    const greet = (greeting: string) => (name: string) => Effect.succeed(`${greeting}, ${name}!`)
 
-    const result = pipe(
-      Effect.succeed(2),
+    const result: Effect.Effect<string> = pipe(
+      Effect.succeed("World"),
       // #start
-      TODO(add(8))
+      TODO(greet("Hello"))
       // #solution
-      // Effect.flatMap(add(8))
+      // Effect.flatMap(greet("Hello"))
       // #end
     )
 
-    expect(Effect.runSync(result)).toEqual(10)
+    expect(Effect.runSync(result)).toEqual("Hello, World!")
   })
 
   it.skip("Async operation", async () => {

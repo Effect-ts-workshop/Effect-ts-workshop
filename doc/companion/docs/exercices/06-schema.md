@@ -1,14 +1,14 @@
 ---
-sidebar_position: 7
+sidebar_position: 6
 ---
 
-# Exercice 7 — Schema
+# Exercice 6 — Schema
 
 Les données entrent dans notre application depuis des sources qu'on ne contrôle pas : APIs, formulaires, fichiers JSON. Ces données sont `unknown` — on ne peut pas faire confiance à leur structure.
 
 `Schema` d'Effect est une bibliothèque de validation qui résout deux problèmes à la fois : valider la structure _et_ inférer le type TypeScript. Un seul schema, zéro duplication.
 
-Fichier à compléter : `packages/api/_exercices/7-schema.spec.ts`
+Fichier à compléter : `packages/api/_exercices/6-schema.spec.ts`
 
 ---
 

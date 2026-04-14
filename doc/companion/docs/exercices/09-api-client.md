@@ -1,14 +1,14 @@
 ---
-sidebar_position: 10
+sidebar_position: 9
 ---
 
-# Exercice 10 — API Client
+# Exercice 9 — API Client
 
-L'exercice 8 montrait comment _définir_ une API côté serveur. Ici, on est côté client (navigateur) : on _consomme_ une API existante.
+L'exercice 7 montrait comment _définir_ une API côté serveur. Ici, on est côté client (navigateur) : on _consomme_ une API existante.
 
 Le contrat (`Api`) est importé depuis `shared/api.ts` — la même source de vérité que le serveur. Si un endpoint est renommé côté serveur, le compilateur signale immédiatement l'erreur côté client.
 
-Fichier de référence : `packages/app/_exercices/10-api-client.spec.tsx`
+Fichier de référence : `packages/app/_exercices/9-api-client.spec.tsx`
 
 ---
 

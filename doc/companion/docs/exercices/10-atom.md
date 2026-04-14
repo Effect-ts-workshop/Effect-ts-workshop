@@ -1,14 +1,14 @@
 ---
-sidebar_position: 11
+sidebar_position: 10
 ---
 
-# Exercice 11 — Atom
+# Exercice 10 — Atom
 
 Gérer l'état d'une application React, c'est souvent choisir entre une variable globale (difficile à tester), du prop drilling (bruyant à propager) ou un store centralisé (verbeux à configurer).
 
 `Atom` est une primitive plus simple : une unité de state réactive et isolée. Quand sa valeur change, tous ses abonnés sont notifiés automatiquement. Cet exercice explore le mécanisme de base, puis son intégration React.
 
-Fichier à compléter : `packages/app/_exercices/11-atom.spec.tsx`
+Fichier à compléter : `packages/app/_exercices/10-atom.spec.tsx`
 
 ---
 

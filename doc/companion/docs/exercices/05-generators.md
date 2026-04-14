@@ -1,12 +1,12 @@
 ---
-sidebar_position: 6
+sidebar_position: 5
 ---
 
-# Exercice 6 — Générateurs
+# Exercice 5 — Générateurs
 
 Les générateurs JavaScript sont un mécanisme du langage souvent méconnu. Cet exercice a deux parties : la première explore le mécanisme pur, sans Effect. La deuxième montre comment Effect s'en sert pour écrire des programmes complexes avec le flot de contrôle impératif qu'on connaît déjà — `if`, `for`, `while`, ...
 
-Fichier à compléter : `packages/api/_exercices/6-generators.spec.ts`
+Fichier à compléter : `packages/api/_exercices/5-generators.spec.ts`
 
 ---
 

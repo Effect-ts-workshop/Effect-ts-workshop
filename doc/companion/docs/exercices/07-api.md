@@ -1,14 +1,14 @@
 ---
-sidebar_position: 8
+sidebar_position: 7
 ---
 
-# Exercice 8 — HTTP API
+# Exercice 7 — HTTP API
 
 Nous avons vu comment consommer un service externe. Voici maintenant comment en _définir_ un.
 
 `@effect/platform` fournit un système en trois couches : le **contrat** (ce que l'API expose), l'**implémentation** (comment elle répond), et le **layer** (qui branche les deux). Cette séparation permet de tester l'API sans démarrer de vrai serveur.
 
-Fichier à compléter : `packages/api/_exercices/8-api.spec.ts`
+Fichier à compléter : `packages/api/_exercices/7-api.spec.ts`
 
 ---
 

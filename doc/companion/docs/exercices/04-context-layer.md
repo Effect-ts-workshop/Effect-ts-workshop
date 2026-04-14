@@ -1,14 +1,14 @@
 ---
-sidebar_position: 5
+sidebar_position: 4
 ---
 
-# Exercice 5 — Context et Layer
+# Exercice 4 — Context et Layer
 
 Une fonction qui fait une requête HTTP dépend d'un client HTTP. En TypeScript classique, cette dépendance est soit une variable globale (difficile à tester), soit un paramètre en plus (bruyant à propager).
 
 Effect résout ça avec le troisième paramètre de type : le `Context`. Une fonction déclare ce dont elle a besoin, Effect le fournit automatiquement.
 
-Fichier à compléter : `packages/api/_exercices/5-context-layer.spec.ts`
+Fichier à compléter : `packages/api/_exercices/4-context-layer.spec.ts`
 
 ---
 

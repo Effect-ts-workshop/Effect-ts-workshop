@@ -1,14 +1,14 @@
 ---
-sidebar_position: 3
+sidebar_position: 12
 ---
 
-# Exercice 3 — Interruption et ressources
+# Bonus — Interruption et ressources
 
 Jusqu'ici nos programmes se terminent toujours : ils réussissent ou ils échouent. Mais il existe un troisième cas : l'interruption. Un utilisateur annule une requête, un timeout expire, un autre fiber termine en premier.
 
 Effect traite l'interruption comme un citoyen de première classe. Ce qui veut dire : quand un program est interrompu, les ressources qu'il a ouvertes sont quand même libérées.
 
-Fichier à compléter : `packages/api/_exercices/3-interruption.spec.ts`
+Fichier à compléter : `packages/api/_exercices/bonus-interruption.spec.ts`
 
 ---
 

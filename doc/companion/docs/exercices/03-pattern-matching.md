@@ -1,8 +1,8 @@
 ---
-sidebar_position: 4
+sidebar_position: 3
 ---
 
-# Exercice 4 — Pattern Matching
+# Exercice 3 — Pattern Matching
 
 En TypeScript un `switch/case` fonctionne, mais il a des angles morts :
 
@@ -12,7 +12,7 @@ En TypeScript un `switch/case` fonctionne, mais il a des angles morts :
 
 Effect fournit avec `Match` une alternative typée, composable et exhaustive.
 
-Fichier à compléter : `packages/api/_exercices/4-pattern-matching.spec.ts`
+Fichier à compléter : `packages/api/_exercices/3-pattern-matching.spec.ts`
 
 ---
 

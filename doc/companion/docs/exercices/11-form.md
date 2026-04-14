@@ -1,14 +1,14 @@
 ---
-sidebar_position: 12
+sidebar_position: 11
 ---
 
-# Exercice 12 — Form
+# Exercice 11 — Form
 
 Les formulaires posent trois problèmes récurrents : valider les champs, afficher les erreurs au bon moment, et soumettre uniquement quand les données sont valides.
 
 `effect-form-react` résout ces trois problèmes en s'appuyant sur `Schema` pour la validation et `Atom` pour l'état.
 
-Fichier à compléter : `packages/app/_exercices/12-form.spec.tsx`
+Fichier à compléter : `packages/app/_exercices/11-form.spec.tsx`
 
 ---
 

@@ -1,14 +1,14 @@
 ---
-sidebar_position: 9
+sidebar_position: 8
 ---
 
-# Exercice 9 — SQL
+# Exercice 8 — SQL
 
 Nos services utilisent une base de données PostgreSQL. Cet exercice couvre deux niveaux d'abstraction : le SQL natif avec `@effect/sql`, et le query builder Drizzle.
 
 Les tests de cet exercice démarrent un vrai conteneur PostgreSQL via `testcontainers`. Pas de mocks — les requêtes s'exécutent contre une vraie base.
 
-Fichier à compléter : `packages/api/_exercices/9-sql.spec.ts`
+Fichier à compléter : `packages/api/_exercices/8-sql.spec.ts`
 
 :::warning Prérequis
 

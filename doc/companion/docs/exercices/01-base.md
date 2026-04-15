@@ -16,20 +16,84 @@ Fichier à compléter : `packages/api/_exercices/1-base.spec.ts`
 
 ## Partie 1 — FP utils
 
-### Composer une transformation pas à pas
+### Transformer une fonction en curried function
 
-Imaginons deux fonctions :
+Certaines fonctions prennent plusieurs arguments en une fois :
+
+<!-- prettier-ignore -->
+```typescript
+const greet = (greeting: string, name: string) => `${greeting}, ${name}!`;
+greet("Hello", "Alice"); // "Hello, Alice!"
+```
+
+Une **curried function** prend les mêmes arguments, mais un par un. Chaque appel partiel renvoie une nouvelle fonction :
+
+<!-- prettier-ignore -->
+```typescript
+const greet = (greeting: string) => (name: string) => `${greeting}, ${name}!`;
+
+greet("Hello");         // (name: string) => "Hello, " + name + "!"
+greet("Hello")("Alice") // "Hello, Alice!"
+```
+
+`greet("Hello")` ne produit pas encore de résultat — elle fixe le premier argument et attend le second.
+
+#### Exercice
+
+Transformez `add` et `multiply` en curried functions :
+
+<!-- prettier-ignore -->
+```typescript
+const add = (a: number, b: number) => a + b;
+const multiply = (a: number, b: number) => a * b;
+
+const currifiedAdd = ??? // À compléter
+const currifiedMultiply = ??? // À compléter
+
+expect(add(4, 6)).toEqual(currifiedAdd(4)(6));
+expect(multiply(4, 6)).toEqual(currifiedMultiply(4)(6));
+```
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>La structure d'une curried function à deux arguments</summary>
+
+<!-- prettier-ignore -->
+```typescript
+const fn = (a: number) => (b: number) => /* résultat */;
+```
+
+Le premier appel fixe `a`. Le second appel fournit `b` et produit le résultat.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+<!-- prettier-ignore -->
+```typescript
+const currifiedAdd = (a: number) => (b: number) => a + b;
+const currifiedMultiply = (a: number) => (b: number) => a * b;
+```
+
+</details>
+
+---
+
+### Composer des transformations avec `pipe`
+
+Pour transformer une valeur en enchaînant plusieurs fonctions, on pourrait les imbriquer :
 
 <!-- prettier-ignore -->
 ```typescript
 const trim = (s: string) => s.trim();
 const capitalize = (s: string) => s[0].toUpperCase() + s.slice(1);
-```
 
-Pour nettoyer puis mettre en forme un nom, on pourrait écrire :
-
-<!-- prettier-ignore -->
-```typescript
 const result = capitalize(trim("  alice  ")); // "Alice"
 ```
 
@@ -43,95 +107,23 @@ import { pipe } from "effect";
 
 const result = pipe(
   "  alice  ",
-  trim, // "alice" — supprime les espaces
-  capitalize, // "Alice" — met la première lettre en majuscule
+  trim,       // "alice"
+  capitalize, // "Alice"
 );
 ```
 
-Chaque étape reçoit le résultat de la précédente.
-
-#### Exercice
-
-Complétez le `pipe` pour que `result` vaille `40` :
+Et avec des curried functions, plus besoin de lambda intermédiaire — on passe directement la fonction partiellement appliquée :
 
 <!-- prettier-ignore -->
 ```typescript
-const add = (a: number, b: number) => a + b;
-const multiply = (a: number, b: number) => a * b;
+const add = (a: number) => (b: number) => a + b;
+const multiply = (a: number) => (b: number) => a * b;
 
-const result = pipe(
-  add(4, 6),
-  // À compléter
-);
-
-expect(result).toEqual(40);
+pipe(4, add(6), multiply(4)); // 40
+//       ^           ^
+//  add(6) renvoie une fonction (b) => 6 + b
+//  multiply(4) renvoie une fonction (b) => 4 * b
 ```
-
-À vous de jouer !
-
-:::tip Ressources
-
-- [Le type Effect — Transformer des Effects](../base-de-connaissance/01-le-type-effect.md)
-
-:::
-
-#### Indice 1
-
-<details>
-  <summary>Que reçoit la deuxième étape du pipe ?</summary>
-
-`add(4, 6)` produit `10`. La deuxième étape reçoit `10` et doit renvoyer `40`.
-
-`multiply` prend deux arguments — il faut en fixer un et laisser `pipe` fournir l'autre.
-
-</details>
-
-#### Solution
-
-<details>
-  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
-
-<!-- prettier-ignore -->
-```typescript
-const result = pipe(
-  add(4, 6), 
-  (a) => multiply(a, 4)
-);
-```
-
-</details>
-
----
-
-### Simplifier le pipe avec des fonctions currifiées
-
-Il existe une façon d'écrire des fonctions qui s'intègrent encore plus naturellement dans un `pipe` : les **curried functions**.
-
-Au lieu de prendre tous les arguments en une fois, une curried function les prend un par un :
-
-<!-- prettier-ignore -->
-```typescript
-// Fonction normale — tous les arguments d'un coup
-const prefix = (p: string, s: string) => p + s;
-
-// Currified — un argument à la fois
-const prefix = (p: string) => (s: string) => p + s;
-```
-
-Ce que ça change dans un `pipe` : `prefix("Mr. ")` renvoie une fonction `(s: string) => "Mr. " + s`. On peut la passer directement, sans lambda :
-
-<!-- prettier-ignore -->
-```typescript
-const suffix = (p: string) => (s: string) => s + p;
-
-const result = pipe(
-  "Alice",
-  prefix("Hello, "), // (s) => "Hello, " + s → "Hello, Alice"
-  suffix("!"), // (s) => s + "!" → "Hello, Alice!"
-);
-```
-
-Plus de `(a) => ...` — les étapes sont plus lisibles.
 
 #### Exercice
 
@@ -153,6 +145,12 @@ expect(result).toEqual(40);
 
 À vous de jouer !
 
+:::tip Ressources
+
+- [Le type Effect — Transformer des Effects](../base-de-connaissance/01-le-type-effect.md)
+
+:::
+
 #### Indice 1
 
 <details>
@@ -172,8 +170,8 @@ Il suffit de faire la même chose avec `multiply`.
 <!-- prettier-ignore -->
 ```typescript
 const result = pipe(
-  4, 
-  add(6), 
+  4,
+  add(6),
   multiply(4)
 );
 ```

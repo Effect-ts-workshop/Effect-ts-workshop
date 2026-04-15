@@ -68,6 +68,109 @@ Les champs non déclarés (`unknown`) sont automatiquement éliminés à la vali
 
 ---
 
+## Visualiser les erreurs de validation
+
+Quand un schema imbriqué échoue, Effect ne renvoie pas un message générique. Il produit un arbre d'erreurs qui trace exactement quel champ, dans quel objet, pose problème :
+
+<!-- prettier-ignore -->
+```typescript
+const CommandeSchema = Schema.Struct({
+  livraison: Schema.Struct({
+    ville: Schema.String,
+    codePostal: Schema.String
+  })
+})
+
+const result = Schema.decodeUnknownEither(CommandeSchema, { errors: "all" })({ livraison: {} })
+
+if (Either.isLeft(result)) {
+  console.log(result.left.toString())
+}
+// { readonly livraison: { readonly ville: string; readonly codePostal: string } }
+// └─ ["livraison"]
+//    └─ { readonly ville: string; readonly codePostal: string }
+//       ├─ ["ville"]
+//       │  └─ is missing
+//       └─ ["codePostal"]
+//          └─ is missing
+```
+
+Chaque niveau de l'objet correspond à un niveau dans l'arbre. Les champs manquants apparaissent comme des feuilles.
+
+### Exercice
+
+Définissez le schema qui produit ce rapport d'erreurs quand on valide `{ user: {} }` :
+
+<!-- prettier-ignore -->
+```typescript
+// Rapport attendu :
+// { readonly user: { readonly id: string; readonly name: NonEmptyString } }
+// └─ ["user"]
+//    └─ { readonly id: string; readonly name: NonEmptyString }
+//       ├─ ["id"]
+//       │  └─ is missing
+//       └─ ["name"]
+//          └─ is missing
+
+const schema = ??? // À compléter
+
+const result = Schema.decodeUnknownEither(schema, { errors: "all" })({ user: {} })
+```
+
+À vous de jouer !
+
+:::tip Ressources
+
+- [Schema avancé](../base-de-connaissance/10-schema-avance.md)
+
+:::
+
+#### Indice 1
+
+<details>
+  <summary>Un `Schema.Struct` peut contenir un autre `Schema.Struct`</summary>
+
+Pour modéliser un objet imbriqué, imbriquez les structs :
+
+<!-- prettier-ignore -->
+```typescript
+Schema.Struct({
+  outer: Schema.Struct({
+    inner: Schema.String
+  })
+})
+```
+
+</details>
+
+#### Indice 2
+
+<details>
+  <summary>Quel schema pour `name` ?</summary>
+
+`Schema.NonEmptyString` est le schema Effect pour les chaînes non vides. Il apparaît dans le rapport d'erreur sous le nom `NonEmptyString`.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+<!-- prettier-ignore -->
+```typescript
+const schema = Schema.Struct({
+  user: Schema.Struct({
+    id: Schema.String,
+    name: Schema.NonEmptyString
+  })
+})
+```
+
+</details>
+
+---
+
 ## Erreurs lisibles
 
 Les erreurs de validation de `Schema` sont structurées. Pour les afficher d'une façon plus lisible on utilise par exemple `ParseResult.ArrayFormatter` qui renverra un tableau d'erreurs le cas échéant :
@@ -332,12 +435,6 @@ const Person = Schema.Struct({}).annotations({ identifier: "Person" })
 </details>
 
 #### Solution B
-<details>
-  <summary>L'ordre des cas compte</summary>
-
-Placez `Match.when(Match.null, ...)` avant `Match.when(Match.string, ...)` — `null` pourrait autrement être absorbé par un cas trop large.
-
-</details>
 
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>

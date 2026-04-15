@@ -202,6 +202,110 @@ const result = gen.next(true);
 
 ---
 
+### Enchaîner des opérations avec un générateur
+
+On peut faire "rebondir" le résultat d'une étape vers l'entrée de la suivante : chaque appel à `next(value)` injecte `value` comme résultat de l'expression `yield` en cours, puis avance jusqu'au prochain `yield`.
+
+<!-- prettier-ignore -->
+```typescript
+function* processText(text: string) {
+  const trimmed = yield text.trim()          // étape 1 : expose la chaîne nettoyée
+  const upper = yield trimmed.toUpperCase()  // étape 2 : reçoit le résultat du trim
+  return upper + "!"                         // valeur finale
+}
+
+const gen = processText("  hello  ")
+let step = gen.next()             // { value: "hello", done: false }
+step = gen.next(step.value)       // { value: "HELLO", done: false }
+step = gen.next(step.value)       // { value: "HELLO!", done: true }
+```
+
+C'est _exactement_ le mécanisme qu'Effect utilise pour chaîner des Effects dans un générateur.
+
+### Exercice
+
+Implémentez le corps du `do…while` dans `genPipe` — la boucle qui fait avancer le générateur pas à pas en réinjectant chaque résultat :
+
+<!-- prettier-ignore -->
+```typescript
+const genPipe = (fn: () => Generator) => {
+  let done = false
+  let previousResult = undefined
+  const gen = fn()
+  do {
+    // À compléter : avancer d'un pas, récupérer la valeur, vérifier si terminé
+  } while (!done)
+  return previousResult
+}
+```
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>Ce que renvoie `gen.next(value)`</summary>
+
+`gen.next(value)` renvoie un objet `{ value, done }` :
+
+- `value` : ce qui a été `yield`é (ou la valeur de `return` si `done: true`)
+- `done` : `true` si le générateur a atteint son `return`
+
+</details>
+
+#### Indice 2
+
+<details>
+  <summary>Dans quel ordre mettre à jour les variables ?</summary>
+
+`previousResult` doit d'abord recevoir la valeur du pas courant avant d'être injecté dans le prochain `next(...)`.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+<!-- prettier-ignore -->
+```typescript
+const result = gen.next(previousResult)
+previousResult = result.value
+done = result.done || false
+```
+
+</details>
+
+---
+
+### Évaluer les étapes d'un générateur à la demande
+
+Un générateur ne s'exécute pas au moment où on l'appelle. Rien ne se passe tant qu'on n'appelle pas `.next()`. C'est ce qu'on appelle l'**évaluation lazy**.
+
+<!-- prettier-ignore -->
+```typescript
+function* processItem(brand: string) {
+  log.push("step 1: validate")
+  yield brand.toUpperCase()
+
+  log.push("step 2: save")
+  yield `${brand} saved`
+}
+
+const gen = processItem("Apple")
+// log est encore vide — la fonction n'a pas encore démarré
+
+gen.next()
+// "step 1: validate" est dans log — on s'est arrêté au premier yield
+
+gen.next()
+// "step 1: validate", "step 2: save" — deuxième étape atteinte
+```
+
+Retirez le `.skip` sur le test `"un générateur peut modéliser une séquence d'opérations lazy"` et lancez les tests pour le voir passer.
+
+---
+
 ## Partie 2 — Générateurs avec Effect
 
 Les générateurs permettent de mettre une fonction en pause et d'y injecter des valeurs. Effect exploite ce mécanisme pour deux choses : remplacer les longues chaînes de `flatMap` par une syntaxe linéaire, et retrouver le flot de contrôle impératif — `if`, `for`, `while`, ... — sans sortir du monde Effect.

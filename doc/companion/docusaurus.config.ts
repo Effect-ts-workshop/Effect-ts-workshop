@@ -55,6 +55,34 @@ const config: Config = {
         }
       ]
     },
+    footer: {
+      style: "dark",
+      links: [
+        {
+          title: "Documentation",
+          items: [
+            {
+              label: "Effect.ts",
+              href: "https://effect.website/"
+            }
+          ]
+        },
+        {
+          title: "Community",
+          items: [
+            {
+              label: "Blog",
+              href: "https://effect.website/blog"
+            },
+            {
+              label: "Discord",
+              href: "https://discord.com/invite/effect-ts"
+            }
+          ]
+        }
+      ],
+      copyright: `Copyright © ${new Date().getFullYear()} - Effect Devoxx workshop`
+    },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,

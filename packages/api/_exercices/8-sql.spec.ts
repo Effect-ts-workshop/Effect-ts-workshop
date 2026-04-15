@@ -1,9 +1,10 @@
 import { Model, SqlClient } from "@effect/sql"
-import type { InferInsertModel } from "drizzle-orm"
+import { eq, type InferInsertModel } from "drizzle-orm"
 import { ConfigProvider, Effect, Layer, pipe, Schema } from "effect"
 import { InventoryItemId, InventoryItemIdSchema } from "shared/item"
 import { GenericContainer, Wait } from "testcontainers"
 import { describe, expect, it as itBase } from "vitest"
+import { items } from "../src/domains/items/db/item.sql"
 import { SqlLive } from "../src/utils/database/database"
 import { Database, DatabaseLive } from "../src/utils/database/database-drizzle"
 import { MigratorLive } from "../src/utils/database/migrator"
@@ -37,16 +38,20 @@ const it = itBase.extend("pgConfig", async ({}, { onCleanup }) => {
 describe("Native effect module", () => {
   const databaseLayer = Layer.mergeAll(SqlLive, MigratorLive)
 
-  it.skip("Should run raw sql", { timeout: 5_000 }, async ({ pgConfig }) => {
+  /**
+   * If you get an error like "Error: Could not find a working container runtime strategy"
+   * Check docker is running
+   */
+  it("Should run raw sql", { timeout: 5_000 }, async ({ pgConfig }) => {
     const getAll = Effect.fn("getAll")(function*() {
       const sql = yield* SqlClient.SqlClient
       // #start
-      const items = TODO
+      // const items = TODO
       // #solution
-      // const items = yield* sql`
-      //     SELECT *
-      //     FROM items
-      //   `
+      const items = yield* sql`
+          SELECT *
+          FROM items
+        `
       // #end
       return items
     })
@@ -62,7 +67,7 @@ describe("Native effect module", () => {
     }))
   })
 
-  it.skip("Should operate CRUD easily", { timeout: 5_000 }, async ({ pgConfig }) => {
+  it("Should operate CRUD easily", { timeout: 5_000 }, async ({ pgConfig }) => {
     class DbItem extends Model.Class<DbItem>("DbItem")({
       id: InventoryItemIdSchema,
       brand: Schema.String,
@@ -73,15 +78,15 @@ describe("Native effect module", () => {
 
     const getCrud = Effect.fn("getCrud")(function*() {
       // #start
-      const repository = TODO
+      // const repository = TODO
       // #solution
-      // const repoConfig = {
-      //   tableName: "items",
-      //   idColumn: "id" as const,
-      //   spanPrefix: "ItemRepository"
-      // }
+      const repoConfig = {
+        tableName: "items",
+        idColumn: "id" as const,
+        spanPrefix: "ItemRepository"
+      }
 
-      // const repository = yield* Model.makeRepository(DbItem, repoConfig)
+      const repository = yield* Model.makeRepository(DbItem, repoConfig)
       // #end
 
       return repository
@@ -112,7 +117,7 @@ describe("Native effect module", () => {
 })
 
 describe("Drizzle effect integration", () => {
-  it.skip("Simplify with query builder", { timeout: 5_000 }, async ({ pgConfig }) => {
+  it("Simplify with query builder", { timeout: 5_000 }, async ({ pgConfig }) => {
     const testDatabaseLayer = Layer.mergeAll(
       DatabaseLive,
       Layer.mergeAll(SqlLive, MigratorLive)
@@ -122,9 +127,9 @@ describe("Drizzle effect integration", () => {
       const db = yield* Database
 
       // #start
-      return TODO
+      // return TODO
       // #solution
-      // return yield* db.insert(items).values(item)
+      return yield* db.insert(items).values(item)
       // #end
     })
 
@@ -132,9 +137,9 @@ describe("Drizzle effect integration", () => {
       const db = yield* Database
 
       // #start
-      return TODO
+      // return TODO
       // #solution
-      // return yield* db.select().from(items).where(eq(items.brand, brand))
+      return yield* db.select().from(items).where(eq(items.brand, brand))
       // #end
     })
 

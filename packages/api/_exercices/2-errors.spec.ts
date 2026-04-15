@@ -1,17 +1,16 @@
 import { Data, Effect, pipe } from "effect"
-import { TODO } from "shared/utils"
 import type { Response } from "undici"
 import { fetch as baseFetch } from "undici"
 import { describe, expect, expectTypeOf, it } from "vitest"
 
 describe("Effect basics - Errors", () => {
-  it.skip("should return failure explicitely", () => {
+  it("should return failure explicitely", () => {
     function racineCarrée(n: number): Effect.Effect<number, Error> {
       if (n < 0) {
         // #start
-        return TODO(new Error("toto"))
+        // return TODO(new Error("toto"))
         // #solution
-        // return Effect.fail(new Error("toto"))
+        return Effect.fail(new Error("toto"))
         // #end
       }
 
@@ -25,7 +24,7 @@ describe("Effect basics - Errors", () => {
     expect(() => Effect.runSync(invalidProgram)).toThrow()
   })
 
-  it.skip("should return multiple errors", async () => {
+  it("should return multiple errors", async () => {
     class NetworkError extends Error {}
     class HTTPResponseError extends Error {}
 
@@ -38,9 +37,9 @@ describe("Effect basics - Errors", () => {
           try: () => baseFetch(input, init),
           catch: (error) => {
             // #start
-            return TODO
+            // return TODO
             // #solution
-            // return new NetworkError(String(error))
+            return new NetworkError(String(error))
             // #end
           }
         }),
@@ -48,9 +47,9 @@ describe("Effect basics - Errors", () => {
           (response) => response.ok,
           (response) => {
             // #start
-            return TODO
+            // return TODO
             // #solution
-            // return new HTTPResponseError(response.statusText)
+            return new HTTPResponseError(response.statusText)
             // #end
           }
         )
@@ -63,25 +62,25 @@ describe("Effect basics - Errors", () => {
     await expect(Effect.runPromise(invalidProgram)).rejects.toThrow()
   })
 
-  it.skip("should create tagged errors", async () => {
+  it("should create tagged errors", async () => {
     // #start
-    class NetworkError extends TODO {}
+    // class NetworkError extends TODO {}
     // #solution
-    // class NetworkError extends Data.TaggedError("NetworkError")<{ error: unknown }> {}
+    class NetworkError extends Data.TaggedError("NetworkError")<{ error: unknown }> {}
     // #end
     const netError = new NetworkError({ error: "unknown" })
     expect(netError._tag).toBe("NetworkError")
 
     // #start
-    const HTTPResponseError = TODO
+    // const HTTPResponseError = TODO
     // #solution
-    // class HTTPResponseError extends Data.TaggedError("HTTPResponseError")<{ response: Response }> {}
+    class HTTPResponseError extends Data.TaggedError("HTTPResponseError")<{ response: Response }> {}
     // #end
     const httpError = new HTTPResponseError({ response: "fake" as any })
     expect(httpError).toMatchObject({ "_tag": "HTTPResponseError" })
   })
 
-  it.skip("should catch single error", async () => {
+  it("should catch single error", async () => {
     type HTTPResponseError = { readonly _tag: "HTTPResponseError" }
     type NetworkError = { readonly _tag: "NetworkError" }
     const getJoke = (): Effect.Effect<string, HTTPResponseError | NetworkError, never> =>
@@ -90,9 +89,9 @@ describe("Effect basics - Errors", () => {
     const program = pipe(
       getJoke(),
       // #start
-      TODO
+      // TODO
       // #solution
-      // Effect.catchTag("HTTPResponseError", () => Effect.succeed("Fallback joke"))
+      Effect.catchTag("HTTPResponseError", () => Effect.succeed("Fallback joke"))
       // #end
     )
 
@@ -100,7 +99,7 @@ describe("Effect basics - Errors", () => {
     expect(Effect.runSync(program)).toEqual("Fallback joke")
   })
 
-  it.skip.each([["NetworkError"], ["HTTPResponseError"]] as const)("should catch multiple errors", async (tag) => {
+  it.each([["NetworkError"], ["HTTPResponseError"]] as const)("should catch multiple errors", async (tag) => {
     type UnknownException = { readonly _tag: "UnknownException" }
     type HTTPResponseError = { readonly _tag: "HTTPResponseError" }
     type NetworkError = { readonly _tag: "NetworkError" }
@@ -110,12 +109,12 @@ describe("Effect basics - Errors", () => {
     const program = pipe(
       getJoke(),
       // #start
-      TODO
+      // TODO
       // #solution
-      // Effect.catchTags({
-      //   HTTPResponseError: () => Effect.succeed("Fallback joke"),
-      //   NetworkError: () => Effect.succeed("Fallback joke")
-      // })
+      Effect.catchTags({
+        HTTPResponseError: () => Effect.succeed("Fallback joke"),
+        NetworkError: () => Effect.succeed("Fallback joke")
+      })
       // #end
     )
 
@@ -123,7 +122,7 @@ describe("Effect basics - Errors", () => {
     expect(Effect.runSync(program)).toEqual("Fallback joke")
   })
 
-  it.skip("should all errors and always get a joke", async () => {
+  it("should all errors and always get a joke", async () => {
     type UnknownException = { readonly _tag: "UnknownException" }
     type HTTPResponseError = { readonly _tag: "HTTPResponseError" }
     type NetworkError = { readonly _tag: "NetworkError" }
@@ -133,9 +132,9 @@ describe("Effect basics - Errors", () => {
     const program = pipe(
       getJoke(),
       // #start
-      TODO
+      // TODO
       // #solution
-      // Effect.catchAll(() => Effect.succeed("Fallback joke"))
+      Effect.catchAll(() => Effect.succeed("Fallback joke"))
       // #end
     )
 
@@ -145,15 +144,15 @@ describe("Effect basics - Errors", () => {
 })
 
 describe("Effect defect", () => {
-  it.skip("should handle unexpected error (defect)", async () => {
+  it("should handle unexpected error (defect)", async () => {
     const trustMe = () => Effect.dieMessage("You are too naive")
 
     const program = pipe(
       trustMe(),
       // #start
-      TODO
+      // TODO
       // #solution
-      // Effect.catchAllDefect(() => Effect.succeed("I'm alive"))
+      Effect.catchAllDefect(() => Effect.succeed("I'm alive"))
       // #end
     )
 

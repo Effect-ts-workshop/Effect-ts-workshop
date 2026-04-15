@@ -126,10 +126,17 @@ function isIgnored(filePath) {
  */
 function transformExercices(content) {
   const lines = content.split("\n")
-  const out = []
+  const out = ['import { TODO } from "shared/utils"']
   let state = "normal" // normal | start | solution
 
+
   for (const line of lines) {
+    if(/^(\s*)it(\(|\.)(.*)/.test(line)) {
+      const skipped = line.replace(/^(\s*)it/, "$1it.skip")
+      out.push(skipped)
+      continue
+    }
+
     const trimmed = line.trimStart()
     switch (state) {
       case "normal":
@@ -139,7 +146,10 @@ function transformExercices(content) {
       case "start":
         if (trimmed === "// #solution") { state = "solution"; break }
         if (trimmed === "// #end")      { state = "normal";   break }
-        out.push(line) // keep the TODO line(s)
+        // Strip leading "// " (or "//" with no space) preserving indentation
+        const indent = line.match(/^(\s*)/)[1]
+        const uncommented = trimmed.replace(/^\/\/ ?/, "")
+        out.push(uncommented.length > 0 ? indent + uncommented : "")
         break
       case "solution":
         if (trimmed === "// #end")      { state = "normal";   break }
@@ -167,17 +177,14 @@ function transformSolutions(content) {
         if (trimmed === "// #start")    { state = "start";    break }
         out.push(line)
         break
-      case "start":
-        if (trimmed === "// #solution") { state = "solution"; break }
-        if (trimmed === "// #end")      { state = "normal";   break }
-        // drop the TODO line(s)
-        break
-      case "solution": {
-        if (trimmed === "// #end")      { state = "normal";   break }
-        // Strip leading "// " (or "//" with no space) preserving indentation
-        const indent = line.match(/^(\s*)/)[1]
-        const uncommented = trimmed.replace(/^\/\/ ?/, "")
-        out.push(uncommented.length > 0 ? indent + uncommented : "")
+        case "start":
+          if (trimmed === "// #solution") { state = "solution"; break }
+          if (trimmed === "// #end")      { state = "normal";   break }
+          // drop the TODO line(s)
+          break
+          case "solution": {
+            if (trimmed === "// #end")      { state = "normal";   break }
+            out.push(line)
         break
       }
     }

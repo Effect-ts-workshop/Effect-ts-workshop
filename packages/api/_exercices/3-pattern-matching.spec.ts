@@ -1,9 +1,8 @@
 import { Array, Match, Option, pipe } from "effect"
-import { TODO } from "shared/utils"
 import { describe, expect, it } from "vitest"
 
 describe("Pattern matching", () => {
-  it.skip("should handle all possible values", () => {
+  it("should handle all possible values", () => {
     type NumberField = { type: "number"; value: number }
     type TextField = { type: "text"; value: string }
     type SelectField = { type: "select"; multiple: false; value: string }
@@ -18,12 +17,12 @@ describe("Pattern matching", () => {
       pipe(
         Match.value(field),
         // #start
-        TODO,
+        // TODO,
         // #solution
-        // Match.when({ type: "number" }, (field) => String(field.value)),
-        // Match.when({ type: "text" }, (field) => field.value),
-        // Match.when({ type: "select", multiple: true }, (field) => field.value.join(", ")),
-        // Match.when({ type: "select", multiple: false }, (field) => field.value),
+        Match.when({ type: "number" }, (field) => String(field.value)),
+        Match.when({ type: "text" }, (field) => field.value),
+        Match.when({ type: "select", multiple: true }, (field) => field.value.join(", ")),
+        Match.when({ type: "select", multiple: false }, (field) => field.value),
         // #end
         Match.exhaustive
       )
@@ -34,7 +33,7 @@ describe("Pattern matching", () => {
     expect(getValue({ type: "select", multiple: true, value: ["selected", "a", "lot"] })).toEqual("selected, a, lot")
   })
 
-  it.skip("should handle optional value", () => {
+  it("should handle optional value", () => {
     const allValues = ["you got me"]
 
     const getValueAt = (index: number) =>
@@ -42,12 +41,12 @@ describe("Pattern matching", () => {
         allValues,
         Array.get(index),
         // #start
-        TODO
+        // TODO
         // #solution
-        // Option.match({
-        //   onSome: (v) => v.toUpperCase(),
-        //   onNone: () => `DEFAULT`
-        // })
+        Option.match({
+          onSome: (v) => v.toUpperCase(),
+          onNone: () => `DEFAULT`
+        })
         // #end
       )
 
@@ -55,7 +54,7 @@ describe("Pattern matching", () => {
     expect(getValueAt(42)).toEqual("DEFAULT")
   })
 
-  it.skip("should wrap result in Option with Match.option (product availability)", () => {
+  it("should wrap result in Option with Match.option (product availability)", () => {
     type StockStatus =
       | { status: "in_stock"; quantity: number }
       | { status: "out_of_stock" }
@@ -65,10 +64,10 @@ describe("Pattern matching", () => {
       pipe(
         Match.value(stock),
         // #start
-        TODO
+        // TODO
         // #solution
-        // Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
-        // Match.option
+        Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
+        Match.option
         // #end
       )
 
@@ -78,7 +77,7 @@ describe("Pattern matching", () => {
     expect(getDeliveryDays({ status: "discontinued" })).toEqual(Option.none())
   })
 
-  it.skip("should match on _tag discriminated union (notifications)", () => {
+  it("should match on _tag discriminated union (notifications)", () => {
     type EmailNotification = { _tag: "Email"; to: string; subject: string }
     type SmsNotification = { _tag: "Sms"; phone: string; body: string }
     type PushNotification = { _tag: "Push"; deviceId: string; title: string }
@@ -88,11 +87,11 @@ describe("Pattern matching", () => {
       pipe(
         Match.value(notif),
         // #start
-        TODO,
+        // TODO,
         // #solution
-        // Match.tag("Email", (n) => `Email to ${n.to}: ${n.subject}`),
-        // Match.tag("Sms", (n) => `SMS to ${n.phone}: ${n.body}`),
-        // Match.tag("Push", (n) => `Push on ${n.deviceId}: ${n.title}`),
+        Match.tag("Email", (n) => `Email to ${n.to}: ${n.subject}`),
+        Match.tag("Sms", (n) => `SMS to ${n.phone}: ${n.body}`),
+        Match.tag("Push", (n) => `Push on ${n.deviceId}: ${n.title}`),
         // #end
         Match.exhaustive
       )
@@ -108,19 +107,19 @@ describe("Pattern matching", () => {
     )
   })
 
-  it.skip("should use orElse as a fallback for unmatched cases (payment methods)", () => {
+  it("should use orElse as a fallback for unmatched cases (payment methods)", () => {
     type PaymentMethod = "card" | "paypal" | "crypto" | "check" | string
 
     const getProcessingFee = (method: PaymentMethod): string =>
       pipe(
         Match.value(method),
         // #start
-        TODO
+        // TODO
         // #solution
-        // Match.when("card", () => "1.5%"),
-        // Match.when("paypal", () => "2.9%"),
-        // Match.when("crypto", () => "0%"),
-        // Match.orElse(() => "unknown method, default fee: 3%")
+        Match.when("card", () => "1.5%"),
+        Match.when("paypal", () => "2.9%"),
+        Match.when("crypto", () => "0%"),
+        Match.orElse(() => "unknown method, default fee: 3%")
         // #end
       )
 
@@ -130,16 +129,16 @@ describe("Pattern matching", () => {
     expect(getProcessingFee("check")).toEqual("unknown method, default fee: 3%")
   })
 
-  it.skip("should exclude a specific case with Match.not (order status)", () => {
+  it("should exclude a specific case with Match.not (order status)", () => {
     type OrderStatus = "pending" | "processing" | "shipped" | "cancelled"
 
     const isTrackable = (status: OrderStatus) =>
       pipe(
         Match.value(status),
         // #start
-        TODO,
+        // TODO,
         // #solution
-        // Match.not("cancelled", () => true),
+        Match.not("cancelled", () => true),
         // #end
         Match.orElse(() => false)
       )
@@ -150,16 +149,16 @@ describe("Pattern matching", () => {
     expect(isTrackable("cancelled")).toEqual(false)
   })
 
-  it.skip("should match multiple conditions with whenOr (user roles)", () => {
+  it("should match multiple conditions with whenOr (user roles)", () => {
     type Role = "viewer" | "editor" | "admin" | "superAdmin"
 
     const canAccessDashboard = (role: Role) =>
       pipe(
         Match.value(role),
         // #start
-        TODO,
+        // TODO,
         // #solution
-        // Match.whenOr("admin", "superAdmin", () => true),
+        Match.whenOr("admin", "superAdmin", () => true),
         // #end
         Match.orElse(() => false)
       )
@@ -170,19 +169,19 @@ describe("Pattern matching", () => {
     expect(canAccessDashboard("superAdmin")).toEqual(true)
   })
 
-  it.skip("should use built-in predicates to match on primitive types (form field validation)", () => {
+  it("should use built-in predicates to match on primitive types (form field validation)", () => {
     type FieldValue = string | number | boolean | null
 
     const formatForDisplay = (value: FieldValue) =>
       pipe(
         Match.value(value),
         // #start
-        TODO,
+        // TODO,
         // #solution
-        // Match.when(Match.null, () => "—"),
-        // Match.when(Match.boolean, (b) => (b ? "Oui" : "Non")),
-        // Match.when(Match.number, (n) => n.toLocaleString("fr-FR")),
-        // Match.when(Match.string, (s) => s),
+        Match.when(Match.null, () => "—"),
+        Match.when(Match.boolean, (b) => (b ? "Oui" : "Non")),
+        Match.when(Match.number, (n) => n.toLocaleString("fr-FR")),
+        Match.when(Match.string, (s) => s),
         // #end
         Match.exhaustive
       )

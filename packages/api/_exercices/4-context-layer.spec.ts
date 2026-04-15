@@ -1,26 +1,21 @@
 import { HttpClient } from "@effect/platform"
 import { NodeHttpClient } from "@effect/platform-node"
-import { Effect, Layer, pipe } from "effect"
-import { TODO } from "shared/utils"
+import { Context, Effect, Layer, pipe } from "effect"
 import { describe, expect, expectTypeOf, it } from "vitest"
 
-/**
- * Key points to document:
- * - Avoiding Requirement Leakage
- */
 describe("Effect context", () => {
-  it.skip("Using a service", async () => {
+  it("Using a service", async () => {
     type Joke = { value: string; url: string }
     const fetchJoke = () =>
       pipe(
         // #start
-        TODO
+        // TODO
         // #solution
-        // HttpClient.HttpClient,
-        // Effect.flatMap((client) => client.get("https://api.chucknorris.io/jokes/random")),
-        // Effect.flatMap((response) => response.json),
-        // Effect.map((joke) => joke as Joke),
-        // Effect.orElseSucceed((): Joke => ({ url: "http://fake.fr", value: "No jokes today" }))
+        HttpClient.HttpClient,
+        Effect.flatMap((client) => client.get("https://api.chucknorris.io/jokes/random")),
+        Effect.flatMap((response) => response.json),
+        Effect.map((joke) => joke as Joke),
+        Effect.orElseSucceed((): Joke => ({ url: "http://fake.fr", value: "No jokes today" }))
         // #end
       )
 
@@ -34,39 +29,39 @@ describe("Effect context", () => {
     })
   })
 
-  it.skip("Creating your own service with live and test implementation", async () => {
+  it("Creating your own service with live and test implementation", async () => {
     type JokeService = {
       getRandom: () => Effect.Effect<string>
     }
     // #start
-    const JokeService = TODO
+    // const JokeService = TODO
     // #solution
-    // const JokeService = Context.GenericTag<JokeService>("JokeService")
+    const JokeService = Context.GenericTag<JokeService>("JokeService")
     // #end
 
     const JokeServiceTest = Layer.succeed(
       JokeService,
       // #start
-      TODO
+      // TODO
       // #solution
-      // {
-      //   getRandom: () => {
-      //     return Effect.succeed("Not really random for tests")
-      //   }
-      // }
+      {
+        getRandom: () => {
+          return Effect.succeed("Not really random for tests")
+        }
+      }
       // #end
     )
 
     const JokeServiceLive = Layer.succeed(
       JokeService,
       // #start
-      TODO
+      // TODO
       // #solution
-      // {
-      //   getRandom: () => {
-      //     return Effect.succeed("Amazing joke from server")
-      //   }
-      // }
+      {
+        getRandom: () => {
+          return Effect.succeed("Amazing joke from server")
+        }
+      }
       // #end
     )
 
@@ -79,27 +74,27 @@ describe("Effect context", () => {
     )
   })
 
-  it.skip("Simplifying service definitions with Effect.Service", async () => {
+  it("Simplifying service definitions with Effect.Service", async () => {
     // #start
-    const JokeService = TODO
+    // const JokeService = TODO
     // #solution
-    // class JokeService extends Effect.Service<JokeService>()("JokeService", {
-    //   effect: pipe(
-    //     HttpClient.HttpClient,
-    //     Effect.map((client) => {
-    //       return {
-    //         getRandom: () =>
-    //           pipe(
-    //             client.get("https://api.chucknorris.io/jokes/random"),
-    //             Effect.flatMap((response) => response.json),
-    //             Effect.map((joke) => (joke as { value: string }).value),
-    //             Effect.orElseSucceed(() => "No jokes for today")
-    //           )
-    //       }
-    //     })
-    //   ),
-    //   dependencies: [NodeHttpClient.layer]
-    // }) {}
+    class JokeService extends Effect.Service<JokeService>()("JokeService", {
+      effect: pipe(
+        HttpClient.HttpClient,
+        Effect.map((client) => {
+          return {
+            getRandom: () =>
+              pipe(
+                client.get("https://api.chucknorris.io/jokes/random"),
+                Effect.flatMap((response) => response.json),
+                Effect.map((joke) => (joke as { value: string }).value),
+                Effect.orElseSucceed(() => "No jokes for today")
+              )
+          }
+        })
+      ),
+      dependencies: [NodeHttpClient.layer]
+    }) {}
     // #end
 
     const program = pipe(JokeService, Effect.flatMap((jokes) => jokes.getRandom()))
@@ -108,7 +103,7 @@ describe("Effect context", () => {
     )
   })
 
-  it.skip("Easily testing services", async () => {
+  it("Easily testing services", async () => {
     class JokeService extends Effect.Service<JokeService>()("JokeService", {
       effect: pipe(
         HttpClient.HttpClient,
@@ -128,15 +123,15 @@ describe("Effect context", () => {
     }) {}
 
     // #start
-    const JokeServiceTest = TODO
+    // const JokeServiceTest = TODO
     // #solution
-    // const ClientTest = Layer.mock(
-    //   HttpClient.HttpClient,
-    //   {
-    //     get: () => Effect.fail(undefined)
-    //   } as any
-    // )
-    // const JokeServiceTest = pipe(JokeService.DefaultWithoutDependencies, Layer.provide(ClientTest))
+    const ClientTest = Layer.mock(
+      HttpClient.HttpClient,
+      {
+        get: () => Effect.fail(undefined)
+      } as any
+    )
+    const JokeServiceTest = pipe(JokeService.DefaultWithoutDependencies, Layer.provide(ClientTest))
     // #end
 
     const program = pipe(JokeService, Effect.flatMap((jokes) => jokes.getRandom()))

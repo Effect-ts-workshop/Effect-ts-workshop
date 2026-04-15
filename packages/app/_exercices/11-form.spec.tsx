@@ -1,18 +1,18 @@
-import { FormBuilder, FormReact } from "@lucas-barake/effect-form-react"
+import { useAtomSet } from "@effect-atom/atom-react"
+import { Field, FormBuilder, FormReact } from "@lucas-barake/effect-form-react"
 import { act, fireEvent, render, screen } from "@testing-library/react"
-import { Option, Schema } from "effect"
-import { TODO } from "shared/utils"
+import { Option, pipe, Schema } from "effect"
 import { describe, expect, it, vi } from "vitest"
 
 describe("Form", () => {
   describe("Form core", () => {
-    it.skip("should create simple form builder", () => {
+    it("should create simple form builder", () => {
       // #start
-      const MyFormBuilder = TODO
+      // const MyFormBuilder = TODO
       // #solution
-      // const MyFormBuilder = FormBuilder.empty
-      //   .addField("brand", Schema.NonEmptyTrimmedString)
-      //   .addField("model", Schema.NonEmptyTrimmedString)
+      const MyFormBuilder = FormBuilder.empty
+        .addField("brand", Schema.NonEmptyTrimmedString)
+        .addField("model", Schema.NonEmptyTrimmedString)
       // #end
 
       expect(MyFormBuilder.fields).toMatchObject({
@@ -21,13 +21,13 @@ describe("Form", () => {
       })
     })
 
-    it.skip("should create form builder with array field", () => {
+    it("should create form builder with array field", () => {
       // #start
-      const MyFormBuilder = TODO
+      // const MyFormBuilder = TODO
       // #solution
-      // const ItemIdsField = Field.makeArrayField("itemIds", Schema.UUID)
-      // const MyFormBuilder = FormBuilder.empty
-      //   .addField(ItemIdsField)
+      const ItemIdsField = Field.makeArrayField("itemIds", Schema.UUID)
+      const MyFormBuilder = FormBuilder.empty
+        .addField(ItemIdsField)
       // #end
 
       expect(MyFormBuilder.fields).toMatchObject({
@@ -37,21 +37,21 @@ describe("Form", () => {
   })
 
   describe("Form react", () => {
-    it.skip("should integrate basic login", async () => {
+    it("should integrate basic login", async () => {
       const onSubmit = vi.fn()
       // #start
-      const loginFormBuilder = TODO
+      // const loginFormBuilder = TODO
       // #solution
-      // const loginFormBuilder = FormBuilder.empty
-      //   .addField("username", Schema.NonEmptyTrimmedString)
-      //   .addField(
-      //     "password",
-      //     pipe(
-      //       Schema.NonEmptyTrimmedString.annotations({ message: () => "Required field" }),
-      //       Schema.minLength(8, { message: () => "Minimum 8 chars" })
-      //     )
-      //   )
-      //   .addField("remember", Schema.Boolean)
+      const loginFormBuilder = FormBuilder.empty
+        .addField("username", Schema.NonEmptyTrimmedString)
+        .addField(
+          "password",
+          pipe(
+            Schema.NonEmptyTrimmedString.annotations({ message: () => "Required field" }),
+            Schema.minLength(8, { message: () => "Minimum 8 chars" })
+          )
+        )
+        .addField("remember", Schema.Boolean)
       // #end
 
       const loginForm = FormReact.make(loginFormBuilder, {
@@ -91,9 +91,9 @@ describe("Form", () => {
       const formSchema = FormBuilder.buildSchema(loginFormBuilder)
       const TestComponent: React.FC<{ defaultValues: typeof formSchema.Encoded }> = ({ defaultValues }) => {
         // #start
-        const submit = TODO
+        // const submit = TODO
         // #solution
-        // const submit = useAtomSet(loginForm.submit)
+        const submit = useAtomSet(loginForm.submit)
         // #end
 
         return (

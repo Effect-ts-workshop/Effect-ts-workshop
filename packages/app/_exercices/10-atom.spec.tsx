@@ -1,44 +1,43 @@
-import { Atom, AtomHttpApi, Registry, Result } from "@effect-atom/atom-react"
+import { Atom, AtomHttpApi, Registry, Result, useAtom, useAtomValue } from "@effect-atom/atom-react"
 import { HttpClient, HttpClientResponse } from "@effect/platform"
 import { act, render, screen, waitFor } from "@testing-library/react"
 import { Duration, Effect, Layer, pipe } from "effect"
 import { randomUUID } from "node:crypto"
 import { Api } from "shared/api"
-import { TODO } from "shared/utils"
 import { describe, expect, it, vi } from "vitest"
 
 describe("Atom", () => {
   describe("Atom core", () => {
     const r = Registry.make()
 
-    it.skip("should create a state in a registry", () => {
+    it("should create a state in a registry", () => {
       // #start
-      const counter = TODO
+      // const counter = TODO
       // #solution
-      // const counter = Atom.make(0)
+      const counter = Atom.make(0)
       // #end
 
       expect(r.get(counter)).toEqual(0)
     })
 
-    it.skip("should update a state", () => {
+    it("should update a state", () => {
       const counter = Atom.make(0)
       // #start
-      TODO(counter, 1)
+      // TODO(counter, 1)
       // #solution
-      // r.set(counter, 1)
+      r.set(counter, 1)
       // #end
 
       expect(r.get(counter)).toEqual(1)
     })
 
-    it.skip("should create a computed value", () => {
+    it("should create a computed value", () => {
       const counter = Atom.make(0)
 
       // #start
-      const doubled = TODO
+      // const doubled = TODO
       // #solution
-      // const doubled = Atom.make((get) => get(counter) * 2)
+      const doubled = Atom.make((get) => get(counter) * 2)
       // #end
 
       r.set(counter, 9)
@@ -46,13 +45,13 @@ describe("Atom", () => {
       expect(r.get(doubled)).toEqual(18)
     })
 
-    it.skip("should tranform a value (like creating a computed value)", () => {
+    it("should tranform a value (like creating a computed value)", () => {
       const counter = Atom.make(0)
 
       // #start
-      const doubled = TODO
+      // const doubled = TODO
       // #solution
-      // const doubled = Atom.map(counter, (v) => v * 2)
+      const doubled = Atom.map(counter, (v) => v * 2)
       // #end
 
       r.set(counter, 9)
@@ -60,26 +59,26 @@ describe("Atom", () => {
       expect(r.get(doubled)).toEqual(18)
     })
 
-    it.skip("should handle function to tranform value", () => {
+    it("should handle function to tranform value", () => {
       const increment = (count: number) => count + 1
 
       // #start
-      const next = TODO
+      // const next = TODO
       // #solution
-      // const next = Atom.fnSync(increment, { initialValue: 0 })
+      const next = Atom.fnSync(increment, { initialValue: 0 })
       // #end
 
       r.set(next, 0)
       expect(r.get(next)).toEqual(1)
     })
 
-    it.skip("should handle effect", () => {
+    it("should handle effect", () => {
       const effect = Effect.succeed(2)
 
       // #start
-      const counter = TODO
+      // const counter = TODO
       // #solution
-      // const counter = Atom.make(effect)
+      const counter = Atom.make(effect)
       // #end
 
       // When creating an atom from an effect, you automatically receive a type Result
@@ -90,14 +89,14 @@ describe("Atom", () => {
       expect(value.value).toEqual(2)
     })
 
-    it.skip("should be notified on value change", async () => {
+    it("should be notified on value change", async () => {
       const listener = vi.fn()
       const counter = Atom.make(0)
 
       // #start
-      TODO(counter, listener)
+      // TODO(counter, listener)
       // #solution
-      // r.subscribe(counter, listener)
+      r.subscribe(counter, listener)
       // #end
 
       r.set(counter, 9)
@@ -105,13 +104,13 @@ describe("Atom", () => {
       expect(listener).toHaveBeenCalledWith(9)
     })
 
-    it.skip("should keep alive a value even if there is no subscriber", async () => {
+    it("should keep alive a value even if there is no subscriber", async () => {
       const initialAtom = Atom.make(0)
 
       // #start
-      const aliveAtom = TODO
+      // const aliveAtom = TODO
       // #solution
-      // const aliveAtom = Atom.keepAlive(initialAtom)
+      const aliveAtom = Atom.keepAlive(initialAtom)
       // #end
 
       r.set(initialAtom, 9)
@@ -123,14 +122,14 @@ describe("Atom", () => {
   })
 
   describe("Atom react", () => {
-    it.skip("should read value from simple Atom", () => {
+    it("should read value from simple Atom", () => {
       const atom = Atom.make(42)
 
       function TestComponent() {
         // #start
-        const value = TODO(atom)
+        // const value = TODO(atom)
         // #solution
-        // const value = useAtomValue(atom)
+        const value = useAtomValue(atom)
         // #end
         return <div data-testid="value">{value}</div>
       }
@@ -140,14 +139,14 @@ describe("Atom", () => {
       expect(screen.getByTestId("value")).toHaveTextContent("42")
     })
 
-    it.skip("should update when Atom value changes", async () => {
+    it("should update when Atom value changes", async () => {
       const atom = Atom.make(0)
 
       function TestComponent() {
         // #start
-        const [value, setValue] = TODO(atom)
+        // const [value, setValue] = TODO(atom)
         // #solution
-        // const [value, setValue] = useAtom(atom)
+        const [value, setValue] = useAtom(atom)
         // #end
         return (
           <>
@@ -166,7 +165,7 @@ describe("Atom", () => {
       expect(screen.getByTestId("value")).toHaveTextContent("1")
     })
 
-    it.skip("should integrate nicely with api client", async () => {
+    it("should integrate nicely with api client", async () => {
       const mockClient = HttpClient.make((request) =>
         pipe(
           Effect.sleep(Duration.millis(100)),
@@ -193,10 +192,10 @@ describe("Atom", () => {
 
       function TestComponent() {
         // #start
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const result = TODO as Result.Result<{ items: any[] }, any>
+        // // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // const result = TODO as Result.Result<{ items: any[] }, any>
         // #solution
-        // const result = useAtomValue(DemoClient.query("items", "getAllItems", { reactivityKeys: ["items"] }))
+        const result = useAtomValue(DemoClient.query("items", "getAllItems", { reactivityKeys: ["items"] }))
         // #end
 
         return (

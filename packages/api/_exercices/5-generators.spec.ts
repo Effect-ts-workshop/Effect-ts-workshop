@@ -1,10 +1,7 @@
 import { HttpClient } from "@effect/platform"
 import { NodeHttpClient } from "@effect/platform-node"
 import { Array, Data, Effect, pipe } from "effect"
-import { UnknownException } from "effect/Cause"
-import { TaggedError } from "effect/Data"
 import { randomUUID } from "node:crypto"
-import { TODO } from "shared/utils"
 import { describe, expect, expectTypeOf, it, vi } from "vitest"
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -12,18 +9,18 @@ import { describe, expect, expectTypeOf, it, vi } from "vitest"
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("JS generators – bases", () => {
-  it.skip("yield met le générateur en pause et expose une valeur", () => {
+  it("yield met le générateur en pause et expose une valeur", () => {
     // Un générateur est une fonction qui peut être mise en pause avec yield.
     // Chaque appel à .next() reprend l'exécution jusqu'au prochain yield.
 
     // #start
-    const items = TODO
+    // const items = TODO
     // #solution
-    // function* items() {
-    //   yield "laptop"
-    //   yield "mouse"
-    //   yield "keyboard"
-    // }
+    function* items() {
+      yield "laptop"
+      yield "mouse"
+      yield "keyboard"
+    }
     // #end
 
     const gen = items()
@@ -34,17 +31,17 @@ describe("JS generators – bases", () => {
     expect(gen.next()).toEqual({ value: undefined, done: true }) // le générateur est épuisé
   })
 
-  it.skip("la valeur de retour d'un générateur est dans le dernier .next()", () => {
+  it("la valeur de retour d'un générateur est dans le dernier .next()", () => {
     // La valeur après `return` dans le générateur se retrouve dans { done: true, value: X }.
     // Les valeurs `yield`ées sont { done: false }, la valeur retournée est { done: true }.
 
     // #start
-    const getBrand = TODO
+    // const getBrand = TODO
     // #solution
-    // function* getBrand(): Generator<string, string, unknown> {
-    //   yield "validating…" // étape intermédiaire
-    //   return "Apple" // valeur finale
-    // }
+    function* getBrand(): Generator<string, string, unknown> {
+      yield "validating…" // étape intermédiaire
+      return "Apple" // valeur finale
+    }
     // #end
 
     const gen = getBrand()
@@ -53,7 +50,7 @@ describe("JS generators – bases", () => {
     expect(gen.next()).toEqual({ value: "Apple", done: true })
   })
 
-  it.skip("yield* délègue à un autre générateur (comme un flatMap)", () => {
+  it("yield* délègue à un autre générateur (comme un flatMap)", () => {
     // `yield*` permet de déléguer l'itération à un sous-générateur.
     // C'est l'équivalent d'un "appeler et attendre" pour les générateurs.
 
@@ -63,12 +60,12 @@ describe("JS generators – bases", () => {
     }
 
     // #start
-    const models = TODO
+    // const models = TODO
     // #solution
-    // function* models() {
-    //   yield* brands() // délègue à brands : yield "Apple", yield "Dell"
-    //   yield "ThinkPad"
-    // }
+    function* models() {
+      yield* brands() // délègue à brands : yield "Apple", yield "Dell"
+      yield "ThinkPad"
+    }
     // #end
 
     const result = [...models()]
@@ -76,7 +73,7 @@ describe("JS generators – bases", () => {
     expect(result).toEqual(["Apple", "Dell", "ThinkPad"])
   })
 
-  it.skip("on peut envoyer une valeur dans le générateur via next(value)", () => {
+  it("on peut envoyer une valeur dans le générateur via next(value)", () => {
     // next(value) reprend le générateur ET injecte `value` comme résultat du `yield` en cours.
     // C'est ainsi qu'Effect.gen va "injecter" les résultats d'effects dans ton code.
 
@@ -90,32 +87,31 @@ describe("JS generators – bases", () => {
 
     const question = gen.next()
     // #start
-    const result = TODO
+    // const result = TODO
     // #solution
-    // const result = gen.next(true) // répond "true" → reprend avec approved = true
+    const result = gen.next(true) // répond "true" → reprend avec approved = true
     // #end
 
     expect(question).toEqual({ value: "Approve this item?", done: false })
     expect(result).toEqual({ value: "Item approved", done: true })
   })
 
-  it.skip("can be used to chain operations", () => {
+  it("can be used to chain operations", () => {
     const add = (a: number) => (b: number) => a + b
     const pipeResult = pipe(20, add(18), add(4))
 
     const genPipe = (fn: () => Generator) => {
-      // eslint-disable-next-line prefer-const
       let done = false
-      // eslint-disable-next-line prefer-const
+
       let previousResult = undefined
       const gen = fn()
       do {
         // #start
-        TODO()
+        // TODO()
         // #solution
-        // const result = gen.next(previousResult)
-        // previousResult = result.value
-        // done = result.done || false
+        const result = gen.next(previousResult)
+        previousResult = result.value
+        done = result.done || false
         // #end
       } while (!done)
 
@@ -131,7 +127,7 @@ describe("JS generators – bases", () => {
   })
 
   // TODO Add in doc and remove test
-  it.skip("un générateur peut modéliser une séquence d'opérations lazy", () => {
+  it("un générateur peut modéliser une séquence d'opérations lazy", () => {
     // Sans générateur : toutes les opérations s'exécutent immédiatement.
     // Avec générateur : chaque étape ne s'exécute que quand on appelle .next().
 
@@ -165,18 +161,18 @@ describe("JS generators – bases", () => {
 // Si vous voulez aller jeter un coup d'oeil
 
 describe("Effect.fn – nommer et composer des handlers", () => {
-  it.skip("Effect.fn crée une fonction qui retourne un Effect (avec span de tracing)", () => {
+  it("Effect.fn crée une fonction qui retourne un Effect (avec span de tracing)", () => {
     // Effect.fn("name")(function*() { ... }) est exactement ce qu'on voit dans :
     //   - item-repository.ts : `const getAll = Effect.fn("getAll")(function*() { ... })`
     //   - http.ts : `Effect.fn(function*({ payload }) { ... })`
 
     // #start
-    const getItemLabel = TODO
+    // const getItemLabel = TODO
     // #solution
-    // const getItemLabel = Effect.fn("getItemLabel")(function*(brand: string, model: string) {
-    //   const upper = yield* Effect.sync(() => brand.toUpperCase())
-    //   return `${upper} – ${model}`
-    // })
+    const getItemLabel = Effect.fn("getItemLabel")(function*(brand: string, model: string) {
+      const upper = yield* Effect.sync(() => brand.toUpperCase())
+      return `${upper} – ${model}`
+    })
     // #end
 
     const program = getItemLabel("apple", "MacBook Pro")
@@ -194,7 +190,7 @@ describe("Effect.fn – nommer et composer des handlers", () => {
 // On verra comment fournir ces dépendances dans l'exercice sur les Layers.
 
 describe("Effect context", () => {
-  it.skip("Using a generator instead of pipe", async () => {
+  it("Using a generator instead of pipe", async () => {
     const fetchJoke = (id: string) =>
       pipe(
         HttpClient.HttpClient,
@@ -222,14 +218,14 @@ describe("Effect context", () => {
       )
 
     // #start
-    const fetchJokeGen = TODO
+    // const fetchJokeGen = TODO
     // #solution
-    // const fetchJokeGen = Effect.fn("fetchJokeGen")(function*(id: string) {
-    //   const client = yield* HttpClient.HttpClient
-    //   const response = yield* client.get(`https://api.chucknorris.io/jokes/${id}`)
-    //   const data = yield* response.json
-    //   return { response, data }
-    // })
+    const fetchJokeGen = Effect.fn("fetchJokeGen")(function*(id: string) {
+      const client = yield* HttpClient.HttpClient
+      const response = yield* client.get(`https://api.chucknorris.io/jokes/${id}`)
+      const data = yield* response.json
+      return { response, data }
+    })
     // #end
 
     const jokeId = "XRg6ljeHSlaXghH1IYulJw"
@@ -240,18 +236,18 @@ describe("Effect context", () => {
     expect((await Effect.runPromise(program)).data).toEqual((await Effect.runPromise(programGen)).data)
   })
 
-  it.skip("can use imperative control flow inside generator", () => {
+  it("can use imperative control flow inside generator", () => {
     const buildUser = () => Effect.succeed({ id: randomUUID() })
     const buildUsers = Effect.fn(function*(count: number) {
       const users = []
 
       // #start
-      TODO()
+      // TODO()
       // #solution
-      // for (let index = 0; index < count; index++) {
-      //   const user = yield* buildUser()
-      //   users.push(user)
-      // }
+      for (let index = 0; index < count; index++) {
+        const user = yield* buildUser()
+        users.push(user)
+      }
       // #end
 
       return users
@@ -260,7 +256,7 @@ describe("Effect context", () => {
     expect(Effect.runSync(buildUsers(10))).toHaveLength(10)
   })
 
-  it.skip("should catch error inside generator to go to the end", () => {
+  it("should catch error inside generator to go to the end", () => {
     class ThirdPartyError extends Data.TaggedError("ThirdPartyError")<{ message: string }> {}
 
     const getUserById = (id: string) => Effect.succeed({ id, firstName: "Martin", lastName: "Pecheur" })
@@ -270,12 +266,12 @@ describe("Effect context", () => {
       const user = yield* getUserById(id)
 
       // #start
-      const friends = TODO
+      // const friends = TODO
       // #solution
-      // const friends = yield* Effect.orElse(
-      //   getUserFriends(id),
-      //   () => Effect.succeed([])
-      // )
+      const friends = yield* Effect.orElse(
+        getUserFriends(id),
+        () => Effect.succeed([])
+      )
       // #end
 
       return { ...user, friends }
@@ -285,7 +281,7 @@ describe("Effect context", () => {
     expect(getUserFriends).toHaveBeenCalled()
   })
 
-  it.skip("interop with other data types", async () => {
+  it("interop with other data types", async () => {
     class MyDomainError extends Data.TaggedError("MyDomainError")<{ error: unknown }> {}
 
     type User = { id: string }
@@ -294,9 +290,9 @@ describe("Effect context", () => {
       const foundUser = Array.findFirst(users, (user) => user.id === id)
 
       // #start
-      const user = TODO
+      // const user = TODO
       // #solution
-      // const user = yield* Effect.catchAll(foundUser, (error) => new MyDomainError({ error }))
+      const user = yield* Effect.catchAll(foundUser, (error) => new MyDomainError({ error }))
       // #end
 
       return user

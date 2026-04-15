@@ -1,21 +1,19 @@
 import { Arbitrary, Brand, Either, ParseResult, pipe, Schema } from "effect"
 import { describe, expect, expectTypeOf, it } from "vitest"
 
-import type { ParseOptions } from "effect/SchemaAST"
-import fc, { toStringMethod } from "fast-check"
-import { TODO } from "shared/utils"
+import fc from "fast-check"
 
 describe("Schema", () => {
-  it.skip("should validate data of all sort", () => {
+  it("should validate data of all sort", () => {
     // Implement the schema to validate the data
     // #start
-    const schema = TODO
+    // const schema = TODO
     // #solution
-    // const schema = Schema.Struct({
-    //   name: Schema.String,
-    //   age: Schema.Number,
-    //   isActive: Schema.Boolean
-    // })
+    const schema = Schema.Struct({
+      name: Schema.String,
+      age: Schema.Number,
+      isActive: Schema.Boolean
+    })
     // #end
 
     const rawData = {
@@ -33,17 +31,17 @@ describe("Schema", () => {
     })
   })
 
-  it.skip("should print errors for human", () => {
+  it("should print errors for human", () => {
     // Implement the schema to match the expected error
     // #start
-    const schema = TODO
+    // const schema = TODO
     // #solution
-    // const schema = Schema.Struct({
-    //   user: Schema.Struct({
-    //     id: Schema.String,
-    //     name: Schema.NonEmptyString
-    //   })
-    // })
+    const schema = Schema.Struct({
+      user: Schema.Struct({
+        id: Schema.String,
+        name: Schema.NonEmptyString
+      })
+    })
     // #end
 
     const result = Schema.decodeUnknownEither(schema, { errors: "all" })({ user: {} })
@@ -62,7 +60,7 @@ describe("Schema", () => {
 `.trim())
   })
 
-  it.skip("should format errors as array", () => {
+  it("should format errors as array", () => {
     // Format errors as array
     const schema = Schema.Struct({
       user: Schema.Struct({
@@ -72,19 +70,19 @@ describe("Schema", () => {
     const result = Schema.decodeUnknownEither(schema)({ user: {} })
 
     // #start
+    // const errors = pipe(
+    // result,
+    // Either.mapLeft(TODO),
+    // Either.map(() => []),
+    // Either.getOrElse((error) => error)
+    // )
+    // #solution
     const errors = pipe(
       result,
-      Either.mapLeft(TODO),
+      Either.mapLeft(ParseResult.ArrayFormatter.formatErrorSync),
       Either.map(() => []),
       Either.getOrElse((error) => error)
     )
-    // #solution
-    // const errors = pipe(
-    //   result,
-    //   Either.mapLeft(ParseResult.ArrayFormatter.formatErrorSync),
-    //   Either.map(() => []),
-    //   Either.getOrElse((error) => error)
-    // )
     // #end
 
     expect(errors).toHaveLength(1)
@@ -94,31 +92,31 @@ describe("Schema", () => {
     })
   })
 
-  it.skip("can encode and decode value", () => {
+  it("can encode and decode value", () => {
     // Encode originalData with our schema
     const DataSchema = Schema.Struct({ createdAt: Schema.Date })
     const originalData = { createdAt: new Date("2026-04-22") }
 
     // #start
-    const dataDto = pipe(originalData, TODO(DataSchema))
-    const decodedData = pipe(dataDto, TODO(DataSchema))
+    // const dataDto = pipe(originalData, TODO(DataSchema))
+    // const decodedData = pipe(dataDto, TODO(DataSchema))
     // #solution
-    // const dataDto = pipe(originalData, Schema.encodeSync(DataSchema))
-    // const decodedData = pipe(dataDto, Schema.decodeSync(DataSchema))
+    const dataDto = pipe(originalData, Schema.encodeSync(DataSchema))
+    const decodedData = pipe(dataDto, Schema.decodeSync(DataSchema))
     // #end
 
     expect(dataDto).toEqual({ createdAt: "2026-04-22T00:00:00.000Z" })
     expect(decodedData).toEqual(originalData)
   })
 
-  it.skip("can easily create arbitrary data for your tests", () => {
+  it("can easily create arbitrary data for your tests", () => {
     // Generate arbitrary data (aka random generator) from the schema
     const DataSchema = Schema.Struct({ createdAt: Schema.DateFromString, name: Schema.NonEmptyTrimmedString })
 
     // #start
-    const arbitrary = TODO
+    // const arbitrary = TODO
     // #solution
-    // const arbitrary = Arbitrary.make(DataSchema)
+    const arbitrary = Arbitrary.make(DataSchema)
     // #end
 
     fc.assert(
@@ -131,20 +129,20 @@ describe("Schema", () => {
     )
   })
 
-  it.skip("can create your own schema", () => {
+  it("can create your own schema", () => {
     // Construct an Email schema using pattern + brand
     type Email = string & Brand.Brand<"email">
     const Email = Brand.nominal<Email>()
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
     // #start
-    const EmailSchema = TODO
+    // const EmailSchema = TODO
     // #solution
-    // const EmailSchema = pipe(
-    //   Schema.String,
-    //   Schema.pattern(emailPattern),
-    //   Schema.fromBrand(Email)
-    // )
+    const EmailSchema = pipe(
+      Schema.String,
+      Schema.pattern(emailPattern),
+      Schema.fromBrand(Email)
+    )
     // #end
 
     const data = Schema.decodeUnknownSync(EmailSchema)("user@example.com")
@@ -154,13 +152,13 @@ describe("Schema", () => {
     expectTypeOf(data).toExtend<Email>()
     expect(Either.isLeft(failureResult)).toBeTruthy()
   })
-  it.skip("can enhance clarity in error messages", () => {
+  it("can enhance clarity in error messages", () => {
     // Annotate schema with an identifier
     // #start
-    const Person = Schema.Struct({}).annotations(TODO)
+    // const Person = Schema.Struct({}).annotations(TODO)
     // #solution
-    // const Person = Schema.Struct({})
-    //   .annotations({ identifier: "Person" })
+    const Person = Schema.Struct({})
+      .annotations({ identifier: "Person" })
     // #end
 
     // When
@@ -179,17 +177,17 @@ describe("Schema", () => {
       message: "Expected Person, actual null"
     })
   })
-  it.skip("can provide paths to invalid data", () => {
+  it("can provide paths to invalid data", () => {
     // Annotate schema's paths with identifiers
     // #start
-    const Person = Schema.Struct(TODO)
-      .annotations({ identifier: "Person" })
+    // const Person = Schema.Struct(TODO)
+    // .annotations({ identifier: "Person" })
     // #solution
-    // const Person = Schema.Struct({
-    //   name: Schema.String.annotations({ identifier: "Name" }),
-    //   age: Schema.Number.annotations({ identifier: "Age" })
-    // })
-    //   .annotations({ identifier: "Person" })
+    const Person = Schema.Struct({
+      name: Schema.String.annotations({ identifier: "Name" }),
+      age: Schema.Number.annotations({ identifier: "Age" })
+    })
+      .annotations({ identifier: "Person" })
     // #end
 
     const errors = pipe(
@@ -210,19 +208,19 @@ describe("Schema", () => {
       message: "is missing"
     })
   })
-  it.skip("can indicate refinement errors", () => {
+  it("can indicate refinement errors", () => {
     // Define a refinement schema that will fail
     const notAPerson = { id: "", age: -2 }
     // #start
+    // const Person = Schema.Struct({
+    // age: TODO
+    // })
+    // .annotations({ identifier: "Person" })
+    // #solution
     const Person = Schema.Struct({
-      age: TODO
+      age: Schema.Positive
     })
       .annotations({ identifier: "Person" })
-    // #solution
-    // const Person = Schema.Struct({
-    //   age: Schema.Positive
-    // })
-    //   .annotations({ identifier: "Person" })
     // #end
 
     expect(() => pipe(notAPerson, Schema.decodeUnknownSync(Person))).toThrowError(`Person
@@ -231,21 +229,21 @@ describe("Schema", () => {
       └─ Predicate refinement failure
          └─ Expected a positive number, actual -2`)
   })
-  it.skip("can customize error message", () => {
+  it("can customize error message", () => {
     // Validate with custom message if invalid
     // #start
+    // const Person = Schema.Struct({
+    // strength: TODO
+    // })
+    // .annotations({ identifier: "Person" })
+    // #solution
     const Person = Schema.Struct({
-      strength: TODO
+      strength: pipe(
+        Schema.Number,
+        Schema.lessThanOrEqualTo(9000, { message: () => "is over 9000 !!!" })
+      )
     })
       .annotations({ identifier: "Person" })
-    // #solution
-    // const Person = Schema.Struct({
-    //   strength: pipe(
-    //     Schema.Number,
-    //     Schema.lessThanOrEqualTo(9000, { message: () => "is over 9000 !!!" })
-    //   )
-    // })
-    //   .annotations({ identifier: "Person" })
     // #end
 
     expect(() => pipe({ strength: 9001 }, Schema.decodeUnknownSync(Person))).toThrowError(`Person

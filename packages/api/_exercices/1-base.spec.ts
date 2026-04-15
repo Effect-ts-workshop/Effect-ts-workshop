@@ -1,9 +1,6 @@
 import { Effect, pipe } from "effect"
-import { TODO } from "shared/utils"
-import type { fetch as baseFetch } from "undici"
+import { fetch as baseFetch } from "undici"
 import { describe, expect, it } from "vitest"
-
-const TODO: any = {}
 
 describe("functional programming utils", () => {
   it("currified function", () => {
@@ -12,11 +9,11 @@ describe("functional programming utils", () => {
     const multiply = (a: number, b: number) => a * b
 
     // #start
-    const currifiedAdd = TODO
-    const currifiedMultiply = TODO
+    // const currifiedAdd = TODO
+    // const currifiedMultiply = TODO
     // #solution
-    // const currifiedAdd = (a: number) => (b: number) => a + b
-    // const currifiedMultiply = (a: number) => (b: number) => a * b
+    const currifiedAdd = (a: number) => (b: number) => a + b
+    const currifiedMultiply = (a: number) => (b: number) => a * b
 
     // #end
 
@@ -24,7 +21,7 @@ describe("functional programming utils", () => {
     expect(multiply(4, 6)).toEqual(currifiedMultiply(4)(6))
   })
 
-  it.skip("pipe", () => {
+  it("pipe", () => {
     const add = (a: number) => (b: number) => a + b
     const multiply = (a: number) => (b: number) => a * b
 
@@ -33,9 +30,9 @@ describe("functional programming utils", () => {
       4,
       add(6),
       // #start
-      TODO
+      // TODO
       // #solution
-      // multiply(4)
+      multiply(4)
       // #end
     )
 
@@ -44,14 +41,14 @@ describe("functional programming utils", () => {
 })
 
 describe("Effect basics", () => {
-  it.skip("Sync operation", () => {
+  it("Sync operation", () => {
     const add = (a: number, b: number): Effect.Effect<number> => {
       const result = a + b
 
       // #start
-      return TODO(result)
+      // return TODO(result)
       // #solution
-      // return Effect.succeed(result)
+      return Effect.succeed(result)
       // #end
     }
 
@@ -60,46 +57,46 @@ describe("Effect basics", () => {
     expect(Effect.runSync(program)).toEqual(10)
   })
 
-  it.skip("Should transform effect value", () => {
+  it("Should transform effect value", () => {
     const add = (a: number) => (b: number) => a + b
 
-    const result: Effect.Effect<string> = pipe(
+    const result: Effect.Effect<number> = pipe(
       Effect.succeed(2),
       // #start
-      TODO(add(8))
+      // TODO(add(8))
       // #solution
-      // Effect.map(add(8))
+      Effect.map(add(8))
       // #end
     )
 
     expect(Effect.runSync(result)).toEqual(10)
   })
 
-  it.skip("Should transform effect value and flatten to avoid Effect<Effect<string>>", () => {
+  it("Should transform effect value and flatten to avoid Effect<Effect<string>>", () => {
     const greet = (greeting: string) => (name: string) => Effect.succeed(`${greeting}, ${name}!`)
 
     const result: Effect.Effect<string> = pipe(
       Effect.succeed("World"),
       // #start
-      TODO(greet("Hello"))
+      // TODO(greet("Hello"))
       // #solution
-      // Effect.flatMap(greet("Hello"))
+      Effect.flatMap(greet("Hello"))
       // #end
     )
 
     expect(Effect.runSync(result)).toEqual("Hello, World!")
   })
 
-  it.skip("Async operation", async () => {
+  it("Async operation", async () => {
     const add = (a: number, b: number): Promise<number> =>
       new Promise((resolve) => {
         setTimeout(() => resolve(a + b), 200)
       })
     const addWithDelay = (a: number, b: number): Effect.Effect<number> => {
       // #start
-      return TODO(() => add(a, b))
+      // return TODO(() => add(a, b))
       // #solution
-      // return Effect.promise(() => add(a, b))
+      return Effect.promise(() => add(a, b))
       // #end
     }
 
@@ -108,18 +105,18 @@ describe("Effect basics", () => {
     await expect(Effect.runPromise(program)).resolves.toEqual(10)
   })
 
-  it.skip("Async operation that could fail", async () => {
+  it("Async operation that could fail", async () => {
     type Fetch = (
       ...args: Parameters<typeof baseFetch>
     ) => Effect.Effect<Response, Error>
     const fetch: Fetch = (input, init) => {
       // #start
-      return TODO
+      // return TODO
       // #solution
-      // return Effect.tryPromise({
-      //   try: () => baseFetch(input, init),
-      //   catch: (_error) => new Error("meh")
-      // })
+      return Effect.tryPromise({
+        try: () => baseFetch(input, init),
+        catch: (_error) => new Error("meh")
+      })
       // #end
     }
     const asyncProgramThatSucceeds = fetch("https://api.chucknorris.io/jokes/random")

@@ -1,14 +1,7 @@
-import { // AtomHttpApi,
-  RegistryProvider,
-  Result,
-  useAtomValue
-} from "@effect-atom/atom-react"
 import { FetchHttpClient, HttpApiClient } from "@effect/platform"
-import { render, screen, waitFor } from "@testing-library/react"
 import { Effect, Layer, Option, pipe } from "effect"
 import { Api } from "shared/api"
 import { InventoryItemId } from "shared/item"
-import { TODO } from "shared/utils"
 import { describe, expect, it } from "vitest"
 
 // L'exercice 8 montrait comment définir et tester une API côté serveur (Node.js).
@@ -64,15 +57,15 @@ const TestHttpClient = pipe(FetchHttpClient.layer, Layer.provide(Layer.succeed(F
 // La structure reflète l'organisation en groupes : client.items.getAllItems()
 // Si on renomme un endpoint dans shared/api.ts, le compilateur signale l'erreur ici.
 describe("HttpApiClient", () => {
-  it.skip("appelle GET /items et retourne la liste typée", async () => {
+  it("appelle GET /items et retourne la liste typée", async () => {
     // #start
-    const program = TODO
+    // const program = TODO
     // #solution
-    // const program = pipe(
-    //   HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
-    //   Effect.flatMap((client) => client.items.getAllItems()),
-    //   Effect.provide(TestHttpClient)
-    // )
+    const program = pipe(
+      HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
+      Effect.flatMap((client) => client.items.getAllItems()),
+      Effect.provide(TestHttpClient)
+    )
     // #end
 
     const result = await Effect.runPromise(program)
@@ -82,15 +75,15 @@ describe("HttpApiClient", () => {
     expect(result.items[1].brand).toBe("Specialized")
   })
 
-  it.skip("appelle GET /items/:itemId et retourne un Option<InventoryItem>", async () => {
+  it("appelle GET /items/:itemId et retourne un Option<InventoryItem>", async () => {
     // #start
-    const program = TODO
+    // const program = TODO
     // #solution
-    // const program = pipe(
-    //   HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
-    //   Effect.flatMap((client) => client.items.getItemById({ path: { itemId: ITEM_1.id } })),
-    //   Effect.provide(TestHttpClient)
-    // )
+    const program = pipe(
+      HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
+      Effect.flatMap((client) => client.items.getItemById({ path: { itemId: ITEM_1.id } })),
+      Effect.provide(TestHttpClient)
+    )
     // #end
 
     const result = await Effect.runPromise(program)
@@ -103,18 +96,18 @@ describe("HttpApiClient", () => {
     }
   })
 
-  it.skip("compose plusieurs appels avec Effect.all", async () => {
+  it("compose plusieurs appels avec Effect.all", async () => {
     // Effect.all exécute les deux appels en parallèle par défaut
     const program = pipe(
       HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
       Effect.flatMap((client) =>
         // #start
-        Effect.all(TODO)
+        // Effect.all(TODO)
         // #solution
-        // Effect.all({
-        //   list: client.items.getAllItems(),
-        //   single: client.items.getItemById({ path: { itemId: ITEM_1.id } })
-        // })
+        Effect.all({
+          list: client.items.getAllItems(),
+          single: client.items.getItemById({ path: { itemId: ITEM_1.id } })
+        })
         // #end
       ),
       Effect.provide(TestHttpClient)

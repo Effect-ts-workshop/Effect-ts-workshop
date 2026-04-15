@@ -1,4 +1,5 @@
 import {
+  FetchHttpClient,
   HttpApi,
   HttpApiBuilder,
   HttpApiClient,
@@ -7,22 +8,20 @@ import {
   HttpLayerRouter
 } from "@effect/platform"
 import { Effect, Layer, pipe, Schema } from "effect"
-import { TODO } from "shared/utils"
 import { describe, expect, it } from "vitest"
 
 describe("Api  Effect - serveur", () => {
-  it.skip("HttpApiClient pour appeler l'API de façon typée", async () => {
+  it("HttpApiClient pour appeler l'API de façon typée", async () => {
     // "Le contrat : une route GET /hello qui retourne une string
     // #start
-    const MyApi = TODO
+    // const MyApi = TODO
     // #solution
-    // const MyApi = HttpApi.make("MyApi").add(
-    //   HttpApiGroup.make("greet").add(
-    //     HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)
-    //   )
-    // )
+    const MyApi = HttpApi.make("MyApi").add(
+      HttpApiGroup.make("greet").add(
+        HttpApiEndpoint.get("sayHello", "/hello").addSuccess(Schema.String)
+      )
+    )
     // #end
-    expect(MyApi.identifier).toBe("MyApi")
     const endpoint = MyApi.groups?.["greet"]?.endpoints?.["sayHello"]
     expect(endpoint?.method).toBe("GET")
     expect(endpoint?.path).toBe("/hello")
@@ -44,12 +43,12 @@ describe("Api  Effect - serveur", () => {
     const { dispose, handler } = HttpLayerRouter.toWebHandler(apiLayer, { disableLogger: true })
 
     // #start
-    const TestHttpClient = TODO
+    // const TestHttpClient = TODO
     // #solution
-    // const TestHttpClient = pipe(
-    //   FetchHttpClient.layer,
-    //   Layer.provide(Layer.succeed(FetchHttpClient.Fetch, (input, init) => handler(new Request(input as string, init))))
-    // )
+    const TestHttpClient = pipe(
+      FetchHttpClient.layer,
+      Layer.provide(Layer.succeed(FetchHttpClient.Fetch, (input, init) => handler(new Request(input as string, init))))
+    )
     // #end
 
     const program = pipe(

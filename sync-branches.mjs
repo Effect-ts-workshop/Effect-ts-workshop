@@ -195,7 +195,7 @@ function transformSolutions(content) {
 
 // ── Branch sync ───────────────────────────────────────────────────────────────
 
-function syncBranch(branchName, transformFn) {
+function syncBranch(branchName, transformFn, { eslintFix = false, afterTransform = null } = {}) {
   console.log(`\n── ${branchName} ${"─".repeat(Math.max(0, 48 - branchName.length))}`)
 
   // Dry-run: just report which files would change
@@ -241,7 +241,9 @@ function syncBranch(branchName, transformFn) {
 
     for (const file of files) {
       const original = readFileSync(file, "utf8")
-      const transformed = transformFn(original)
+      const transformed = afterTransform
+        ? afterTransform(file, transformFn(original))
+        : transformFn(original)
       if (original !== transformed) {
         writeFileSync(file, transformed, "utf8")
         console.log(`  updated: ${relative(wtDir, file)}`)
@@ -250,6 +252,17 @@ function syncBranch(branchName, transformFn) {
     }
 
     if (count === 0) console.log("  no spec changes.")
+
+    // Run ESLint auto-fix on transformed spec files
+    if (eslintFix && files.length > 0) {
+      const fileArgs = files.map((f) => `"${f}"`).join(" ")
+      try {
+        run(`npx eslint --fix ${fileArgs}`, wtDir)
+        console.log("  eslint --fix applied.")
+      } catch {
+        console.log("  eslint --fix completed (some errors may remain).")
+      }
+    }
 
     // Stage everything, then write the index as a tree object
     git("add -A", wtDir)
@@ -295,7 +308,13 @@ if (branchIgnoreList.length) console.log(`Branch ignore : ${branchIgnoreList.joi
 if (dryRun) console.log("Mode          : dry-run")
 if (noPush)  console.log("Push          : disabled")
 
-syncBranch(exercicesBranch, transformExercices)
+syncBranch(exercicesBranch, transformExercices, {
+  eslintFix: true,
+  afterTransform: (filePath, content) =>
+    basename(filePath) === "1-base.spec.ts"
+      ? content.replace(/it\.skip/, "it")
+      : content,
+})
 syncBranch(solutionsBranch, transformSolutions)
 
 console.log("\nDone.")

@@ -26,7 +26,7 @@
  *   --root <dir>              Directory to search for spec files (default: .)
  *   --ignore <f1,f2,...>      Spec files to skip transformation (basename or path suffix)
  *   --branch-ignore <p1,...>  Paths (relative to repo root) to delete from branch commits
- *                             Supports files and directories. e.g. plan.md,doc,packages/api/src
+ *                             Supports files and directories. e.g. CLAUDE.md,doc,packages/api/src
  *   --exercices-branch <name> Default: workshop/exercices
  *   --solutions-branch <name> Default: workshop/solutions
  *   --no-push                 Skip git push
@@ -91,7 +91,7 @@ const autoExcludePaths = [
 ".claude",
 ".github",
 "/doc/exemple-companion",
-"plan.md"
+"CLAUDE.md"
 ]
 autoExcludePaths.forEach(path => branchIgnoreList.push(relative(repoRoot, path)))
 
@@ -255,8 +255,11 @@ function syncBranch(branchName, transformFn, { eslintFix = false, afterTransform
 
     // Run ESLint auto-fix on transformed spec files
     if (eslintFix && files.length > 0) {
-      const fileArgs = files.map((f) => `"${f}"`).join(" ")
+      const fileArgs = files.map((f) => `"${relative(wtDir, f)}"`).join(" ")
       try {
+        console.log("  installing dependencies")
+        run(`npm install`, wtDir)
+        console.log(`  eslint cleanup`)
         run(`npx eslint --fix ${fileArgs}`, wtDir)
         console.log("  eslint --fix applied.")
       } catch {

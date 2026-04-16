@@ -15,7 +15,12 @@ const config: Config = {
   projectName: "Effect-ts-workshop",
 
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
+
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: "warn"
+    }
+  },
 
   i18n: {
     defaultLocale: "fr",

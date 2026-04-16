@@ -6,6 +6,11 @@ sidebar_position: 11
 
 ## Qu'est-ce qu'un Atom ?
 
+:::note Package externe
+`Atom` fait partie de `@effect-atom/atom-react`, un package distinct d'Effect core.
+Cependant il est créé et maintenu par un des mainteneurs principaux d'Effect.
+:::
+
 Un **Atom** est la brique de base du state management dans `@effect-atom/atom-react`. C'est une unité de state réactive :
 
 - il **stocke** une valeur (ou un calcul dérivé d'autres Atoms)

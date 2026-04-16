@@ -38,7 +38,7 @@ Scope fermé (succès / erreur / interruption)
 
 ## `Effect.addFinalizer` — enregistrer un cleanup
 
-`Effect.addFinalizer` ajoute une action au Scope courant. Elle reçoit en option un `exit` qui décrit comment le programme s'est terminé.
+`Effect.addFinalizer` ajoute une action au Scope courant. La fonction reçoit `exit`, en paramètre, qui décrit comment le programme s'est terminé.
 
 <!-- prettier-ignore -->
 ```typescript

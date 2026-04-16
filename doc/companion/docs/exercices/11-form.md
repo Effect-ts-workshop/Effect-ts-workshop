@@ -6,6 +6,10 @@ sidebar_position: 11
 
 Les formulaires posent trois problèmes récurrents : valider les champs, afficher les erreurs au bon moment, et soumettre uniquement quand les données sont valides.
 
+:::note Package externe
+`effect-form-react` est un package distinct d'Effect core, créé par Lucas Barake — contributeur actif de la communauté Effect, auteur de nombreuses vidéos et ressources sur le sujet.
+:::
+
 `effect-form-react` résout ces trois problèmes en s'appuyant sur `Schema` pour la validation et `Atom` pour l'état.
 
 Fichier à compléter : `packages/app/_exercices/11-form.spec.tsx`

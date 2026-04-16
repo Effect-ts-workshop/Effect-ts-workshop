@@ -210,6 +210,14 @@ const JokeServiceLive = Layer.succeed(JokeService, {
 
 ## Simplifier la définition d'un service
 
+:::warning Fuite de requirements
+
+Quand un service utilise un autre service en interne, ses méthodes doivent renvoyer `Effect<T>` — jamais `Effect<T, never, AutreService>`. Sinon la dépendance interne devient une contrainte pour tous les appelants.
+
+[Comprendre la fuite de requirements →](../base-de-connaissance/05-layers.md#éviter-la-fuite-de-requirements)
+
+:::
+
 `Context.GenericTag` + `Layer.succeed` fonctionne, mais c'est verbeux. `Effect.Service` est la forme moderne qui regroupe tout en une classe :
 
 <!-- prettier-ignore -->

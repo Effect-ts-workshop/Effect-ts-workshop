@@ -151,6 +151,50 @@ Layer.launch(ApiLive)
 
 Chaque `Layer.provide(...)` résout une couche de dépendances. Effect valide que tout est fourni **à la compilation** avant même d'exécuter.
 
+## Éviter la fuite de requirements
+
+Quand un service utilise un autre service en interne, il y a un piège courant : laisser fuir la dépendance dans la signature des méthodes.
+
+<!-- prettier-ignore -->
+```typescript
+type JokeService = {
+  // ❌ HttpClient fuite dans le type de retour
+  getRandom: () => Effect.Effect<string, never, HttpClient.HttpClient>
+}
+```
+
+Résultat : tout code qui appelle `getRandom()` doit aussi fournir `HttpClient`. La dépendance interne est devenue une contrainte externe — même dans les tests.
+
+La règle : **les méthodes d'un service doivent avoir `Requirements = never`**. Les dépendances se résolvent à la construction du layer, pas à l'usage.
+
+<!-- prettier-ignore -->
+```typescript
+type JokeService = {
+  // ✓ Le service ne laisse rien filtrer
+  getRandom: () => Effect.Effect<string>
+}
+
+// La dépendance est capturée dans la closure, invisible depuis l'extérieur
+const JokeServiceLive = Layer.effect(
+  JokeService,
+  pipe(
+    HttpClient.HttpClient, // résolu ici, une seule fois
+    Effect.map((client) => ({
+      getRandom: () =>
+        pipe(
+          client.get("https://api.chucknorris.io/jokes/random"),
+          Effect.flatMap((r) => r.json),
+          Effect.map((j) => (j as { value: string }).value),
+        ),
+    })),
+  ),
+)
+```
+
+`client` est capturé dans la closure au moment de la construction. Les appelants voient `Effect<string>` — aucune trace de `HttpClient`.
+
+`Effect.Service` applique ce pattern automatiquement via la clé `dependencies`.
+
 ## Pourquoi les Layers ?
 
 | Problème       | Sans Layers                                | Avec Layers                          |

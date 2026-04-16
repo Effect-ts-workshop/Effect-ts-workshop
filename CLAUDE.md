@@ -465,7 +465,20 @@ Chaque page doc correspond à **un seul fichier spec**. On ne mélange pas deux 
 
 ---
 
-## 6. Checklist avant publication d'une page
+## 6. Liens utiles
+
+- Documentation officielle Effect-TS: https://effect.website/llms.txt
+- Repository officielle Effect-TS:
+  - Documentation pour le package sql https://github.com/Effect-TS/effect/blob/main/packages/sql/README.md
+  - Documentation pour le package platform https://github.com/Effect-TS/effect/blob/main/packages/platform/README.md
+- Documentation officielle effect-atom: https://github.com/tim-smart/effect-atom
+- Documentation officielle effect-form: https://github.com/lucas-barake/effect-form
+
+Cherche toujours des infos en priorité dans les docs officielles, adapte ensuite le contenu à ta pédagogie et au contexte
+
+---
+
+## 7. Checklist avant publication d'une page
 
 - [ ] Le concept est expliqué avec un problème concret avant l'API
 - [ ] Le code utilise `pipe(...)` et jamais `xxx.pipe(...)`

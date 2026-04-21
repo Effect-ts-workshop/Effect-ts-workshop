@@ -31,7 +31,7 @@ describe("JS generators - bases", () => {
     expect(gen.next()).toEqual({ value: undefined, done: true }) // le générateur est épuisé
   })
 
-  it("[OPTIONAL] la valeur de retour d'un générateur est dans le dernier .next()", () => {
+  it("la valeur de retour d'un générateur est dans le dernier .next()", () => {
     // La valeur après `return` dans le générateur se retrouve dans { done: true, value: X }.
     // Les valeurs `yield`ées sont { done: false }, la valeur retournée est { done: true }.
 
@@ -50,7 +50,7 @@ describe("JS generators - bases", () => {
     expect(gen.next()).toEqual({ value: "Apple", done: true })
   })
 
-  it("[OPTIONAL] yield* délègue à un autre générateur (comme un flatMap)", () => {
+  it("yield* délègue à un autre générateur (comme un flatMap)", () => {
     // `yield*` permet de déléguer l'itération à un sous-générateur.
     // C'est l'équivalent d'un "appeler et attendre" pour les générateurs.
 
@@ -73,7 +73,7 @@ describe("JS generators - bases", () => {
     expect(result).toEqual(["Apple", "Dell", "ThinkPad"])
   })
 
-  it("[OPTIONAL] on peut envoyer une valeur dans le générateur via next(value)", () => {
+  it("on peut envoyer une valeur dans le générateur via next(value)", () => {
     // next(value) reprend le générateur ET injecte `value` comme résultat du `yield` en cours.
     // C'est ainsi qu'Effect.gen va "injecter" les résultats d'effects dans ton code.
 
@@ -143,7 +143,7 @@ describe("JS generators - bases", () => {
 // Si vous voulez aller jeter un coup d'oeil
 
 describe("Effect.fn - nommer et composer des handlers", () => {
-  it("[OPTIONAL] Effect.fn crée une fonction qui retourne un Effect (avec span de tracing)", () => {
+  it("Effect.fn crée une fonction qui retourne un Effect (avec span de tracing)", () => {
     // Effect.fn("name")(function*() { ... }) est exactement ce qu'on voit dans :
     //   - item-repository.ts : `const getAll = Effect.fn("getAll")(function*() { ... })`
     //   - http.ts : `Effect.fn(function*({ payload }) { ... })`
@@ -225,7 +225,7 @@ describe("Effect context", () => {
     expect(result.data).toEqual(resultGen.data)
   })
 
-  it("can use imperative control flow inside generator", () => {
+  it("Can use imperative control flow inside generator", () => {
     const buildUser = () => Effect.succeed({ id: randomUUID() })
     const buildUsers = Effect.fn(function*(count: number) {
       const users = []
@@ -245,7 +245,7 @@ describe("Effect context", () => {
     expect(Effect.runSync(buildUsers(10))).toHaveLength(10)
   })
 
-  it("[OPTIONAL] should catch error inside generator to go to the end", () => {
+  it("Should catch error inside generator to reach the end", () => {
     class ThirdPartyError extends Data.TaggedError("ThirdPartyError")<{ message: string }> {}
 
     const getUserById = (id: string) => Effect.succeed({ id, firstName: "Martin", lastName: "Pecheur" })

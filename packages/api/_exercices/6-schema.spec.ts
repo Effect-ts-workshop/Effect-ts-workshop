@@ -60,6 +60,64 @@ describe("Schema", () => {
 `.trim())
   })
 
+  it("can encode and decode value", () => {
+    // Encode originalData with our schema
+    const DataSchema = Schema.Struct({ createdAt: Schema.Date })
+    const originalData = { createdAt: new Date("2026-04-22") }
+
+    // #start
+    // const dataDto = TODO(DataSchema)(originalData)
+    // const decodedData = TODO(DataSchema)(dataDto)
+    // #solution
+    const dataDto = Schema.encodeSync(DataSchema)(originalData)
+    const decodedData = Schema.decodeSync(DataSchema)(dataDto)
+    // #end
+
+    expect(dataDto).toEqual({ createdAt: "2026-04-22T00:00:00.000Z" })
+    expect(decodedData).toEqual(originalData)
+  })
+
+  it("can customize error message", () => {
+    // Validate with custom message if invalid
+    // #start
+    // const Person = Schema.Struct({
+    // strength: TODO
+    // })
+    // .annotations({ identifier: "Person" })
+    // #solution
+    const Person = Schema.Struct({
+      strength: pipe(Schema.Number, Schema.lessThanOrEqualTo(9000, { message: () => "is over 9000 !!!" }))
+    })
+      .annotations({ identifier: "Person" })
+    // #end
+
+    expect(() => Schema.decodeUnknownSync(Person)({ strength: 9001 })).toThrow(`Person
+└─ ["strength"]
+   └─ is over 9000 !!!`.trim())
+  })
+
+  it("[OPTIONAL] can indicate refinement errors", () => {
+    // Define a refinement schema that will fail
+    const notAPerson = { id: "", age: -2 }
+    // #start
+    // const Person = Schema.Struct({
+    // age: TODO
+    // })
+    // .annotations({ identifier: "Person" })
+    // #solution
+    const Person = Schema.Struct({
+      age: Schema.Positive
+    })
+      .annotations({ identifier: "Person" })
+    // #end
+
+    expect(() => Schema.decodeUnknownSync(Person)(notAPerson)).toThrow(`Person
+└─ ["age"]
+   └─ Positive
+      └─ Predicate refinement failure
+         └─ Expected a positive number, actual -2`)
+  })
+
   it("[OPTIONAL] should format errors as array", () => {
     // Format errors as array
     const schema = Schema.Struct({
@@ -86,23 +144,6 @@ describe("Schema", () => {
       "path": ["user", "id"],
       message: "is missing"
     })
-  })
-
-  it("can encode and decode value", () => {
-    // Encode originalData with our schema
-    const DataSchema = Schema.Struct({ createdAt: Schema.Date })
-    const originalData = { createdAt: new Date("2026-04-22") }
-
-    // #start
-    // const dataDto = TODO(DataSchema)(originalData)
-    // const decodedData = TODO(DataSchema)(dataDto)
-    // #solution
-    const dataDto = Schema.encodeSync(DataSchema)(originalData)
-    const decodedData = Schema.decodeSync(DataSchema)(dataDto)
-    // #end
-
-    expect(dataDto).toEqual({ createdAt: "2026-04-22T00:00:00.000Z" })
-    expect(decodedData).toEqual(originalData)
   })
 
   it("[OPTIONAL] can easily create arbitrary data for your tests", () => {
@@ -199,46 +240,5 @@ describe("Schema", () => {
       "path": ["name"],
       message: "is missing"
     })
-  })
-
-  it("can indicate refinement errors", () => {
-    // Define a refinement schema that will fail
-    const notAPerson = { id: "", age: -2 }
-    // #start
-    // const Person = Schema.Struct({
-    // age: TODO
-    // })
-    // .annotations({ identifier: "Person" })
-    // #solution
-    const Person = Schema.Struct({
-      age: Schema.Positive
-    })
-      .annotations({ identifier: "Person" })
-    // #end
-
-    expect(() => Schema.decodeUnknownSync(Person)(notAPerson)).toThrow(`Person
-└─ ["age"]
-   └─ Positive
-      └─ Predicate refinement failure
-         └─ Expected a positive number, actual -2`)
-  })
-
-  it("can customize error message", () => {
-    // Validate with custom message if invalid
-    // #start
-    // const Person = Schema.Struct({
-    // strength: TODO
-    // })
-    // .annotations({ identifier: "Person" })
-    // #solution
-    const Person = Schema.Struct({
-      strength: pipe(Schema.Number, Schema.lessThanOrEqualTo(9000, { message: () => "is over 9000 !!!" }))
-    })
-      .annotations({ identifier: "Person" })
-    // #end
-
-    expect(() => Schema.decodeUnknownSync(Person)({ strength: 9001 })).toThrow(`Person
-└─ ["strength"]
-   └─ is over 9000 !!!`.trim())
   })
 })

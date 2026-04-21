@@ -111,7 +111,7 @@ Effect.runPromise(Effect.scoped(program))
 
 Implémentez `Effect.addFinalizer` dans chacun des tests suivants :
 
-- **Connexion base de données** (`it.skip`) : retirez le `.skip` pour activer le test, puis enregistrez la fermeture de la connexion comme finalizer.
+- **Connexion base de données** : enregistrez la fermeture de la connexion comme finalizer.
 - **Fichier temporaire** : supprimez le fichier temporaire à la fin du scope via `deleteTempFile`.
 
 Dans chaque cas, la structure est la même :

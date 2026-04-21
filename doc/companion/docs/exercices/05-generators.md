@@ -204,6 +204,10 @@ const result = gen.next(true);
 
 ### Enchaîner des opérations avec un générateur
 
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous êtes à l'aise avec les générateurs.
+:::
+
 On peut faire "rebondir" le résultat d'une étape vers l'entrée de la suivante : chaque appel à `next(value)` injecte `value` comme résultat de l'expression `yield` en cours, puis avance jusqu'au prochain `yield`.
 
 <!-- prettier-ignore -->
@@ -275,34 +279,6 @@ done = result.done || false
 ```
 
 </details>
-
----
-
-### Évaluer les étapes d'un générateur à la demande
-
-Un générateur ne s'exécute pas au moment où on l'appelle. Rien ne se passe tant qu'on n'appelle pas `.next()`. C'est ce qu'on appelle l'**évaluation lazy**.
-
-<!-- prettier-ignore -->
-```typescript
-function* processItem(brand: string) {
-  log.push("step 1: validate")
-  yield brand.toUpperCase()
-
-  log.push("step 2: save")
-  yield `${brand} saved`
-}
-
-const gen = processItem("Apple")
-// log est encore vide — la fonction n'a pas encore démarré
-
-gen.next()
-// "step 1: validate" est dans log — on s'est arrêté au premier yield
-
-gen.next()
-// "step 1: validate", "step 2: save" — deuxième étape atteinte
-```
-
-Retirez le `.skip` sur le test `"un générateur peut modéliser une séquence d'opérations lazy"` et lancez les tests pour le voir passer.
 
 ---
 
@@ -404,7 +380,7 @@ fetchUser(id, function (user) {
 
 JavaScript l'a résolu avec `async/await` : même logique, lecture linéaire. `Effect.fn` joue exactement le même rôle pour Effect — `yield*` est l'équivalent d'`await`.
 
-Les deux écritures suivantes sont équivalentes. La version générateur est souvent plus lisible quand il y a plusieurs étapes :
+Les trois écritures suivantes sont équivalentes. La version générateur est souvent plus lisible quand il y a plusieurs étapes :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -423,6 +399,16 @@ const fetchWeather = (city: string) =>
         ),
       ),
     ),
+  );
+
+// Avec Effect.Do (do notation) — nommage explicite des valeurs intermédiaires
+const fetchWeatherDo = (city: string) =>
+  pipe(
+    Effect.Do,
+    Effect.bind("client", () => HttpClient.HttpClient),
+    Effect.bind("response", ({ client }) => client.get(`https://api.weather.io/${city}`)),
+    Effect.bind("data", ({ response }) => response.json),
+    Effect.map(({ data, response }) => ({ response, data })),
   );
 
 // Avec Effect.fn — même logique, lecture linéaire
@@ -572,6 +558,10 @@ const friends = yield* Effect.orElse(
 ---
 
 ### Utiliser Option et Either dans un générateur
+
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
 
 `Option` et `Either` sont des sous-types d'`Effect` : les fonctions du module `Effect` les acceptent directement. On peut les utiliser avec `yield*` dans un générateur comme n'importe quel Effect.
 

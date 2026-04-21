@@ -492,6 +492,10 @@ const addWithDelay = (a: number, b: number): Effect.Effect<number> => {
 
 ### Modéliser une opération asynchrone faillible
 
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
+
 `Effect.promise` suppose que la `Promise` ne peut jamais rejeter. Mais dans la réalité, la plupart des operations asynchrones peuvent échouer. Si on prend l'exemple de `fetch`, le réseau ou le serveur peut être indisponible.
 
 `Effect.tryPromise` modélise cette faillibilité. Il prend deux fonctions : `try` pour la `Promise`, et `catch` pour transformer l'exception en une erreur **typée** :

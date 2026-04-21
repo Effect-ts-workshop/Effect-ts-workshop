@@ -94,6 +94,10 @@ const getAll = Effect.fn("getAll")(function*() {
 
 ## CRUD automatique
 
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
+
 Pour les opérations CRUD classiques, `Model.Class` et `Model.makeRepository` génèrent le repository automatiquement à partir d'un schema :
 
 <!-- prettier-ignore -->

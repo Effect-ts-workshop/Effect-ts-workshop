@@ -84,96 +84,6 @@ function squareRoot(n: number): Effect.Effect<number, Error> {
 
 ---
 
-## Plusieurs types d'erreurs
-
-Une même fonction peut échouer de plusieurs façons. Effect le modélise avec une union dans le type d'erreur :
-
-<!-- prettier-ignore -->
-```typescript
-type ParseCSV = (
-  path: string,
-) => Effect.Effect<string[], ReadError | InvalidFormatError>;
-```
-
-`ReadError | InvalidFormatError` signifie : cette fonction peut échouer de ces deux façons précises — et rien d'autre. C'est un contrat.
-
-`Effect.filterOrFail` permet de convertir un cas de succès partiel en échec :
-
-<!-- prettier-ignore -->
-```typescript
-pipe(
-  Effect.tryPromise({
-    try: () => readFile(path),
-    catch: (e) => new ReadError(String(e)),
-  }),
-  Effect.filterOrFail(
-    (content) => content.startsWith("id,"), // condition de succès
-    (content) => new InvalidFormatError(content), // sinon : échec
-  ),
-);
-```
-
-### Exercice
-
-Complétez les deux `TODO` dans `catch` et dans `filterOrFail` :
-
-<!-- prettier-ignore -->
-```typescript
-const fetch: Fetch = (input, init) =>
-  pipe(
-    Effect.tryPromise({
-      try: () => baseFetch(input, init),
-      catch: (error) => {
-        return ??? // À compléter : transformer en NetworkError
-      }
-    }),
-    Effect.filterOrFail(
-      (response) => response.ok,
-      (response) => {
-        return ??? // À compléter : transformer en HTTPResponseError
-      }
-    )
-  )
-```
-
-À vous de jouer !
-
-#### Indice 1
-
-<details>
-  <summary>Les deux erreurs attendent leurs arguments</summary>
-
-`NetworkError` et `HTTPResponseError` sont des classes. Elles s'instancient avec `new`.
-
-- `catch` reçoit l'exception brute (une `unknown`) → à passer à `NetworkError`
-- `filterOrFail` reçoit la response HTTP → à passer à `HTTPResponseError`
-
-</details>
-
-#### Solution
-
-<details>
-  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
-
-<!-- prettier-ignore -->
-```typescript
-const fetch: Fetch = (input, init) =>
-  pipe(
-    Effect.tryPromise({
-      try: () => baseFetch(input, init),
-      catch: (error) => new NetworkError(String(error)),
-    }),
-    Effect.filterOrFail(
-      (response) => response.ok,
-      (response) => new HTTPResponseError(response.statusText),
-    ),
-  );
-```
-
-</details>
-
----
-
 ## Créer des erreurs identifiables
 
 Les classes d'erreur classiques ont un problème : impossible de les distinguer par leur type à l'exécution si on n'a que `instanceof`. `Data.TaggedError` ajoute une propriété `_tag` qui sert d'identifiant :
@@ -197,8 +107,8 @@ Définissez `NetworkError` et `HTTPResponseError` avec `Data.TaggedError` :
 
 <!-- prettier-ignore -->
 ```typescript
-const NetworkError = ??? // _tag: "NetworkError", data: { error: unknown }
-const HTTPResponseError = ??? // _tag: "HTTPResponseError", data: { response: Response }
+class NetworkError extends ??? {} // _tag: "NetworkError", data: { error: unknown }
+class HTTPResponseError extends ??? {} // _tag: "HTTPResponseError", data: { response: Response }
 ```
 
 À vous de jouer !
@@ -236,6 +146,96 @@ class NetworkError extends Data.TaggedError("NetworkError")<{
 class HTTPResponseError extends Data.TaggedError("HTTPResponseError")<{
   response: Response;
 }> {}
+```
+
+</details>
+
+---
+
+## Plusieurs types d'erreurs
+
+Une même fonction peut échouer de plusieurs façons. Effect le modélise avec une union dans le type d'erreur :
+
+<!-- prettier-ignore -->
+```typescript
+type ParseCSV = (
+  path: string,
+) => Effect.Effect<string[], ReadError | InvalidFormatError>;
+```
+
+`ReadError | InvalidFormatError` signifie : cette fonction peut échouer de ces deux façons précises — et rien d'autre. C'est un contrat.
+
+`Effect.filterOrFail` permet de convertir un cas de succès partiel en échec :
+
+<!-- prettier-ignore -->
+```typescript
+pipe(
+  Effect.tryPromise({
+    try: () => readFile(path),
+    catch: (e) => new ReadError({ path: String(e) }),
+  }),
+  Effect.filterOrFail(
+    (content) => content.startsWith("id,"), // condition de succès
+    (content) => new InvalidFormatError({ message: content }), // sinon : échec
+  ),
+);
+```
+
+### Exercice
+
+Complétez les deux `TODO` dans `catch` et dans `filterOrFail` :
+
+<!-- prettier-ignore -->
+```typescript
+const fetch: Fetch = (input, init) =>
+  pipe(
+    Effect.tryPromise({
+      try: () => baseFetch(input, init),
+      catch: (error) => {
+        return ??? // À compléter : transformer en NetworkError
+      }
+    }),
+    Effect.filterOrFail(
+      (response) => response.ok,
+      (response) => {
+        return ??? // À compléter : transformer en HTTPResponseError
+      }
+    )
+  )
+```
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>Les deux erreurs attendent leurs arguments</summary>
+
+`NetworkError` et `HTTPResponseError` sont des `Data.TaggedError`. Regardez le générique défini pour chacune : il indique le type de l'objet à passer à `new`.
+
+- `catch` reçoit l'exception brute (une `unknown`) — elle correspond au champ `error` de `NetworkError`
+- `filterOrFail` reçoit la response HTTP — elle correspond au champ `response` de `HTTPResponseError`
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+<!-- prettier-ignore -->
+```typescript
+const fetch: Fetch = (input, init) =>
+  pipe(
+    Effect.tryPromise({
+      try: () => baseFetch(input, init),
+      catch: (error) => new NetworkError({ error }),
+    }),
+    Effect.filterOrFail(
+      (response) => response.ok,
+      (response) => new HTTPResponseError({ response }),
+    ),
+  );
 ```
 
 </details>
@@ -322,7 +322,10 @@ Chaque clé est un tag, chaque valeur est le handler correspondant.
 
 ### Exercice
 
-Gérez `HTTPResponseError` et `NetworkError` ensemble, en renvoyant `"Fallback joke"` dans les deux cas :
+Gérez `HTTPResponseError` et `NetworkError` ensemble. Chaque tag a son propre message de fallback :
+
+- `HTTPResponseError` → `"Fallback joke from HTTPResponseError"`
+- `NetworkError` → `"Fallback joke from NetworkError"`
 
 <!-- prettier-ignore -->
 ```typescript
@@ -344,8 +347,8 @@ const program = pipe(
 const program = pipe(
   getJoke(),
   Effect.catchTags({
-    HTTPResponseError: () => Effect.succeed("Fallback joke"),
-    NetworkError: () => Effect.succeed("Fallback joke"),
+    HTTPResponseError: () => Effect.succeed("Fallback joke from HTTPResponseError"),
+    NetworkError: () => Effect.succeed("Fallback joke from NetworkError"),
   }),
 );
 ```

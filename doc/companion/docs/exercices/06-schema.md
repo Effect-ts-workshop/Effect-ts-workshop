@@ -173,32 +173,34 @@ const schema = Schema.Struct({
 
 ## Erreurs lisibles
 
-Les erreurs de validation de `Schema` sont structurées. Pour les afficher d'une façon plus lisible on utilise par exemple `ParseResult.ArrayFormatter` qui renverra un tableau d'erreurs le cas échéant :
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
+
+Les erreurs de validation de `Schema` sont structurées. Pour les afficher sous forme de tableau, `ParseResult.ArrayFormatter` transforme l'erreur brute en une liste d'objets `{ path, message }`.
+
+`Either.match` permet de couvrir les deux branches — succès et échec — sans condition explicite :
 
 <!-- prettier-ignore -->
 ```typescript
-const result = Schema.decodeUnknownEither(schema, { errors: "all" })(data)
+const parsed = Schema.decodeUnknownEither(Schema.Number)("abc")
 
-if (Either.isLeft(result)) { // si la validation a échoué, result.left contient les erreurs formatées
-  const errors = ParseResult.ArrayFormatter.formatErrorSync(result.left)
-  // [ { path: ["user", "id"], message: "is missing" }, ... ]
-}
+const message = Either.match(parsed, {
+  onLeft: (error) => `Erreur : ${error.message}`,
+  onRight: (value) => `Valeur : ${value}`
+})
 ```
-
-`{ errors: "all" }` force la collecte de toutes les erreurs, pas seulement la première.
 
 ### Exercice
 
-Formatez les erreurs en tableau en utilisant `Either.mapLeft` et `ParseResult.ArrayFormatter.formatErrorSync` :
+Formatez les erreurs en tableau avec `Either.match` et `ParseResult.ArrayFormatter.formatErrorSync` :
 
 <!-- prettier-ignore -->
 ```typescript
-const errors = pipe(
-  result,
-  Either.mapLeft(???), // À compléter
-  Either.map(() => []),
-  Either.getOrElse((error) => error)
-)
+const errors = Either.match(result, {
+  onLeft: ???, // À compléter
+  onRight: () => []
+})
 ```
 
 À vous de jouer !
@@ -210,12 +212,10 @@ const errors = pipe(
 
 <!-- prettier-ignore -->
 ```typescript
-const errors = pipe(
-  result,
-  Either.mapLeft(ParseResult.ArrayFormatter.formatErrorSync),
-  Either.map(() => []),
-  Either.getOrElse((error) => error)
-)
+const errors = Either.match(result, {
+  onLeft: ParseResult.ArrayFormatter.formatErrorSync,
+  onRight: () => []
+})
 ```
 
 </details>
@@ -269,6 +269,10 @@ const decodedData = pipe(dataDto, Schema.decodeSync(DataSchema))
 
 ## Générer des données de test automatiquement
 
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
+
 Pour les tests property-based, `Arbitrary.make` génère automatiquement des données aléatoires conformes à un schema qui lui est fourni. On peut tester que l'on récupère bien des valeurs de même validité que les originales après sérialisation et désérialisation :
 
 <!-- prettier-ignore -->
@@ -311,6 +315,10 @@ const arbitrary = Arbitrary.make(DataSchema)
 ---
 
 ## Créer un schema personnalisé
+
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
 
 Pour valider une email, un UUID, un numéro de téléphone, on combine `Schema.pattern` (regex) avec `Schema.fromBrand` (type opaque) :
 
@@ -358,6 +366,10 @@ const EmailSchema = pipe(
 ---
 
 ## Annotations — identifier et clarifier les erreurs
+
+:::note Tests optionnels
+Ces tests sont marqués `[OPTIONAL]` dans la spec — passez-les si vous manquez de temps.
+:::
 
 Les annotations enrichissent les messages d'erreur pour les rendre exploitables :
 
@@ -468,6 +480,10 @@ const NormalizedRange = pipe(
 ```
 
 ### Exercice A
+
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
 
 Créez `Person` avec un champ `age` contraint à être positif :
 

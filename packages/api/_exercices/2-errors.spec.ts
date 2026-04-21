@@ -5,7 +5,7 @@ import { describe, expect, expectTypeOf, it } from "vitest"
 
 describe("Effect basics - Errors", () => {
   it("Should return failure explicitely", () => {
-    function racineCarrée(n: number): Effect.Effect<number, Error> {
+    function squareRoot(n: number): Effect.Effect<number, Error> {
       if (n < 0) {
         // #start
         // return TODO(new Error("toto"))
@@ -17,8 +17,8 @@ describe("Effect basics - Errors", () => {
       return Effect.succeed(Math.sqrt(n))
     }
 
-    const program = racineCarrée(16)
-    const invalidProgram = racineCarrée(-4)
+    const program = squareRoot(16)
+    const invalidProgram = squareRoot(-4)
 
     expect(Effect.runSync(program)).toEqual(4)
     expect(() => Effect.runSync(invalidProgram)).toThrow()

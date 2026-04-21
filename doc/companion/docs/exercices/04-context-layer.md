@@ -210,6 +210,10 @@ const JokeServiceLive = Layer.succeed(JokeService, {
 
 ## Simplifier la définition d'un service
 
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
+
 :::warning Fuite de requirements
 
 Quand un service utilise un autre service en interne, ses méthodes doivent renvoyer `Effect<T>` — jamais `Effect<T, never, AutreService>`. Sinon la dépendance interne devient une contrainte pour tous les appelants.
@@ -306,6 +310,10 @@ class JokeService extends Effect.Service<JokeService>()("JokeService", {
 ---
 
 ## Tester un service sans dépendances réelles
+
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
 
 Pour tester un service qui dépend d'un autre, `Layer.mock` permet de remplacer une dépendance par un double de test — sans modifier l'implémentation.
 

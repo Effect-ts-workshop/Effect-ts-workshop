@@ -119,6 +119,10 @@ const getValue = (field: AnyField) =>
 
 ## Traiter une valeur optionnelle
 
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
+
 `Option` représente une valeur qui peut être présente (`Some`) ou absente (`None`). Il est ainsi possible de décrire une séquence au sein de laquelle les `Some` seront traités et les `None` ignorés. En un sens `Option` est une adaptation du _railway pattern_ au cas de l'absence de valeur. Chacun des cas peut ensuite être traité de façon différenciée.
 
 Ici, `Array.get` renvoie un `Option` plutôt qu'un `undefined` silencieux :
@@ -189,6 +193,10 @@ const getValueAt = (index: number) =>
 ---
 
 ## Retourner un résultat partiel
+
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
 
 Parfois, on ne _veut_ pas couvrir tous les cas — seulement certains. `Match.option` clôt le match en enveloppant le résultat dans un `Option` : `Some` si un cas a matché, `None` sinon.
 
@@ -358,6 +366,10 @@ const getProcessingFee = (method: PaymentMethod): string =>
 
 ## Exclure un cas spécifique
 
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
+
 Pour matcher "tout sauf X", `Match.not` exclut une valeur spécifique :
 
 <!-- prettier-ignore -->
@@ -408,6 +420,10 @@ const isTrackable = (status: OrderStatus) =>
 
 ## Regrouper plusieurs valeurs dans une même branche
 
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
+
 `Match.whenOr` est un raccourci pour plusieurs `Match.when` qui renvoient la même chose :
 
 <!-- prettier-ignore -->
@@ -454,6 +470,10 @@ const canAccessDashboard = (role: Role) =>
 ---
 
 ## Matcher sur des types primitifs
+
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+:::
 
 Pour matcher sur des types primitifs, `Match` fournit des prédicats prêts à l'emploi :
 

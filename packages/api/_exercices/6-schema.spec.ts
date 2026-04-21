@@ -60,7 +60,7 @@ describe("Schema", () => {
 `.trim())
   })
 
-  it("should format errors as array", () => {
+  it("[OPTIONAL] should format errors as array", () => {
     // Format errors as array
     const schema = Schema.Struct({
       user: Schema.Struct({
@@ -92,7 +92,7 @@ describe("Schema", () => {
     })
   })
 
-  it("can encode and decode value", () => {
+  it("[OPTIONAL] can encode and decode value", () => {
     // Encode originalData with our schema
     const DataSchema = Schema.Struct({ createdAt: Schema.Date })
     const originalData = { createdAt: new Date("2026-04-22") }
@@ -109,7 +109,7 @@ describe("Schema", () => {
     expect(decodedData).toEqual(originalData)
   })
 
-  it("can easily create arbitrary data for your tests", () => {
+  it("[OPTIONAL] can easily create arbitrary data for your tests", () => {
     // Generate arbitrary data (aka random generator) from the schema
     const DataSchema = Schema.Struct({ createdAt: Schema.DateFromString, name: Schema.NonEmptyTrimmedString })
 
@@ -129,7 +129,7 @@ describe("Schema", () => {
     )
   })
 
-  it("can create your own schema", () => {
+  it("[OPTIONAL] can create your own schema", () => {
     // Construct an Email schema using pattern + brand
     type Email = string & Brand.Brand<"email">
     const Email = Brand.nominal<Email>()
@@ -177,7 +177,7 @@ describe("Schema", () => {
       message: "Expected Person, actual null"
     })
   })
-  it("can provide paths to invalid data", () => {
+  it("[OPTIONAL] can provide paths to invalid data", () => {
     // Annotate schema's paths with identifiers
     // #start
     // const Person = Schema.Struct(TODO)

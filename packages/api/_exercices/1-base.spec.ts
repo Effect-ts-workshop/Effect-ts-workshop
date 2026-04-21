@@ -105,7 +105,7 @@ describe("Effect basics", () => {
     await expect(Effect.runPromise(program)).resolves.toEqual(10)
   })
 
-  it("Async operation that could fail", async () => {
+  it("[OPTIONAL] Async operation that could fail", async () => {
     type Fetch = (
       ...args: Parameters<typeof baseFetch>
     ) => Effect.Effect<Response, Error>

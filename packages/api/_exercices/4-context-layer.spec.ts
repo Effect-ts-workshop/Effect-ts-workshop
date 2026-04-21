@@ -74,7 +74,7 @@ describe("Effect context", () => {
     )
   })
 
-  it("Simplifying service definitions with Effect.Service", async () => {
+  it("[OPTIONAL] Simplifying service definitions with Effect.Service", async () => {
     // #start
     // const JokeService = TODO
     // #solution
@@ -103,7 +103,7 @@ describe("Effect context", () => {
     )
   })
 
-  it("Easily testing services", async () => {
+  it("[OPTIONAL] Easily testing services", async () => {
     class JokeService extends Effect.Service<JokeService>()("JokeService", {
       effect: pipe(
         HttpClient.HttpClient,

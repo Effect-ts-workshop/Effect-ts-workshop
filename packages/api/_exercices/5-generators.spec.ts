@@ -9,7 +9,7 @@ import { describe, expect, expectTypeOf, it, vi } from "vitest"
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe("JS generators – bases", () => {
-  it("yield met le générateur en pause et expose une valeur", () => {
+  it("[OPTIONAL] yield met le générateur en pause et expose une valeur", () => {
     // Un générateur est une fonction qui peut être mise en pause avec yield.
     // Chaque appel à .next() reprend l'exécution jusqu'au prochain yield.
 
@@ -31,7 +31,7 @@ describe("JS generators – bases", () => {
     expect(gen.next()).toEqual({ value: undefined, done: true }) // le générateur est épuisé
   })
 
-  it("la valeur de retour d'un générateur est dans le dernier .next()", () => {
+  it("[OPTIONAL] la valeur de retour d'un générateur est dans le dernier .next()", () => {
     // La valeur après `return` dans le générateur se retrouve dans { done: true, value: X }.
     // Les valeurs `yield`ées sont { done: false }, la valeur retournée est { done: true }.
 
@@ -50,7 +50,7 @@ describe("JS generators – bases", () => {
     expect(gen.next()).toEqual({ value: "Apple", done: true })
   })
 
-  it("yield* délègue à un autre générateur (comme un flatMap)", () => {
+  it("[OPTIONAL] yield* délègue à un autre générateur (comme un flatMap)", () => {
     // `yield*` permet de déléguer l'itération à un sous-générateur.
     // C'est l'équivalent d'un "appeler et attendre" pour les générateurs.
 
@@ -73,7 +73,7 @@ describe("JS generators – bases", () => {
     expect(result).toEqual(["Apple", "Dell", "ThinkPad"])
   })
 
-  it("on peut envoyer une valeur dans le générateur via next(value)", () => {
+  it("[OPTIONAL] on peut envoyer une valeur dans le générateur via next(value)", () => {
     // next(value) reprend le générateur ET injecte `value` comme résultat du `yield` en cours.
     // C'est ainsi qu'Effect.gen va "injecter" les résultats d'effects dans ton code.
 
@@ -96,7 +96,7 @@ describe("JS generators – bases", () => {
     expect(result).toEqual({ value: "Item approved", done: true })
   })
 
-  it("can be used to chain operations", () => {
+  it("[OPTIONAL] can be used to chain operations", () => {
     const add = (a: number) => (b: number) => a + b
     const pipeResult = pipe(20, add(18), add(4))
 
@@ -127,7 +127,7 @@ describe("JS generators – bases", () => {
   })
 
   // TODO Add in doc and remove test
-  it("un générateur peut modéliser une séquence d'opérations lazy", () => {
+  it("[OPTIONAL] un générateur peut modéliser une séquence d'opérations lazy", () => {
     // Sans générateur : toutes les opérations s'exécutent immédiatement.
     // Avec générateur : chaque étape ne s'exécute que quand on appelle .next().
 
@@ -161,7 +161,7 @@ describe("JS generators – bases", () => {
 // Si vous voulez aller jeter un coup d'oeil
 
 describe("Effect.fn – nommer et composer des handlers", () => {
-  it("Effect.fn crée une fonction qui retourne un Effect (avec span de tracing)", () => {
+  it("[OPTIONAL] Effect.fn crée une fonction qui retourne un Effect (avec span de tracing)", () => {
     // Effect.fn("name")(function*() { ... }) est exactement ce qu'on voit dans :
     //   - item-repository.ts : `const getAll = Effect.fn("getAll")(function*() { ... })`
     //   - http.ts : `Effect.fn(function*({ payload }) { ... })`
@@ -190,7 +190,7 @@ describe("Effect.fn – nommer et composer des handlers", () => {
 // On verra comment fournir ces dépendances dans l'exercice sur les Layers.
 
 describe("Effect context", () => {
-  it("Using a generator instead of pipe", async () => {
+  it("[OPTIONAL] Using a generator instead of pipe", async () => {
     const fetchJoke = (id: string) =>
       pipe(
         HttpClient.HttpClient,
@@ -236,7 +236,7 @@ describe("Effect context", () => {
     expect((await Effect.runPromise(program)).data).toEqual((await Effect.runPromise(programGen)).data)
   })
 
-  it("can use imperative control flow inside generator", () => {
+  it("[OPTIONAL] can use imperative control flow inside generator", () => {
     const buildUser = () => Effect.succeed({ id: randomUUID() })
     const buildUsers = Effect.fn(function*(count: number) {
       const users = []
@@ -256,7 +256,7 @@ describe("Effect context", () => {
     expect(Effect.runSync(buildUsers(10))).toHaveLength(10)
   })
 
-  it("should catch error inside generator to go to the end", () => {
+  it("[OPTIONAL] should catch error inside generator to go to the end", () => {
     class ThirdPartyError extends Data.TaggedError("ThirdPartyError")<{ message: string }> {}
 
     const getUserById = (id: string) => Effect.succeed({ id, firstName: "Martin", lastName: "Pecheur" })
@@ -281,7 +281,7 @@ describe("Effect context", () => {
     expect(getUserFriends).toHaveBeenCalled()
   })
 
-  it("interop with other data types", async () => {
+  it("[OPTIONAL] interop with other data types", async () => {
     class MyDomainError extends Data.TaggedError("MyDomainError")<{ error: unknown }> {}
 
     type User = { id: string }

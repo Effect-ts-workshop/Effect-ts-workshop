@@ -2,7 +2,7 @@ import { Data, Effect, Exit, Fiber } from "effect"
 import { describe, expect, it, vi } from "vitest"
 
 describe("Interruption", () => {
-  it("could propagate interruption with AbortSignal", async () => {
+  it("[OPTIONAL] could propagate interruption with AbortSignal", async () => {
     const abortCallback = vi.fn()
     const slowFetch = vi.fn((_, init) =>
       new Promise((resolve, reject) => {
@@ -35,7 +35,7 @@ describe("Interruption", () => {
 })
 
 describe("addFinalizer — connexion base de données", () => {
-  it("ferme la connexion même si une erreur survient", async () => {
+  it("[OPTIONAL] ferme la connexion même si une erreur survient", async () => {
     // On simule une connexion avec un flag pour savoir si elle est ouverte
     const makeConnection = (log: Array<string>) => ({
       query: () => Effect.fail(new Error("requête échouée")),
@@ -65,7 +65,7 @@ describe("addFinalizer — connexion base de données", () => {
 })
 
 describe("addFinalizer — fichier temporaire", () => {
-  it("supprime le fichier temporaire après utilisation", async () => {
+  it("[OPTIONAL] supprime le fichier temporaire après utilisation", async () => {
     // Simule un système de fichiers en mémoire
     const filesystem = new Set<string>()
 
@@ -104,7 +104,7 @@ describe("acquireRelease — garantie du release", () => {
     close: () => log.push("connection:closed")
   })
 
-  it("exécute le release après un succès", async () => {
+  it("[OPTIONAL] exécute le release après un succès", async () => {
     const log: Array<string> = []
 
     // acquireRelease couple explicitement l'ouverture et la fermeture
@@ -128,7 +128,7 @@ describe("acquireRelease — garantie du release", () => {
     expect(log).toContain("connection:closed") // connexion bien fermée
   })
 
-  it("exécute le release même si une erreur survient", async () => {
+  it("[OPTIONAL] exécute le release même si une erreur survient", async () => {
     const log: Array<string> = []
 
     // #start
@@ -137,7 +137,7 @@ describe("acquireRelease — garantie du release", () => {
     const resource = Effect.acquireRelease(
       Effect.sync(() => ({
         ...makeConnection(log),
-        query: () => Effect.fail(new Error("timeout"))
+        query: (_: string) => Effect.fail(new Error("timeout"))
       })),
       (conn) => Effect.sync(() => conn.close())
     )
@@ -154,7 +154,7 @@ describe("acquireRelease — garantie du release", () => {
     expect(log).toContain("connection:closed")
   })
 
-  it("exécute le release si le fiber est interrompu", async () => {
+  it("[OPTIONAL] exécute le release si le fiber est interrompu", async () => {
     const log: Array<string> = []
 
     const resource = Effect.acquireRelease(

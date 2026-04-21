@@ -344,7 +344,7 @@ Créez `getItemLabel` avec `Effect.fn` :
 <!-- prettier-ignore -->
 ```typescript
 const getItemLabel = ??? // À compléter
-// doit : mettre brand en majuscules, renvoyer "${UPPER} – ${model}"
+// doit : mettre brand en majuscules, renvoyer "${UPPER} - ${model}"
 ```
 
 À vous de jouer !
@@ -358,7 +358,7 @@ const getItemLabel = ??? // À compléter
 ```typescript
 const myFn = Effect.fn("myFn")(function*(arg1: string, arg2: string) {
   const result = yield* Effect.sync(() => /* computation */)
-  return `${result} – ${arg2}`
+  return `${result} - ${arg2}`
 })
 ```
 
@@ -378,7 +378,7 @@ const getItemLabel = Effect.fn("getItemLabel")(function* (
   model: string,
 ) {
   const upper = yield* Effect.sync(() => brand.toUpperCase());
-  return `${upper} – ${model}`;
+  return `${upper} - ${model}`;
 });
 ```
 

@@ -9,6 +9,7 @@ import { SqlLive } from "../src/utils/database/database"
 import { Database, DatabaseLive } from "../src/utils/database/database-drizzle"
 import { MigratorLive } from "../src/utils/database/migrator"
 
+// eslint-disable-next-line no-empty-pattern
 const it = itBase.extend("pgConfig", async ({}, { onCleanup }) => {
   const container = await new GenericContainer("postgres:18.1")
     .withEnvironment({
@@ -42,7 +43,7 @@ describe("Native effect module", () => {
    * If you get an error like "Error: Could not find a working container runtime strategy"
    * Check docker is running
    */
-  it("[OPTIONAL] Should run raw sql", { timeout: 5_000 }, async ({ pgConfig }) => {
+  it("Should run raw sql", { timeout: 5_000 }, async ({ pgConfig }) => {
     const getAll = Effect.fn("getAll")(function*() {
       const sql = yield* SqlClient.SqlClient
       // #start
@@ -117,7 +118,7 @@ describe("Native effect module", () => {
 })
 
 describe("Drizzle effect integration", () => {
-  it("[OPTIONAL] Simplify with query builder", { timeout: 5_000 }, async ({ pgConfig }) => {
+  it("Simplify with query builder", { timeout: 5_000 }, async ({ pgConfig }) => {
     const testDatabaseLayer = Layer.mergeAll(
       DatabaseLive,
       Layer.mergeAll(SqlLive, MigratorLive)

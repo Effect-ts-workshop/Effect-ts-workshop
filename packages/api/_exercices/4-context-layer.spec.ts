@@ -76,7 +76,7 @@ describe("Effect context", () => {
 
   it("[OPTIONAL] Simplifying service definitions with Effect.Service", async () => {
     // #start
-    // const JokeService = TODO
+    // class JokeService extends TODO {}
     // #solution
     class JokeService extends Effect.Service<JokeService>()("JokeService", {
       effect: pipe(
@@ -122,16 +122,18 @@ describe("Effect context", () => {
       dependencies: [NodeHttpClient.layer]
     }) {}
 
+    const httpClientMock = {
+      get: () => Effect.fail(undefined)
+    } as any
+
     // #start
     // const JokeServiceTest = TODO
     // #solution
-    const ClientTest = Layer.mock(
+    const HttpClientTestLayer = Layer.mock(
       HttpClient.HttpClient,
-      {
-        get: () => Effect.fail(undefined)
-      } as any
+      httpClientMock
     )
-    const JokeServiceTest = pipe(JokeService.DefaultWithoutDependencies, Layer.provide(ClientTest))
+    const JokeServiceTest = pipe(JokeService.DefaultWithoutDependencies, Layer.provide(HttpClientTestLayer))
     // #end
 
     const program = pipe(JokeService, Effect.flatMap((jokes) => jokes.getRandom()))

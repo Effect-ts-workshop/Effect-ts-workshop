@@ -2,7 +2,7 @@ import { Array, Match, Option, pipe } from "effect"
 import { describe, expect, it } from "vitest"
 
 describe("Pattern matching", () => {
-  it("[OPTIONAL] should handle all possible values", () => {
+  it("should handle all possible values", () => {
     type NumberField = { type: "number"; value: number }
     type TextField = { type: "text"; value: string }
     type SelectField = { type: "select"; multiple: false; value: string }
@@ -33,51 +33,7 @@ describe("Pattern matching", () => {
     expect(getValue({ type: "select", multiple: true, value: ["selected", "a", "lot"] })).toEqual("selected, a, lot")
   })
 
-  it("[OPTIONAL] should handle optional value", () => {
-    const allValues = ["you got me"]
-
-    const getValueAt = (index: number) =>
-      pipe(
-        allValues,
-        Array.get(index),
-        // #start
-        // TODO
-        // #solution
-        Option.match({
-          onSome: (v) => v.toUpperCase(),
-          onNone: () => `DEFAULT`
-        })
-        // #end
-      )
-
-    expect(getValueAt(0)).toEqual("YOU GOT ME")
-    expect(getValueAt(42)).toEqual("DEFAULT")
-  })
-
-  it("[OPTIONAL] should wrap result in Option with Match.option (product availability)", () => {
-    type StockStatus =
-      | { status: "in_stock"; quantity: number }
-      | { status: "out_of_stock" }
-      | { status: "discontinued" }
-
-    const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
-      pipe(
-        Match.value(stock),
-        // #start
-        // TODO
-        // #solution
-        Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
-        Match.option
-        // #end
-      )
-
-    expect(getDeliveryDays({ status: "in_stock", quantity: 50 })).toEqual(Option.some(2))
-    expect(getDeliveryDays({ status: "in_stock", quantity: 3 })).toEqual(Option.some(5))
-    expect(getDeliveryDays({ status: "out_of_stock" })).toEqual(Option.none())
-    expect(getDeliveryDays({ status: "discontinued" })).toEqual(Option.none())
-  })
-
-  it("[OPTIONAL] should match on _tag discriminated union (notifications)", () => {
+  it("should match on _tag discriminated union (notifications)", () => {
     type EmailNotification = { _tag: "Email"; to: string; subject: string }
     type SmsNotification = { _tag: "Sms"; phone: string; body: string }
     type PushNotification = { _tag: "Push"; deviceId: string; title: string }
@@ -107,8 +63,8 @@ describe("Pattern matching", () => {
     )
   })
 
-  it("[OPTIONAL] should use orElse as a fallback for unmatched cases (payment methods)", () => {
-    type PaymentMethod = "card" | "paypal" | "crypto" | "check" | string
+  it("should use orElse as a fallback for unmatched cases (payment methods)", () => {
+    type PaymentMethod = "card" | "paypal" | "crypto" | "check"
 
     const getProcessingFee = (method: PaymentMethod): string =>
       pipe(
@@ -191,5 +147,49 @@ describe("Pattern matching", () => {
     expect(formatForDisplay(false)).toEqual("Non")
     expect(formatForDisplay(1234567)).toEqual("1\u202f234\u202f567") // séparateur milliers fr-FR
     expect(formatForDisplay("bonjour")).toEqual("bonjour")
+  })
+
+  it("[OPTIONAL] should handle optional value", () => {
+    const allValues = ["you got me"]
+
+    const getValueAt = (index: number) =>
+      pipe(
+        allValues,
+        Array.get(index),
+        // #start
+        // TODO
+        // #solution
+        Option.match({
+          onSome: (v) => v.toUpperCase(),
+          onNone: () => `DEFAULT`
+        })
+        // #end
+      )
+
+    expect(getValueAt(0)).toEqual("YOU GOT ME")
+    expect(getValueAt(42)).toEqual("DEFAULT")
+  })
+
+  it("[OPTIONAL] should wrap result in Option with Match.option (product availability)", () => {
+    type StockStatus =
+      | { status: "in_stock"; quantity: number }
+      | { status: "out_of_stock" }
+      | { status: "discontinued" }
+
+    const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
+      pipe(
+        Match.value(stock),
+        // #start
+        // TODO
+        // #solution
+        Match.when({ status: "in_stock" }, (s) => (s.quantity > 10 ? 2 : 5)),
+        Match.option
+        // #end
+      )
+
+    expect(getDeliveryDays({ status: "in_stock", quantity: 50 })).toEqual(Option.some(2))
+    expect(getDeliveryDays({ status: "in_stock", quantity: 3 })).toEqual(Option.some(5))
+    expect(getDeliveryDays({ status: "out_of_stock" })).toEqual(Option.none())
+    expect(getDeliveryDays({ status: "discontinued" })).toEqual(Option.none())
   })
 })

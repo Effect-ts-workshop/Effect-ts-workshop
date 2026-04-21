@@ -22,7 +22,7 @@ describe("Schema", () => {
       isActive: true,
       unknown: "stripped"
     }
-    const result = pipe(rawData, Schema.decodeUnknownSync(schema))
+    const result = Schema.decodeUnknownSync(schema)(rawData)
 
     expect(result).toEqual({
       name: "anyString",
@@ -67,22 +67,18 @@ describe("Schema", () => {
         id: Schema.String
       })
     })
-    const result = Schema.decodeUnknownEither(schema)({ user: {} })
 
+    const result = Schema.decodeUnknownEither(schema)({ user: {} })
     // #start
-    // const errors = pipe(
-    // result,
-    // Either.mapLeft(TODO),
-    // Either.map(() => []),
-    // Either.getOrElse((error) => error)
-    // )
+    // const errors = Either.match(result, {
+    //   onLeft: TODO,
+    //   onRight: () => []
+    // })
     // #solution
-    const errors = pipe(
-      result,
-      Either.mapLeft(ParseResult.ArrayFormatter.formatErrorSync),
-      Either.map(() => []),
-      Either.getOrElse((error) => error)
-    )
+    const errors = Either.match(result, {
+      onLeft: ParseResult.ArrayFormatter.formatErrorSync,
+      onRight: () => []
+    })
     // #end
 
     expect(errors).toHaveLength(1)
@@ -92,17 +88,17 @@ describe("Schema", () => {
     })
   })
 
-  it("[OPTIONAL] can encode and decode value", () => {
+  it("can encode and decode value", () => {
     // Encode originalData with our schema
     const DataSchema = Schema.Struct({ createdAt: Schema.Date })
     const originalData = { createdAt: new Date("2026-04-22") }
 
     // #start
-    // const dataDto = pipe(originalData, TODO(DataSchema))
-    // const decodedData = pipe(dataDto, TODO(DataSchema))
+    // const dataDto = TODO(DataSchema)(originalData)
+    // const decodedData = TODO(DataSchema)(dataDto)
     // #solution
-    const dataDto = pipe(originalData, Schema.encodeSync(DataSchema))
-    const decodedData = pipe(dataDto, Schema.decodeSync(DataSchema))
+    const dataDto = Schema.encodeSync(DataSchema)(originalData)
+    const decodedData = Schema.decodeSync(DataSchema)(dataDto)
     // #end
 
     expect(dataDto).toEqual({ createdAt: "2026-04-22T00:00:00.000Z" })
@@ -121,8 +117,8 @@ describe("Schema", () => {
 
     fc.assert(
       fc.property(arbitrary, (originalData) => {
-        const dataDto = pipe(originalData, Schema.encodeSync(DataSchema))
-        const decodedData = pipe(dataDto, Schema.decodeSync(DataSchema))
+        const dataDto = Schema.encodeSync(DataSchema)(originalData)
+        const decodedData = Schema.decodeSync(DataSchema)(dataDto)
 
         expect(originalData).toEqual(decodedData)
       })
@@ -152,7 +148,8 @@ describe("Schema", () => {
     expectTypeOf(data).toExtend<Email>()
     expect(Either.isLeft(failureResult)).toBeTruthy()
   })
-  it("can enhance clarity in error messages", () => {
+
+  it("[OPTIONAL] can enhance clarity in error messages", () => {
     // Annotate schema with an identifier
     // #start
     // const Person = Schema.Struct({}).annotations(TODO)
@@ -161,22 +158,19 @@ describe("Schema", () => {
       .annotations({ identifier: "Person" })
     // #end
 
-    // When
-    const errors = pipe(
-      null,
-      Schema.decodeUnknownEither(Person),
-      Either.mapLeft(ParseResult.ArrayFormatter.formatErrorSync),
-      Either.map(() => []),
-      Either.getOrElse((error) => error)
-    )
+    const result = Schema.decodeUnknownEither(Person)(null)
+    const errors = Either.match(result, {
+      onLeft: ParseResult.ArrayFormatter.formatErrorSync,
+      onRight: () => []
+    })
 
-    // Then
     expect(errors).toHaveLength(1)
     expect(errors[0]).toMatchObject({
       "path": [],
       message: "Expected Person, actual null"
     })
   })
+
   it("[OPTIONAL] can provide paths to invalid data", () => {
     // Annotate schema's paths with identifiers
     // #start
@@ -184,30 +178,29 @@ describe("Schema", () => {
     // .annotations({ identifier: "Person" })
     // #solution
     const Person = Schema.Struct({
-      name: Schema.String.annotations({ identifier: "Name" }),
-      age: Schema.Number.annotations({ identifier: "Age" })
+      name: Schema.String,
+      age: Schema.Number
     })
       .annotations({ identifier: "Person" })
     // #end
 
-    const errors = pipe(
-      { age: "42" },
-      Schema.decodeUnknownEither(Person, { errors: "all" }),
-      Either.mapLeft(ParseResult.ArrayFormatter.formatErrorSync),
-      Either.map(() => []),
-      Either.getOrElse((error) => error)
-    )
+    const result = Schema.decodeUnknownEither(Person, { errors: "all" })({ age: "42" })
+    const errors = Either.match(result, {
+      onLeft: ParseResult.ArrayFormatter.formatErrorSync,
+      onRight: () => []
+    })
 
     expect(errors).toHaveLength(2)
     expect(errors[1]).toMatchObject({
       "path": ["age"],
-      message: "Expected Age, actual \"42\""
+      message: "Expected number, actual \"42\""
     })
     expect(errors[0]).toMatchObject({
       "path": ["name"],
       message: "is missing"
     })
   })
+
   it("can indicate refinement errors", () => {
     // Define a refinement schema that will fail
     const notAPerson = { id: "", age: -2 }
@@ -223,12 +216,13 @@ describe("Schema", () => {
       .annotations({ identifier: "Person" })
     // #end
 
-    expect(() => pipe(notAPerson, Schema.decodeUnknownSync(Person))).toThrowError(`Person
+    expect(() => Schema.decodeUnknownSync(Person)(notAPerson)).toThrow(`Person
 └─ ["age"]
    └─ Positive
       └─ Predicate refinement failure
          └─ Expected a positive number, actual -2`)
   })
+
   it("can customize error message", () => {
     // Validate with custom message if invalid
     // #start
@@ -238,15 +232,12 @@ describe("Schema", () => {
     // .annotations({ identifier: "Person" })
     // #solution
     const Person = Schema.Struct({
-      strength: pipe(
-        Schema.Number,
-        Schema.lessThanOrEqualTo(9000, { message: () => "is over 9000 !!!" })
-      )
+      strength: pipe(Schema.Number, Schema.lessThanOrEqualTo(9000, { message: () => "is over 9000 !!!" }))
     })
       .annotations({ identifier: "Person" })
     // #end
 
-    expect(() => pipe({ strength: 9001 }, Schema.decodeUnknownSync(Person))).toThrowError(`Person
+    expect(() => Schema.decodeUnknownSync(Person)({ strength: 9001 })).toThrow(`Person
 └─ ["strength"]
    └─ is over 9000 !!!`.trim())
   })

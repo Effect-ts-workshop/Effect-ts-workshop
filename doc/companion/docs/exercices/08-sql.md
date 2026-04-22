@@ -1,0 +1,256 @@
+---
+sidebar_position: 8
+---
+
+# Exercice 8 - SQL
+
+Nos services utilisent une base de données PostgreSQL. Cet exercice couvre deux niveaux d'abstraction : le SQL natif avec `@effect/sql`, et le query builder Drizzle.
+
+Les tests de cet exercice démarrent un vrai conteneur PostgreSQL via `testcontainers`. Pas de mocks - les requêtes s'exécutent contre une vraie base.
+
+Fichier à compléter : `packages/api/_exercices/8-sql.spec.ts`
+
+:::warning Prérequis
+
+Cet exercice démarre un conteneur PostgreSQL via `testcontainers`. **Docker doit être installé et démarré** sur votre machine avant de lancer les tests.
+
+:::
+
+---
+
+## SQL natif - template literal
+
+`@effect/sql` fournit un client SQL (`SqlClient.SqlClient`) utilisable comme service Effect. Les requêtes s'écrivent avec des template literals :
+
+<!-- prettier-ignore -->
+```typescript
+const getActive = Effect.fn("getActive")(function*() {
+  const sql = yield* SqlClient.SqlClient   // récupère le client depuis le contexte
+
+  const rows = yield* sql`SELECT * FROM users WHERE active = true`
+  return rows
+})
+```
+
+Le template literal est _safe_ par construction : les variables interpolées sont automatiquement paramétrées - pas d'injection SQL possible.
+
+### Exercice
+
+Complétez `getAll` pour exécuter `SELECT * FROM items` :
+
+<!-- prettier-ignore -->
+```typescript
+const getAll = Effect.fn("getAll")(function*() {
+  const sql = yield* SqlClient.SqlClient
+  const items = ??? // À compléter
+  return items
+})
+```
+
+À vous de jouer !
+
+:::tip Ressources
+
+- [SQL avec @effect/sql](../base-de-connaissance/14-sql.md)
+
+:::
+
+#### Indice 1
+
+<details>
+  <summary>Exécuter une requête SQL</summary>
+
+Le client `sql` s'utilise comme un template literal :
+
+<!-- prettier-ignore -->
+```typescript
+const rows = yield* sql`SELECT * FROM ma_table`
+```
+
+`yield*` attend le résultat de la requête avant de continuer.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+<!-- prettier-ignore -->
+```typescript
+const getAll = Effect.fn("getAll")(function*() {
+  const sql = yield* SqlClient.SqlClient
+  const items = yield* sql`
+    SELECT *
+    FROM items
+  `
+  return items
+})
+```
+
+</details>
+
+---
+
+## CRUD automatique
+
+:::note Test optionnel
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
+:::
+
+Pour les opérations CRUD classiques, `Model.Class` et `Model.makeRepository` génèrent le repository automatiquement à partir d'un schema :
+
+<!-- prettier-ignore -->
+```typescript
+class DbUser extends Model.Class<DbUser>("DbUser")({
+  id: Schema.String,
+  email: Schema.String,
+  createdAt: Model.DateTimeInsertFromDate,
+  updatedAt: Model.DateTimeUpdateFromDate
+}) {}
+
+const repository = yield* Model.makeRepository(DbUser, {
+  tableName: "users",
+  idColumn: "id" as const,
+  spanPrefix: "UserRepository"
+})
+```
+
+Le `repository` expose `insert`, `findById`, `findAll`, `update`, `delete` - typés selon `DbUser`.
+
+### Exercice
+
+Complétez `getCrud` pour créer un repository `DbItem` :
+
+<!-- prettier-ignore -->
+```typescript
+const getCrud = Effect.fn("getCrud")(function*() {
+  const repository = ??? // À compléter
+  return repository
+})
+```
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>Les arguments de `makeRepository`</summary>
+
+<!-- prettier-ignore -->
+```typescript
+yield* Model.makeRepository(MyClass, {
+  tableName: "my_table",
+  idColumn: "id" as const,
+  spanPrefix: "MyRepository"
+})
+```
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+<!-- prettier-ignore -->
+```typescript
+const getCrud = Effect.fn("getCrud")(function*() {
+  const repository = yield* Model.makeRepository(DbItem, {
+    tableName: "items",
+    idColumn: "id" as const,
+    spanPrefix: "ItemRepository"
+  })
+  return repository
+})
+```
+
+</details>
+
+---
+
+## Drizzle - query builder typé
+
+En tant qu'amoureux de TypeScript, on aime les query builders : ils ajoutent de la sécurité de type là où le SQL natif ne voit que des strings. Drizzle a récemment créé une intégration Effect - les opérations renvoient des `Effect` au lieu de `Promise`, sans rien changer à l'API qu'on connaît déjà.
+
+Drizzle offre un query builder qui reste dans le monde Effect via le service `Database` :
+
+<!-- prettier-ignore -->
+```typescript
+const createOrder = Effect.fn("createOrder")(function*(order: InferInsertModel<typeof orders>) {
+  const db = yield* Database
+  return yield* db.insert(orders).values(order)
+})
+
+const findByStatus = Effect.fn("findByStatus")(function*(status: string) {
+  const db = yield* Database
+  return yield* db.select().from(orders).where(eq(orders.status, status))
+})
+```
+
+`db` est une instance Drizzle wrappée dans Effect - toutes les opérations sont des `Effect`, pas des `Promise`.
+
+### Exercice
+
+Complétez `add` et `findByBrand` :
+
+<!-- prettier-ignore -->
+```typescript
+const add = Effect.fn("add")(function*(item: InferInsertModel<typeof items>) {
+  const db = yield* Database
+  return ??? // À compléter : insérer item dans la table items
+})
+
+const findByBrand = Effect.fn("findByBrand")(function*(brand: string) {
+  const db = yield* Database
+  return ??? // À compléter : sélectionner tous les items où brand === brand
+})
+```
+
+À vous de jouer !
+
+#### Indice 1
+
+<details>
+  <summary>Syntaxe Drizzle pour l'insert</summary>
+
+<!-- prettier-ignore -->
+```typescript
+db.insert(table).values(item)
+```
+
+</details>
+
+#### Indice 2
+
+<details>
+  <summary>Syntaxe Drizzle pour le select avec where</summary>
+
+<!-- prettier-ignore -->
+```typescript
+db.select().from(table).where(eq(table.column, value))
+```
+
+`eq` est importé de `drizzle-orm`.
+
+</details>
+
+#### Solution
+
+<details>
+  <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
+
+<!-- prettier-ignore -->
+```typescript
+const add = Effect.fn("add")(function*(item: InferInsertModel<typeof items>) {
+  const db = yield* Database
+  return yield* db.insert(items).values(item)
+})
+
+const findByBrand = Effect.fn("findByBrand")(function*(brand: string) {
+  const db = yield* Database
+  return yield* db.select().from(items).where(eq(items.brand, brand))
+})
+```
+
+</details>

@@ -57,7 +57,7 @@ const TestHttpClient = pipe(FetchHttpClient.layer, Layer.provide(Layer.succeed(F
 // La structure reflète l'organisation en groupes : client.items.getAllItems()
 // Si on renomme un endpoint dans shared/api.ts, le compilateur signale l'erreur ici.
 describe("HttpApiClient", () => {
-  it("appelle GET /items et retourne la liste typée", async () => {
+  it("calls GET /items and returns the typed list", async () => {
     // #start
     // const program = TODO
     // #solution
@@ -75,7 +75,7 @@ describe("HttpApiClient", () => {
     expect(result.items[1].brand).toBe("Specialized")
   })
 
-  it("appelle GET /items/:itemId et retourne un Option<InventoryItem>", async () => {
+  it("calls GET /items/:itemId and returns an Option<InventoryItem>", async () => {
     // #start
     // const program = TODO
     // #solution
@@ -96,7 +96,7 @@ describe("HttpApiClient", () => {
     }
   })
 
-  it("compose plusieurs appels avec Effect.all", async () => {
+  it("composes multiple calls with Effect.all", async () => {
     // Effect.all exécute les deux appels en parallèle par défaut
     const program = pipe(
       HttpApiClient.make(Api, { baseUrl: "http://localhost" }),

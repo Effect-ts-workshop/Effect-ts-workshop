@@ -2,8 +2,8 @@ import { HttpApi, HttpApiBuilder, HttpApiEndpoint, HttpApiGroup } from "@effect/
 import { Effect, Schema } from "effect"
 import { describe, expect, it } from "vitest"
 
-describe("Api  Effect - serveur", () => {
-  it("HttpApiClient pour appeler l'API de façon typée", async () => {
+describe("Api Effect - server", () => {
+  it("HttpApiClient to call the API in a typed way", async () => {
     // "Le contrat : une route GET /hello qui retourne une string
     // #start
     // const MyApi = TODO

@@ -34,8 +34,8 @@ describe("Interruption", () => {
   })
 })
 
-describe("addFinalizer — connexion base de données", () => {
-  it("[OPTIONAL] ferme la connexion même si une erreur survient", async () => {
+describe("addFinalizer — database connection", () => {
+  it("[OPTIONAL] closes the connection even if an error occurs", async () => {
     // On simule une connexion avec un flag pour savoir si elle est ouverte
     const makeConnection = (log: Array<string>) => ({
       query: () => Effect.fail(new Error("requête échouée")),
@@ -64,8 +64,8 @@ describe("addFinalizer — connexion base de données", () => {
   })
 })
 
-describe("addFinalizer — fichier temporaire", () => {
-  it("[OPTIONAL] supprime le fichier temporaire après utilisation", async () => {
+describe("addFinalizer — temporary file", () => {
+  it("[OPTIONAL] deletes the temporary file after use", async () => {
     // Simule un système de fichiers en mémoire
     const filesystem = new Set<string>()
 
@@ -97,14 +97,14 @@ describe("addFinalizer — fichier temporaire", () => {
   })
 })
 
-describe("acquireRelease — garantie du release", () => {
+describe("acquireRelease — release guarantee", () => {
   // Helper partagé : connexion simulée
   const makeConnection = (log: Array<string>) => ({
     query: (sql: string) => Effect.sync(() => `résultat: ${sql}`),
     close: () => log.push("connection:closed")
   })
 
-  it("[OPTIONAL] exécute le release après un succès", async () => {
+  it("[OPTIONAL] executes the release after a success", async () => {
     const log: Array<string> = []
 
     // acquireRelease couple explicitement l'ouverture et la fermeture
@@ -128,7 +128,7 @@ describe("acquireRelease — garantie du release", () => {
     expect(log).toContain("connection:closed") // connexion bien fermée
   })
 
-  it("[OPTIONAL] exécute le release même si une erreur survient", async () => {
+  it("[OPTIONAL] executes the release even if an error occurs", async () => {
     const log: Array<string> = []
 
     // #start
@@ -154,7 +154,7 @@ describe("acquireRelease — garantie du release", () => {
     expect(log).toContain("connection:closed")
   })
 
-  it("[OPTIONAL] exécute le release si le fiber est interrompu", async () => {
+  it("[OPTIONAL] executes the release if the fiber is interrupted", async () => {
     const log: Array<string> = []
 
     const resource = Effect.acquireRelease(

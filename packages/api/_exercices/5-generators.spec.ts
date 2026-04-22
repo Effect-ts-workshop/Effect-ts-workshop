@@ -8,8 +8,8 @@ import { describe, expect, expectTypeOf, it, vi } from "vitest"
 // PARTIE 1 - Générateurs JavaScript classiques
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe("JS generators - bases", () => {
-  it("Yield met le générateur en pause et expose une valeur", () => {
+describe("JS generators - basics", () => {
+  it("yield pauses the generator and exposes a value", () => {
     // Un générateur est une fonction qui peut être mise en pause avec yield.
     // Chaque appel à .next() reprend l'exécution jusqu'au prochain yield.
 
@@ -31,7 +31,7 @@ describe("JS generators - bases", () => {
     expect(gen.next()).toEqual({ value: undefined, done: true }) // le générateur est épuisé
   })
 
-  it("la valeur de retour d'un générateur est dans le dernier .next()", () => {
+  it("the return value of a generator is in the last .next()", () => {
     // La valeur après `return` dans le générateur se retrouve dans { done: true, value: X }.
     // Les valeurs `yield`ées sont { done: false }, la valeur retournée est { done: true }.
 
@@ -50,7 +50,7 @@ describe("JS generators - bases", () => {
     expect(gen.next()).toEqual({ value: "Apple", done: true })
   })
 
-  it("yield* délègue à un autre générateur (comme un flatMap)", () => {
+  it("yield* delegates to another generator (like a flatMap)", () => {
     // `yield*` permet de déléguer l'itération à un sous-générateur.
     // C'est l'équivalent d'un "appeler et attendre" pour les générateurs.
 
@@ -73,7 +73,7 @@ describe("JS generators - bases", () => {
     expect(result).toEqual(["Apple", "Dell", "ThinkPad"])
   })
 
-  it("on peut envoyer une valeur dans le générateur via next(value)", () => {
+  it("can send a value into the generator via next(value)", () => {
     // next(value) reprend le générateur ET injecte `value` comme résultat du `yield` en cours.
     // C'est ainsi qu'Effect.gen va "injecter" les résultats d'effects dans ton code.
 
@@ -142,8 +142,8 @@ describe("JS generators - bases", () => {
 // C'est le pattern utilisé dans item-repository.ts et http.ts du projet.
 // Si vous voulez aller jeter un coup d'oeil
 
-describe("Effect.fn - nommer et composer des handlers", () => {
-  it("Effect.fn crée une fonction qui retourne un Effect (avec span de tracing)", () => {
+describe("Effect.fn - naming and composing handlers", () => {
+  it("Effect.fn creates a function that returns an Effect (with tracing span)", () => {
     // Effect.fn("name")(function*() { ... }) est exactement ce qu'on voit dans :
     //   - item-repository.ts : `const getAll = Effect.fn("getAll")(function*() { ... })`
     //   - http.ts : `Effect.fn(function*({ payload }) { ... })`

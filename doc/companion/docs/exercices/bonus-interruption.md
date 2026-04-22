@@ -199,7 +199,7 @@ La différence avec `addFinalizer` : le `release` est défini au même endroit q
 
 ### Exercice
 
-**Tests `"exécute le release après un succès"` et `"exécute le release même si une erreur survient"`**
+**Tests `"executes the release after a success"` et `"executes the release even if an error occurs"`**
 
 Définissez `resource` avec `Effect.acquireRelease`. Dans le second test, la `query` doit échouer avec `new Error("timeout")` — pensez à étendre `makeConnection` en remplaçant uniquement cette méthode.
 
@@ -210,7 +210,7 @@ const resource = ??? // À compléter
 
 ---
 
-**Test `"exécute le release si le fiber est interrompu"`**
+**Test `"executes the release if the fiber is interrupted"`**
 
 La ressource est déjà fournie. Il reste à déclencher l'interruption du fiber :
 

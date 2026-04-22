@@ -1,0 +1,50 @@
+.features_row_container {
+  gap: 4rem;
+}
+
+.features {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.avatar__intro {
+  justify-content: start;
+}
+
+.avatar__photo {
+  object-fit: cover;
+}
+
+.cta:hover {
+  background-color: #034b70;
+  color: white;
+}
+
+.logo_comet {
+  height: 50px;
+  margin-bottom: 12px;
+}
+.logo_najar {
+  height: 36px;
+  margin-bottom: 12px;
+}
+.logo_dilitrust {
+  height: 64px;
+}
+
+.urlSection {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url("https://github.com/quantixx/template-presentation/blob/master/images/2023/Robots/png/robot6.png?raw=true");
+  background-size: 40%;
+  background-repeat: no-repeat;
+  background-position: right bottom;
+}
+
+.textBlack {
+  color: black;
+}

@@ -105,7 +105,7 @@ describe("HttpApiClient", () => {
     // Effect.all exécute les deux appels en parallèle par défaut
     const program = pipe(
       // #start
-      // Effect.all(TODO)
+      // Effect.all(TODO),
       // #solution
       Effect.gen(function*() {
         const client = yield* HttpApiClient.make(Api, { baseUrl: "http://localhost" })

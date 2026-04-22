@@ -315,10 +315,14 @@ Pour comprendre comment visualiser ces traces dans Jaeger, voir [Observabilité]
 
 ### Exercice
 
+Une fonction `upperCase` est déjà disponible dans le contexte — elle prend une `string` et renvoie un `Effect` contenant la version en majuscules.
+
 Créez `getItemLabel` avec `Effect.fn` :
 
 <!-- prettier-ignore -->
 ```typescript
+const upperCase = (value: string) => Effect.succeed(value.toUpperCase())
+
 const getItemLabel = ??? // À compléter
 // doit : mettre brand en majuscules, renvoyer "${UPPER} - ${model}"
 ```
@@ -333,12 +337,12 @@ const getItemLabel = ??? // À compléter
 <!-- prettier-ignore -->
 ```typescript
 const myFn = Effect.fn("myFn")(function*(arg1: string, arg2: string) {
-  const result = yield* Effect.sync(() => /* computation */)
+  const result = yield* someEffect(arg1)
   return `${result} - ${arg2}`
 })
 ```
 
-`Effect.sync` emballe un calcul synchrone (sans Effect existant).
+`yield*` attend un `Effect` — `upperCase(brand)` en renvoie un directement.
 
 </details>
 
@@ -353,7 +357,7 @@ const getItemLabel = Effect.fn("getItemLabel")(function* (
   brand: string,
   model: string,
 ) {
-  const upper = yield* Effect.sync(() => brand.toUpperCase());
+  const upper = yield* upperCase(brand);
   return `${upper} - ${model}`;
 });
 ```

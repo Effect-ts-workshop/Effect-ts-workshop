@@ -6,7 +6,7 @@ sidebar_position: 8
 
 ## Le problème du cleanup
 
-Quand un programme acquiert une ressource (connexion, fichier, lock…), il doit la libérer — même si une erreur survient. En TypeScript classique, on utilise `try/finally` :
+Quand un programme acquiert une ressource (connexion, fichier, lock…), il doit la libérer - même si une erreur survient. En TypeScript classique, on utilise `try/finally` :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -18,7 +18,7 @@ try {
 }
 ```
 
-Ça fonctionne, mais ça ne se compose pas. Dès qu'on imbrique plusieurs ressources, le code devient difficile à lire — et si une Fiber est interrompue, `finally` n'est pas garanti.
+Ça fonctionne, mais ça ne se compose pas. Dès qu'on imbrique plusieurs ressources, le code devient difficile à lire - et si une Fiber est interrompue, `finally` n'est pas garanti.
 
 Effect résout ça avec le **Scope**.
 
@@ -36,7 +36,7 @@ Scope fermé (succès / erreur / interruption)
   → cleanup A exécuté
 ```
 
-## `Effect.addFinalizer` — enregistrer un cleanup
+## `Effect.addFinalizer` - enregistrer un cleanup
 
 `Effect.addFinalizer` ajoute une action au Scope courant. La fonction reçoit `exit`, en paramètre, qui décrit comment le programme s'est terminé.
 
@@ -59,9 +59,9 @@ const program = Effect.gen(function* () {
 });
 ```
 
-Le `exit` permet d'adapter le cleanup selon le résultat — typiquement : le commit ou le rollback d'une transaction.
+Le `exit` permet d'adapter le cleanup selon le résultat - typiquement : le commit ou le rollback d'une transaction.
 
-## `Effect.acquireRelease` — paire explicite
+## `Effect.acquireRelease` - paire explicite
 
 Quand l'acquisition et le cleanup sont **logiquement liés**, `acquireRelease` est plus clair :
 
@@ -71,7 +71,7 @@ import { Effect } from "effect";
 
 const resource = Effect.acquireRelease(
   Effect.sync(() => openConnection()),     // acquire
-  (conn) => Effect.sync(() => conn.close()) // release — toujours exécuté
+  (conn) => Effect.sync(() => conn.close()) // release - toujours exécuté
 );
 
 const program = Effect.gen(function* () {
@@ -86,14 +86,14 @@ Le `release` est garanti dans **trois situations** :
 - ❌ Erreur (`Effect.fail`)
 - ⚡ Interruption de la Fiber
 
-## `Effect.scoped` — créer et fermer un Scope
+## `Effect.scoped` - créer et fermer un Scope
 
 `Effect.scoped` crée un Scope, exécute le programme, puis le ferme automatiquement :
 
 <!-- prettier-ignore -->
 ```typescript
 await Effect.runPromise(Effect.scoped(program));
-// Le Scope est fermé ici — cleanups exécutés
+// Le Scope est fermé ici - cleanups exécutés
 ```
 
 Sans `Effect.scoped`, le Scope reste ouvert et doit être géré manuellement via `Scope.make` et `Scope.close`. En pratique, `Effect.scoped` couvre la grande majorité des cas.

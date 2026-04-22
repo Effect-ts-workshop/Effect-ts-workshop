@@ -11,17 +11,17 @@ sidebar_position: 1
 Effect.Effect<Value, Error, Context>
 ```
 
-Un `Effect` est une **description** d'un programme. Il n'exécute rien par lui-même — c'est comme une recette de cuisine. Le plat n'existe que si l'on dispose des ingrédients et qu'on le cuisine.
+Un `Effect` est une **description** d'un programme. Il n'exécute rien par lui-même - c'est comme une recette de cuisine. Le plat n'existe que si l'on dispose des ingrédients et qu'on le cuisine.
 
 Les trois paramètres de type `Effect` décrivent tout ce que le programme peut faire :
 
 | Paramètre | Valeur par défaut | Signification                                       |
 | --------- | ----------------- | --------------------------------------------------- |
-| `Value`   | —                 | Le type de la valeur produite si tout va bien       |
+| `Value`   | -                 | Le type de la valeur produite si tout va bien       |
 | `Error`   | `never`           | Les types d'erreurs **typées** qui peuvent survenir |
 | `Context` | `never`           | Les services/dépendances dont le programme a besoin |
 
-`never` signifie "jamais" — `Error = never` veut dire "ne peut pas échouer", `Context = never` veut dire "n'a pas besoin de dépendances". Dans la documentation officielle, vous retrouvez la syntaxe abrégée `Effect<A, E, R>`
+`never` signifie "jamais" - `Error = never` veut dire "ne peut pas échouer", `Context = never` veut dire "n'a pas besoin de dépendances". Dans la documentation officielle, vous retrouvez la syntaxe abrégée `Effect<A, E, R>`
 
 ## Exemples de types
 
@@ -52,7 +52,7 @@ const ok = Effect.succeed(42);
 const ko = Effect.fail(new MyError());
 // Type : Effect<never, MyError>
 
-// Calcul synchrone (peut lancer des exceptions — elles deviennent des défauts)
+// Calcul synchrone (peut lancer des exceptions - elles deviennent des défauts)
 const calcul = Effect.sync(() => Math.random());
 // Type : Effect<number>
 ```
@@ -64,7 +64,7 @@ const calcul = Effect.sync(() => Math.random());
 // Calcul synchrone sans risque d'erreur
 const calcul = Effect.sync(() => Math.random())
 // Type : Effect<number>
-// La fonction est évaluée de façon lazy — pas immédiatement
+// La fonction est évaluée de façon lazy - pas immédiatement
 
 // Calcul synchrone qui peut lancer une exception
 const parse = Effect.try({
@@ -121,7 +121,7 @@ const exit = Effect.runSyncExit(myEffect);
 ```
 
 :::warning
-N'appelez `Effect.run*` qu'**une seule fois**, au point d'entrée de votre programme. À l'intérieur d'Effect, composez les Effects avec `flatMap`, `gen`, etc. — ne les exécutez pas prématurément.
+N'appelez `Effect.run*` qu'**une seule fois**, au point d'entrée de votre programme. À l'intérieur d'Effect, composez les Effects avec `flatMap`, `gen`, etc. - ne les exécutez pas prématurément.
 :::
 
 ## Transformer des Effects
@@ -167,7 +167,7 @@ pipe(
 
 ## Combiner des Effects
 
-### `Effect.all` — déclarer plusieurs Effects en parallèle
+### `Effect.all` - déclarer plusieurs Effects en parallèle
 
 <!-- prettier-ignore -->
 ```typescript

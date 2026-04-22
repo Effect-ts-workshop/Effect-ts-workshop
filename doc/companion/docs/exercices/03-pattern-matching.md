@@ -2,7 +2,7 @@
 sidebar_position: 3
 ---
 
-# Exercice 3 — Pattern Matching
+# Exercice 3 - Pattern Matching
 
 En TypeScript un `switch/case` fonctionne, mais il a des angles morts :
 
@@ -120,7 +120,7 @@ const getValue = (field: AnyField) =>
 ## Traiter une valeur optionnelle
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 `Option` représente une valeur qui peut être présente (`Some`) ou absente (`None`). Il est ainsi possible de décrire une séquence au sein de laquelle les `Some` seront traités et les `None` ignorés. En un sens `Option` est une adaptation du _railway pattern_ au cas de l'absence de valeur. Chacun des cas peut ensuite être traité de façon différenciée.
@@ -195,10 +195,10 @@ const getValueAt = (index: number) =>
 ## Retourner un résultat partiel
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
-Parfois, on ne _veut_ pas couvrir tous les cas — seulement certains. `Match.option` clôt le match en enveloppant le résultat dans un `Option` : `Some` si un cas a matché, `None` sinon.
+Parfois, on ne _veut_ pas couvrir tous les cas - seulement certains. `Match.option` clôt le match en enveloppant le résultat dans un `Option` : `Some` si un cas a matché, `None` sinon.
 
 <!-- prettier-ignore -->
 ```typescript
@@ -283,7 +283,7 @@ type Notification = EmailNotification | SmsNotification | PushNotification
 const describe = (notif: Notification) =>
   pipe(
     Match.value(notif),
-    ???, // À compléter — 3 cas
+    ???, // À compléter - 3 cas
     Match.exhaustive
   )
 ```
@@ -367,7 +367,7 @@ const getProcessingFee = (method: PaymentMethod): string =>
 ## Exclure un cas spécifique
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 Pour matcher "tout sauf X", `Match.not` exclut une valeur spécifique :
@@ -421,7 +421,7 @@ const isTrackable = (status: OrderStatus) =>
 ## Regrouper plusieurs valeurs dans une même branche
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 `Match.whenOr` est un raccourci pour plusieurs `Match.when` qui renvoient la même chose :
@@ -472,7 +472,7 @@ const canAccessDashboard = (role: Role) =>
 ## Matcher sur des types primitifs
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 Pour matcher sur des types primitifs, `Match` fournit des prédicats prêts à l'emploi :
@@ -500,7 +500,7 @@ type FieldValue = string | number | boolean | null
 const formatForDisplay = (value: FieldValue) =>
   pipe(
     Match.value(value),
-    ???, // À compléter : null → "—", boolean → "Oui"/"Non", number → locale fr-FR, string → identité
+    ???, // À compléter : null → "-", boolean → "Oui"/"Non", number → locale fr-FR, string → identité
     Match.exhaustive
   )
 ```
@@ -512,7 +512,7 @@ const formatForDisplay = (value: FieldValue) =>
 <details>
   <summary>L'ordre des cas compte</summary>
 
-Placez `Match.when(Match.null, ...)` avant `Match.when(Match.string, ...)` — `null` pourrait autrement être absorbé par un cas trop large.
+Placez `Match.when(Match.null, ...)` avant `Match.when(Match.string, ...)` - `null` pourrait autrement être absorbé par un cas trop large.
 
 </details>
 
@@ -526,7 +526,7 @@ Placez `Match.when(Match.null, ...)` avant `Match.when(Match.string, ...)` — `
 const formatForDisplay = (value: FieldValue) =>
   pipe(
     Match.value(value),
-    Match.when(Match.null, () => "—"),
+    Match.when(Match.null, () => "-"),
     Match.when(Match.boolean, (b) => (b ? "Oui" : "Non")),
     Match.when(Match.number, (n) => n.toLocaleString("fr-FR")),
     Match.when(Match.string, (s) => s),

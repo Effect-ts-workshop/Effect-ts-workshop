@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Exercice 2 — Erreurs
+# Exercice 2 - Erreurs
 
 Dans l'exercice précédent, toutes nos fonctions réussissaient. Dans la réalité, une requête réseau peut échouer, une valeur peut être invalide, un service peut être indisponible.
 
@@ -27,7 +27,7 @@ const failure: Effect.Effect<never, Error> = Effect.fail(
 );
 ```
 
-Le deuxième paramètre de type — `Error` — est visible dans la signature. L'appelant _sait_ que ça peut rater.
+Le deuxième paramètre de type - `Error` - est visible dans la signature. L'appelant _sait_ que ça peut rater.
 
 ### Exercice
 
@@ -96,7 +96,7 @@ class InvalidFormatError extends Data.TaggedError("InvalidFormatError")<{
 }> {}
 
 const e = new ReadError({ path: "/data/users.csv" });
-e._tag; // "ReadError" — identifiant garanti
+e._tag; // "ReadError" - identifiant garanti
 ```
 
 Le paramètre générique `<{ ... }>` définit les données portées par l'erreur.
@@ -163,7 +163,7 @@ type ParseCSV = (
 ) => Effect.Effect<string[], ReadError | InvalidFormatError>;
 ```
 
-`ReadError | InvalidFormatError` signifie : cette fonction peut échouer de ces deux façons précises — et rien d'autre. C'est un contrat.
+`ReadError | InvalidFormatError` signifie : cette fonction peut échouer de ces deux façons précises - et rien d'autre. C'est un contrat.
 
 `Effect.filterOrFail` permet de convertir un cas de succès partiel en échec :
 
@@ -213,8 +213,8 @@ const fetch: Fetch = (input, init) =>
 
 `NetworkError` et `HTTPResponseError` sont des `Data.TaggedError`. Regardez le générique défini pour chacune : il indique le type de l'objet à passer à `new`.
 
-- `catch` reçoit l'exception brute (une `unknown`) — elle correspond au champ `error` de `NetworkError`
-- `filterOrFail` reçoit la response HTTP — elle correspond au champ `response` de `HTTPResponseError`
+- `catch` reçoit l'exception brute (une `unknown`) - elle correspond au champ `error` de `NetworkError`
+- `filterOrFail` reçoit la response HTTP - elle correspond au champ `response` de `HTTPResponseError`
 
 </details>
 
@@ -244,7 +244,7 @@ const fetch: Fetch = (input, init) =>
 
 ## Attraper une erreur précise
 
-`Effect.catchTag` intercepte une erreur par son `_tag` et permet de la gérer — sans toucher aux autres :
+`Effect.catchTag` intercepte une erreur par son `_tag` et permet de la gérer - sans toucher aux autres :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -331,7 +331,7 @@ Gérez `HTTPResponseError` et `NetworkError` ensemble. Chaque tag a son propre m
 ```typescript
 const program = pipe(
   getJoke(), // Effect<string, UnknownException | HTTPResponseError | NetworkError>
-  ??? // À compléter — résultat attendu : Effect<string, UnknownException>
+  ??? // À compléter - résultat attendu : Effect<string, UnknownException>
 )
 ```
 
@@ -380,7 +380,7 @@ Rattrapez toutes les erreurs de `getJoke()` et renvoyez `"Fallback joke"` :
 ```typescript
 const program = pipe(
   getJoke(), // Effect<string, UnknownException | HTTPResponseError | NetworkError>
-  ??? // À compléter — résultat : Effect<string, never>
+  ??? // À compléter - résultat : Effect<string, never>
 )
 ```
 
@@ -412,7 +412,7 @@ Il existe deux catégories d'échecs dans Effect :
 | **Erreur** | Dans le type `Effect<_, E, _>` | `NetworkError`, `HTTPResponseError` | `catchTag`, `catchAll`… |
 | **Defect** | Hors du type (imprévu)         | `throw`, bug, `dieMessage`          | `catchAllDefect`        |
 
-Un `defect` est une erreur qu'on n'avait pas prévue — l'équivalent d'une exception non gérée. Si vous venez de Rust, c'est l'analogue d'un `panic!` : quelque chose d'inattendu s'est produit, le programme ne sait pas comment continuer. En Java, ce serait une `RuntimeException` non déclarée.
+Un `defect` est une erreur qu'on n'avait pas prévue - l'équivalent d'une exception non gérée. Si vous venez de Rust, c'est l'analogue d'un `panic!` : quelque chose d'inattendu s'est produit, le programme ne sait pas comment continuer. En Java, ce serait une `RuntimeException` non déclarée.
 
 La différence avec Effect : `catchAllDefect` permet de s'en remettre proprement plutôt que de crasher :
 

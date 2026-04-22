@@ -6,7 +6,7 @@ sidebar_position: 12
 
 ## Qu'est-ce que `Result` ?
 
-`Result` est un type qui représente l'état d'une opération **asynchrone** — typiquement un appel réseau ou un Effect long. Result est fourni via `@effect-atom/atom-react`. Il a trois états possibles :
+`Result` est un type qui représente l'état d'une opération **asynchrone** - typiquement un appel réseau ou un Effect long. Result est fourni via `@effect-atom/atom-react`. Il a trois états possibles :
 
 | État                | Signification                          |
 | ------------------- | -------------------------------------- |
@@ -61,7 +61,7 @@ function InventoryList() {
 }
 ```
 
-## `Result.builder` — rendu déclaratif
+## `Result.builder` - rendu déclaratif
 
 `Result.builder` permet de décrire le rendu pour chaque état sans if/else imbriqués :
 

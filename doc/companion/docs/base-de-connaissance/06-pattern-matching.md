@@ -53,7 +53,7 @@ pipe(
 )
 ```
 
-### `Match.tag` — unions avec `_tag`
+### `Match.tag` - unions avec `_tag`
 
 Quand les variantes d'une union utilisent `_tag` comme discriminant, `Match.tag` est plus concis que `Match.when({ _tag: "..." })` :
 
@@ -73,7 +73,7 @@ pipe(
 )
 ```
 
-### `Match.not` — exclure un cas
+### `Match.not` - exclure un cas
 
 <!-- prettier-ignore -->
 ```typescript
@@ -85,7 +85,7 @@ pipe(
 )
 ```
 
-### `Match.whenOr` — plusieurs valeurs, même branche
+### `Match.whenOr` - plusieurs valeurs, même branche
 
 <!-- prettier-ignore -->
 ```typescript
@@ -97,13 +97,13 @@ pipe(
 )
 ```
 
-### Correspondance avec les primitives — `Match.null`, `Match.boolean`, `Match.number`, `Match.string`
+### Correspondance avec les primitives - `Match.null`, `Match.boolean`, `Match.number`, `Match.string`
 
 <!-- prettier-ignore -->
 ```typescript
 pipe(
   Match.value(value),
-  Match.when(Match.null, () => "—"),
+  Match.when(Match.null, () => "-"),
   Match.when(Match.boolean, (b) => (b ? "Oui" : "Non")),
   Match.when(Match.number, (n) => `Nombre : ${n}`),
   Match.when(Match.string, (s) => `Chaîne : ${s}`),
@@ -115,7 +115,7 @@ pipe(
 
 <!-- prettier-ignore -->
 ```typescript
-// Match.exhaustive — compile seulement si tous les cas sont couverts
+// Match.exhaustive - compile seulement si tous les cas sont couverts
 pipe(
   Match.value(state),
   Match.when("a", () => 1),
@@ -123,7 +123,7 @@ pipe(
   Match.exhaustive
 )
 
-// Match.orElse — fournit un cas par défaut
+// Match.orElse - fournit un cas par défaut
 pipe(
   Match.value(state),
   Match.when("a", () => 1),
@@ -131,8 +131,7 @@ pipe(
 )
 ```
 
-
-### `Match.option` — résultat en `Option`
+### `Match.option` - résultat en `Option`
 
 `Match.option` clôt le match en enveloppant le résultat dans une `Option` (voir plus bas). Dans le cas nominal il renvoie `Option.some(result)` Si aucun cas ne correspond il renvoie `Option.none()`.
 
@@ -147,7 +146,6 @@ const getDeliveryDays = (stock: StockStatus): Option.Option<number> =>
     // Option.none() pour "out_of_stock" et "discontinued"
   )
 ```
-
 
 ## Le type `Option`
 

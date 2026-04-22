@@ -2,15 +2,15 @@
 sidebar_position: 5
 ---
 
-# Exercice 5 — Générateurs
+# Exercice 5 - Générateurs
 
-Les générateurs JavaScript sont un mécanisme du langage souvent méconnu. Cet exercice a deux parties : la première explore le mécanisme pur, sans Effect. La deuxième montre comment Effect s'en sert pour écrire des programmes complexes avec le flot de contrôle impératif qu'on connaît déjà — `if`, `for`, `while`, ...
+Les générateurs JavaScript sont un mécanisme du langage souvent méconnu. Cet exercice a deux parties : la première explore le mécanisme pur, sans Effect. La deuxième montre comment Effect s'en sert pour écrire des programmes complexes avec le flot de contrôle impératif qu'on connaît déjà - `if`, `for`, `while`, ...
 
 Fichier à compléter : `packages/api/_exercices/5-generators.spec.ts`
 
 ---
 
-## Partie 1 — Générateurs JavaScript
+## Partie 1 - Générateurs JavaScript
 
 ### Mettre une fonction en pause
 
@@ -205,7 +205,7 @@ const result = gen.next(true);
 ### Enchaîner des opérations avec un générateur
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous êtes à l'aise avec les générateurs.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous êtes à l'aise avec les générateurs.
 :::
 
 On peut faire "rebondir" le résultat d'une étape vers l'entrée de la suivante : chaque appel à `next(value)` injecte `value` comme résultat de l'expression `yield` en cours, puis avance jusqu'au prochain `yield`.
@@ -228,7 +228,7 @@ C'est _exactement_ le mécanisme qu'Effect utilise pour chaîner des Effects dan
 
 ### Exercice
 
-Implémentez le corps du `do…while` dans `genPipe` — la boucle qui fait avancer le générateur pas à pas en réinjectant chaque résultat :
+Implémentez le corps du `do…while` dans `genPipe` - la boucle qui fait avancer le générateur pas à pas en réinjectant chaque résultat :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -282,9 +282,9 @@ done = result.done || false
 
 ---
 
-## Partie 2 — Générateurs avec Effect
+## Partie 2 - Générateurs avec Effect
 
-Les générateurs permettent de mettre une fonction en pause et d'y injecter des valeurs. Effect exploite ce mécanisme pour deux choses : remplacer les longues chaînes de `flatMap` par une syntaxe linéaire, et retrouver le flot de contrôle impératif — `if`, `for`, `while`, ... — sans sortir du monde Effect.
+Les générateurs permettent de mettre une fonction en pause et d'y injecter des valeurs. Effect exploite ce mécanisme pour deux choses : remplacer les longues chaînes de `flatMap` par une syntaxe linéaire, et retrouver le flot de contrôle impératif - `if`, `for`, `while`, ... - sans sortir du monde Effect.
 
 ### Nommer et composer des handlers
 
@@ -307,7 +307,7 @@ Le `yield*` à l'intérieur joue le rôle de `flatMap` : il suspend le générat
 
 :::info `Effect.gen` vs `Effect.fn`
 
-Il existe aussi `Effect.gen(function*() { ... })` qui s'occupe uniquement du generateur. Préférez `Effect.fn` : le nom passé en premier argument apparaît dans les stack traces et active le tracing automatique — ce qui rend le débogage beaucoup plus simple.
+Il existe aussi `Effect.gen(function*() { ... })` qui s'occupe uniquement du generateur. Préférez `Effect.fn` : le nom passé en premier argument apparaît dans les stack traces et active le tracing automatique - ce qui rend le débogage beaucoup plus simple.
 
 Pour comprendre comment visualiser ces traces dans Jaeger, voir [Observabilité](../base-de-connaissance/16-observabilite.md).
 
@@ -315,7 +315,7 @@ Pour comprendre comment visualiser ces traces dans Jaeger, voir [Observabilité]
 
 ### Exercice
 
-Une fonction `upperCase` est déjà disponible dans le contexte — elle prend une `string` et renvoie un `Effect` contenant la version en majuscules.
+Une fonction `upperCase` est déjà disponible dans le contexte - elle prend une `string` et renvoie un `Effect` contenant la version en majuscules.
 
 Créez `getItemLabel` avec `Effect.fn` :
 
@@ -342,7 +342,7 @@ const myFn = Effect.fn("myFn")(function*(arg1: string, arg2: string) {
 })
 ```
 
-`yield*` attend un `Effect` — `upperCase(brand)` en renvoie un directement.
+`yield*` attend un `Effect` - `upperCase(brand)` en renvoie un directement.
 
 </details>
 
@@ -368,7 +368,7 @@ const getItemLabel = Effect.fn("getItemLabel")(function* (
 
 ### Réécrire un pipeline avec des générateurs
 
-Vous connaissez probablement le "Callback Hell" — des callbacks imbriqués sur plusieurs niveaux, impossible à lire :
+Vous connaissez probablement le "Callback Hell" - des callbacks imbriqués sur plusieurs niveaux, impossible à lire :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -382,7 +382,7 @@ fetchUser(id, function (user) {
 });
 ```
 
-JavaScript l'a résolu avec `async/await` : même logique, lecture linéaire. `Effect.fn` joue exactement le même rôle pour Effect — `yield*` est l'équivalent d'`await`.
+JavaScript l'a résolu avec `async/await` : même logique, lecture linéaire. `Effect.fn` joue exactement le même rôle pour Effect - `yield*` est l'équivalent d'`await`.
 
 Les trois écritures suivantes sont équivalentes. La version générateur est souvent plus lisible quand il y a plusieurs étapes :
 
@@ -405,7 +405,7 @@ const fetchWeather = (city: string) =>
     ),
   );
 
-// Avec Effect.Do (do notation) — nommage explicite des valeurs intermédiaires
+// Avec Effect.Do (do notation) - nommage explicite des valeurs intermédiaires
 const fetchWeatherDo = (city: string) =>
   pipe(
     Effect.Do,
@@ -415,7 +415,7 @@ const fetchWeatherDo = (city: string) =>
     Effect.map(({ data, response }) => ({ response, data })),
   );
 
-// Avec Effect.fn — même logique, lecture linéaire
+// Avec Effect.fn - même logique, lecture linéaire
 const fetchWeatherGen = Effect.fn("fetchWeatherGen")(function* (city: string) {
   const client = yield* HttpClient.HttpClient;
   const response = yield* client.get(`https://api.weather.io/${city}`);
@@ -486,7 +486,7 @@ for (let index = 0; index < count; index++) {
 }
 ```
 
-`yield*` dans une boucle `for` — exactement comme un `await` dans un `for` async.
+`yield*` dans une boucle `for` - exactement comme un `await` dans un `for` async.
 
 </details>
 
@@ -520,7 +520,7 @@ const buildUsers = Effect.fn(function* (count: number) {
 const getOrder = Effect.fn(function* (id: string) {
   const order = yield* getOrderById(id);
 
-  // getOrderItems peut échouer — on fournit un fallback
+  // getOrderItems peut échouer - on fournit un fallback
   const items = yield* Effect.orElse(getOrderItems(id), () =>
     Effect.succeed([]),
   );
@@ -564,16 +564,16 @@ const friends = yield* Effect.orElse(
 ### Utiliser Option et Either dans un générateur
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 `Option` et `Either` sont des sous-types d'`Effect` : les fonctions du module `Effect` les acceptent directement. On peut les utiliser avec `yield*` dans un générateur comme n'importe quel Effect.
 
 | Type              | Comportement                        |
 | ----------------- | ----------------------------------- |
-| `Option.Some(a)`  | Succès — injecte `a`                |
+| `Option.Some(a)`  | Succès - injecte `a`                |
 | `Option.None`     | Échec avec `NoSuchElementException` |
-| `Either.Right(a)` | Succès — injecte `a`                |
+| `Either.Right(a)` | Succès - injecte `a`                |
 | `Either.Left(e)`  | Échec avec `e`                      |
 
 <!-- prettier-ignore -->

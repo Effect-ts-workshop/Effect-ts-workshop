@@ -31,14 +31,14 @@ Si un Effect est sur la voie d'erreur, les transformations suivantes sont **igno
 ```typescript
 const result = pipe(
   divide(10, 0), // ❌ Erreur → DivisionByZero
-  Effect.map((n) => n * 100), // Ignoré — on est sur la voie erreur
-  Effect.map((n) => n + 1),   // Ignoré — idem
-  Effect.map((n) => String(n)) // Ignoré — idem
+  Effect.map((n) => n * 100), // Ignoré - on est sur la voie erreur
+  Effect.map((n) => n + 1),   // Ignoré - idem
+  Effect.map((n) => String(n)) // Ignoré - idem
 )
 // L'erreur DivisionByZero est propagée jusqu'à la fin
 ```
 
-C'est exactement le comportement de `async/await` avec les Promesses — une exception ignore tous les `.then()` suivants.
+C'est exactement le comportement de `async/await` avec les Promesses - une exception ignore tous les `.then()` suivants.
 
 ## Changer de voie
 
@@ -95,7 +95,7 @@ Le Railway Pattern rend la gestion d'erreurs **composable** et **prévisible** :
 
 <!-- prettier-ignore -->
 ```typescript
-// Code Effect — logique principale et erreurs bien séparées
+// Code Effect - logique principale et erreurs bien séparées
 const createOrder = (userId: string, articleId: string) =>
   pipe(
     Effect.gen(function*() {

@@ -2,11 +2,11 @@
 sidebar_position: 1
 ---
 
-# Exercice 1 — Les bases
+# Exercice 1 - Les bases
 
 Cet exercice ne cherche pas à vous faire mémoriser des API. Il pose deux idées qui vont changer votre façon de lire et d'écrire du TypeScript.
 
-La première : `pipe`, pour composer des transformations dans l'ordre naturel de lecture. La deuxième : `Effect`, pour rendre explicite dans le type ce qu'une fonction peut faire — réussir ou échouer, aussi bien de maniere synchrone qu'asynchrone.
+La première : `pipe`, pour composer des transformations dans l'ordre naturel de lecture. La deuxième : `Effect`, pour rendre explicite dans le type ce qu'une fonction peut faire - réussir ou échouer, aussi bien de maniere synchrone qu'asynchrone.
 
 Ces deux idées sont indépendantes pour l'instant. Elles s'assemblent dès l'exercice suivant.
 
@@ -14,7 +14,7 @@ Fichier à compléter : `packages/api/_exercices/1-base.spec.ts`
 
 ---
 
-## Partie 1 — FP utils
+## Partie 1 - FP utils
 
 ### Transformer une fonction en curried function
 
@@ -36,7 +36,7 @@ greet("Hello");         // (name: string) => "Hello, " + name + "!"
 greet("Hello")("Alice") // "Hello, Alice!"
 ```
 
-`greet("Hello")` ne produit pas encore de résultat — elle fixe le premier argument et attend le second.
+`greet("Hello")` ne produit pas encore de résultat - elle fixe le premier argument et attend le second.
 
 #### Exercice
 
@@ -112,7 +112,7 @@ const result = pipe(
 );
 ```
 
-Et avec des curried functions, plus besoin de lambda intermédiaire — on passe directement la fonction partiellement appliquée :
+Et avec des curried functions, plus besoin de lambda intermédiaire - on passe directement la fonction partiellement appliquée :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -147,7 +147,7 @@ expect(result).toEqual(40);
 
 :::tip Ressources
 
-- [Le type Effect — Transformer des Effects](../base-de-connaissance/01-le-type-effect.md)
+- [Le type Effect - Transformer des Effects](../base-de-connaissance/01-le-type-effect.md)
 
 :::
 
@@ -156,7 +156,7 @@ expect(result).toEqual(40);
 <details>
   <summary>Qu'est-ce que `add(6)` renvoie exactement ?</summary>
 
-`add(6)` renvoie une fonction — pas un nombre. `pipe` va appeler cette fonction avec `4`, ce qui donne `10`.
+`add(6)` renvoie une fonction - pas un nombre. `pipe` va appeler cette fonction avec `4`, ce qui donne `10`.
 
 Il suffit de faire la même chose avec `multiply`.
 
@@ -180,7 +180,7 @@ const result = pipe(
 
 ---
 
-## Partie 2 — Effect basics
+## Partie 2 - Effect basics
 
 Une question avant de coder : _qu'est-ce que le type d'une fonction vous dit vraiment ?_
 
@@ -202,15 +202,15 @@ Effect.Effect<Value, Error, Requirements>;
 //                    rater
 ```
 
-Ce n'est pas juste un wrapper — c'est un nouveau contrat. La fonction dit ce qu'elle produit, ce qui peut rater, et ce dont elle a besoin. Plus de surprises à l'exécution.
+Ce n'est pas juste un wrapper - c'est un nouveau contrat. La fonction dit ce qu'elle produit, ce qui peut rater, et ce dont elle a besoin. Plus de surprises à l'exécution.
 
-Et justement : un `Effect` est une **description** d'un programme. Il ne s'exécute pas tout seul — on le lance explicitement.
+Et justement : un `Effect` est une **description** d'un programme. Il ne s'exécute pas tout seul - on le lance explicitement.
 
 <!-- prettier-ignore -->
 ```typescript
-const myEffect = Effect.succeed(42); // description — ne fait rien
+const myEffect = Effect.succeed(42); // description - ne fait rien
 
-Effect.runSync(myEffect); // exécution — produit 42
+Effect.runSync(myEffect); // exécution - produit 42
 ```
 
 Retenez cette distinction. Elle est au cœur de tout ce que vous ferez avec Effect.
@@ -246,7 +246,7 @@ expect(Effect.runSync(add(2, 8))).toEqual(10);
 
 :::tip Ressources
 
-- [Le type Effect — Créer des Effects](../base-de-connaissance/01-le-type-effect.md)
+- [Le type Effect - Créer des Effects](../base-de-connaissance/01-le-type-effect.md)
 
 :::
 
@@ -283,7 +283,7 @@ const add = (a: number, b: number): Effect.Effect<number> => {
 
 ### Transformer la valeur d'un Effect
 
-On a un `Effect` et on veut transformer la valeur à l'intérieur — sans en sortir. C'est le rôle de `map`.
+On a un `Effect` et on veut transformer la valeur à l'intérieur - sans en sortir. C'est le rôle de `map`.
 
 <!-- prettier-ignore -->
 ```typescript
@@ -316,7 +316,7 @@ expect(Effect.runSync(result)).toEqual(10);
 
 :::tip Ressources
 
-- [Le type Effect — Transformer des Effects](../base-de-connaissance/01-le-type-effect.md)
+- [Le type Effect - Transformer des Effects](../base-de-connaissance/01-le-type-effect.md)
 
 :::
 
@@ -327,7 +327,7 @@ expect(Effect.runSync(result)).toEqual(10);
 
 `add` est currifiée : `add(8)` renvoie une fonction `(b: number) => 8 + b`.
 
-`Effect.map` attend précisément une fonction de ce type — pas besoin de lambda supplémentaire.
+`Effect.map` attend précisément une fonction de ce type - pas besoin de lambda supplémentaire.
 
 </details>
 
@@ -430,7 +430,7 @@ Une subtilité importante : on passe une **fonction** qui renvoie la `Promise`, 
 
 <!-- prettier-ignore -->
 ```typescript
-// ❌ La Promise démarre immédiatement — Effect ne contrôle plus rien
+// ❌ La Promise démarre immédiatement - Effect ne contrôle plus rien
 Effect.promise(fetch("https://api.example.com"));
 
 // ✓ La Promise ne démarre que quand Effect l'exécute
@@ -459,7 +459,7 @@ await expect(Effect.runPromise(addWithDelay(2, 8))).resolves.toEqual(10);
 
 :::tip Ressources
 
-- [Le type Effect — À partir de Promises](../base-de-connaissance/01-le-type-effect.md)
+- [Le type Effect - À partir de Promises](../base-de-connaissance/01-le-type-effect.md)
 
 :::
 
@@ -468,7 +468,7 @@ await expect(Effect.runPromise(addWithDelay(2, 8))).resolves.toEqual(10);
 <details>
   <summary>Une fonction qui renvoie une Promise</summary>
 
-`Effect.promise` attend `() => Promise<T>` — une fonction qui retourne une Promise, pas la Promise elle-même.
+`Effect.promise` attend `() => Promise<T>` - une fonction qui retourne une Promise, pas la Promise elle-même.
 
 Les arguments `a` et `b` sont déjà disponibles dans la closure de `addWithDelay`.
 
@@ -493,7 +493,7 @@ const addWithDelay = (a: number, b: number): Effect.Effect<number> => {
 ### Modéliser une opération asynchrone faillible
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 `Effect.promise` suppose que la `Promise` ne peut jamais rejeter. Mais dans la réalité, la plupart des operations asynchrones peuvent échouer. Si on prend l'exemple de `fetch`, le réseau ou le serveur peut être indisponible.
@@ -511,9 +511,9 @@ Effect.tryPromise({
 //                       l'erreur est visible dans le type
 ```
 
-C'est la différence fondamentale avec `Promise` : l'erreur ne disparaît plus dans un `catch` invisible — elle fait partie du contrat de la fonction.
+C'est la différence fondamentale avec `Promise` : l'erreur ne disparaît plus dans un `catch` invisible - elle fait partie du contrat de la fonction.
 
-Vous venez de découvrir les deux premiers parametres du type `Effect` : succès, erreur. L'exercice suivant approfondit la gestion d'erreurs — comment les modéliser, les distinguer, et s'en remettre proprement.
+Vous venez de découvrir les deux premiers parametres du type `Effect` : succès, erreur. L'exercice suivant approfondit la gestion d'erreurs - comment les modéliser, les distinguer, et s'en remettre proprement.
 
 #### Exercice
 
@@ -536,7 +536,7 @@ const fetch: Fetch = (input, init) => {
 
 :::tip Ressources
 
-- [Le type Effect — À partir de Promises](../base-de-connaissance/01-le-type-effect.md)
+- [Le type Effect - À partir de Promises](../base-de-connaissance/01-le-type-effect.md)
 
 :::
 
@@ -562,7 +562,7 @@ Effect.tryPromise({
 <details>
   <summary>Quel `fetch` appeler à l'intérieur ?</summary>
 
-`baseFetch` est le vrai `fetch` importé de `undici`. Les arguments `input` et `init` sont déjà disponibles dans la closure — ce sont exactement les arguments à transmettre à `baseFetch`.
+`baseFetch` est le vrai `fetch` importé de `undici`. Les arguments `input` et `init` sont déjà disponibles dans la closure - ce sont exactement les arguments à transmettre à `baseFetch`.
 
 </details>
 

@@ -17,7 +17,7 @@ Un **Atom** est la brique de base du state management dans `@effect-atom/atom-re
 - quand sa valeur change, tous ses **abonnés sont notifiés**
 - il s'intègre naturellement avec Effect (un Atom peut contenir un `Effect`)
 
-C'est l'équivalent d'un `signal` (SolidJS), d'un `atom` (Jotai) ou d'un `ref` (Vue) — mais pensé pour fonctionner avec Effect.
+C'est l'équivalent d'un `signal` (SolidJS), d'un `atom` (Jotai) ou d'un `ref` (Vue) - mais pensé pour fonctionner avec Effect.
 
 ## La Registry
 
@@ -104,7 +104,7 @@ r.set(counter, 9); // → "nouvelle valeur : 9"
 
 `r.subscribe` retourne une fonction de désabonnement à appeler lors du cleanup.
 
-## `Atom.keepAlive` — persistance sans abonnés
+## `Atom.keepAlive` - persistance sans abonnés
 
 Par défaut, un Atom sans abonné peut être collecté par le garbage collector. `Atom.keepAlive` force sa persistance :
 
@@ -118,7 +118,7 @@ r.get(persistent);       // → 9 (toujours là)
 ```
 
 :::tip Quand utiliser `keepAlive` ?
-Pour les Atoms qui doivent persister entre deux rendus React — par exemple, un état global partagé entre plusieurs composants non montés simultanément.
+Pour les Atoms qui doivent persister entre deux rendus React - par exemple, un état global partagé entre plusieurs composants non montés simultanément.
 :::
 
 ## Utilisation dans React
@@ -169,7 +169,7 @@ function IncrementButton() {
 }
 ```
 
-`useAtomSet` ne provoque pas de re-rendu — le composant ne lit pas la valeur.
+`useAtomSet` ne provoque pas de re-rendu - le composant ne lit pas la valeur.
 
 ## Lien avec `AtomHttpApi.Tag`
 
@@ -186,4 +186,4 @@ const allItemsAtom = Atom.make(
 );
 ```
 
-C'est pourquoi `useAtomValue(ApiClient.query(...))` retourne un `Result` — c'est le même mécanisme que `Atom.make(Effect.succeed(...))`.
+C'est pourquoi `useAtomValue(ApiClient.query(...))` retourne un `Result`.

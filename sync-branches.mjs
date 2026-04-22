@@ -16,7 +16,7 @@
  *   // const counter = Atom.make(0) ← solutions branch uncomments this
  *   // #end
  *
- * The current branch is never modified — it stays the source of truth.
+ * The current branch is never modified - it stays the source of truth.
  * Re-running the script later will overwrite both branches with fresh transforms.
  *
  * Usage:
@@ -81,7 +81,7 @@ function run(cmd, cwd) {
 const repoRoot = run("git rev-parse --show-toplevel", process.cwd())
 const sourceBranch = run("git rev-parse --abbrev-ref HEAD", repoRoot)
 
-// Convenience wrapper — defaults cwd to repoRoot
+// Convenience wrapper - defaults cwd to repoRoot
 const git = (cmd, cwd = repoRoot) => run(`git ${cmd}`, cwd)
 
 // Always exclude the script itself from branch commits
@@ -277,10 +277,10 @@ function syncBranch(branchName, transformFn, { eslintFix = false, afterTransform
     try { currentTree = git(`rev-parse "${branchName}^{tree}"`) } catch {}
 
     if (tree === currentTree) {
-      console.log("  nothing to commit — already up to date.")
+      console.log("  nothing to commit - already up to date.")
     } else {
       // Create an orphan commit: no -p flag means no parent, so no file history.
-      // git commit-tree is a plumbing command — it never runs hooks.
+      // git commit-tree is a plumbing command - it never runs hooks.
       const commitHash = git(`commit-tree ${tree} -m "sync: ${branchName} from ${sourceBranch}"`, wtDir)
 
       // Move the branch pointer to the orphan commit (replaces any previous history)

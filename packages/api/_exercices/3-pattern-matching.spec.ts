@@ -134,7 +134,7 @@ describe("Pattern matching", () => {
         // #start
         // TODO,
         // #solution
-        Match.when(Match.null, () => "—"),
+        Match.when(Match.null, () => "-"),
         Match.when(Match.boolean, (b) => (b ? "Oui" : "Non")),
         Match.when(Match.number, (n) => n.toLocaleString("fr-FR")),
         Match.when(Match.string, (s) => s),
@@ -142,7 +142,7 @@ describe("Pattern matching", () => {
         Match.exhaustive
       )
 
-    expect(formatForDisplay(null)).toEqual("—")
+    expect(formatForDisplay(null)).toEqual("-")
     expect(formatForDisplay(true)).toEqual("Oui")
     expect(formatForDisplay(false)).toEqual("Non")
     expect(formatForDisplay(1234567)).toEqual("1\u202f234\u202f567") // séparateur milliers fr-FR

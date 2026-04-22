@@ -2,11 +2,11 @@
 sidebar_position: 9
 ---
 
-# Exercice 9 — API Client
+# Exercice 9 - API Client
 
 L'exercice 7 montrait comment _définir_ une API côté serveur. Ici, on est côté client (navigateur) : on _consomme_ une API existante.
 
-Le contrat (`Api`) est importé depuis `shared/api.ts` — la même source de vérité que le serveur. Si un endpoint est renommé côté serveur, le compilateur signale immédiatement l'erreur côté client.
+Le contrat (`Api`) est importé depuis `shared/api.ts` - la même source de vérité que le serveur. Si un endpoint est renommé côté serveur, le compilateur signale immédiatement l'erreur côté client.
 
 Fichier de référence : `packages/app/_exercices/9-api-client.spec.tsx`
 
@@ -26,7 +26,7 @@ const program = pipe(
 )
 ```
 
-Le client retourné est lui-même un `Effect` — il faut `flatMap` pour l'utiliser.
+Le client retourné est lui-même un `Effect` - il faut `flatMap` pour l'utiliser.
 
 ### Récupérer la liste des items
 
@@ -47,7 +47,7 @@ N'oubliez pas de fournir `TestHttpClient` avec `Effect.provide`.
 <details>
   <summary>Comment obtenir le client ?</summary>
 
-  `HttpApiClient.make(Api, { baseUrl: "http://localhost" })` renvoie un `Effect<client>`. Il faut `Effect.flatMap` pour accéder à ce client et appeler un endpoint.
+`HttpApiClient.make(Api, { baseUrl: "http://localhost" })` renvoie un `Effect<client>`. Il faut `Effect.flatMap` pour accéder à ce client et appeler un endpoint.
 
 </details>
 
@@ -56,7 +56,7 @@ N'oubliez pas de fournir `TestHttpClient` avec `Effect.provide`.
 <details>
   <summary>Comment fournir le layer HTTP ?</summary>
 
-  `HttpApiClient` a besoin d'un layer HTTP pour effectuer les requêtes. On le fournit en ajoutant `Effect.provide(TestHttpClient)` à la fin du pipe.
+`HttpApiClient` a besoin d'un layer HTTP pour effectuer les requêtes. On le fournit en ajoutant `Effect.provide(TestHttpClient)` à la fin du pipe.
 
 </details>
 
@@ -87,7 +87,7 @@ Implémentez le `program` qui appelle `getItemById`. L'identifiant est passé da
 <details>
   <summary>Comment passer un paramètre de chemin ?</summary>
 
-  Les endpoints qui prennent un paramètre `:itemId` dans l'URL attendent un objet `{ path: { itemId: ... } }`.
+Les endpoints qui prennent un paramètre `:itemId` dans l'URL attendent un objet `{ path: { itemId: ... } }`.
 
 </details>
 
@@ -135,7 +135,7 @@ Implémentez l'argument de `Effect.all` pour appeler `getAllItems` et `getItemBy
 <details>
   <summary>Que passer à Effect.all ?</summary>
 
-  Les clés du résultat attendu sont `list` et `single`. Chaque valeur est un `Effect` retourné par le client — par exemple `client.items.getAllItems()`.
+Les clés du résultat attendu sont `list` et `single`. Chaque valeur est un `Effect` retourné par le client - par exemple `client.items.getAllItems()`.
 
 </details>
 

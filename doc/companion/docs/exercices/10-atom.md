@@ -2,17 +2,24 @@
 sidebar_position: 10
 ---
 
-# Exercice 10 — Atom
+# Exercice 10 - Atom
 
-Gérer l'état d'une application React, c'est souvent choisir entre une variable globale (difficile à tester), du prop drilling (bruyant à propager) ou un store centralisé (verbeux à configurer).
+Gérer l'état d'une application React, c'est souvent choisir entre plusieurs outils :
 
-`Atom` est une primitive plus simple : une unité de state réactive et isolée. Quand sa valeur change, tous ses abonnés sont notifiés automatiquement. Cet exercice explore le mécanisme de base, puis son intégration React.
+- **`useState` / `useReducer`** - local et simple, mais qui ne se partage pas sans prop drilling.
+- **Zustand / Redux** - un store global, mais verbeux à configurer et à câbler.
+- **Jotai** - des atoms isolés et réactifs, proches de `useState` mais partageables.
+- **TanStack Query** - idéal pour l'état serveur : cache, loading, error, revalidation automatique.
+
+`effect-atom` réunit ces deux dernières idées dans un seul modèle : des **atoms réactifs** pour l'état local, et un équivalent de TanStack Query **entièrement typé** et intégré à Effect pour l'état serveur.
 
 Fichier à compléter : `packages/app/_exercices/10-atom.spec.tsx`
 
 ---
 
-## Partie 1 — Atom core
+## Partie 1 - Atom core
+
+Si vous avez déjà utilisé [Jotai](https://jotai.org/), le modèle vous sera familier : un `Atom` est une unité de state isolée et réactive. Quand sa valeur change, tous ses abonnés sont notifiés automatiquement. La différence clé : ces atoms s'intègrent nativement avec Effect - ils peuvent contenir des `Effect`, des `Result`, et s'exécuter dans un `Registry`.
 
 ### Créer un état réactif
 
@@ -96,7 +103,7 @@ r.set(counter, 1)
 
 ---
 
-### Atoms dérivés — computed values
+### Atoms dérivés - computed values
 
 Un atom peut _dériver_ sa valeur d'autres atoms. La fonction reçoit `get` pour lire d'autres atoms :
 
@@ -106,7 +113,7 @@ const price = Atom.make(100)
 const priceWithTax = Atom.make((get) => get(price) * 1.2)
 
 r.set(price, 50)
-r.get(priceWithTax) // 60 — recalculé automatiquement
+r.get(priceWithTax) // 60 - recalculé automatiquement
 ```
 
 ### Exercice
@@ -329,7 +336,7 @@ const aliveAtom = Atom.keepAlive(initialAtom)
 
 ---
 
-## Partie 2 — Atom React
+## Partie 2 - Atom React
 
 ### Lire un atom dans un composant
 
@@ -375,7 +382,7 @@ const value = useAtomValue(atom)
 
 ### Lire et modifier un atom
 
-`useAtom` retourne `[value, setter]` — comme `useState`, mais pour un atom partagé :
+`useAtom` retourne `[value, setter]` - comme `useState`, mais pour un atom partagé :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -416,10 +423,25 @@ const [value, setValue] = useAtom(atom)
 
 ### Intégrer les appels API avec les atoms
 
-Maintenant qu'on comprend les atoms, on peut regarder ce que `AtomHttpApi.Tag` fait par-dessus : il crée automatiquement des atoms à partir des endpoints d'une API HTTP et gère les états `loading`, `success` et `error` via un `Result` :
+Si vous avez utilisé **TanStack Query**, ce pattern vous rappellera quelque chose :
+
+```typescript
+// TanStack Query
+const { data, isLoading, error } = useQuery({
+  queryKey: ["items"],
+  queryFn: () => fetchItems(),
+});
+```
+
+`AtomHttpApi.Tag` fait la même chose, mais :
+
+- la `queryKey` devient `reactivityKeys` - même idée : quand ces clés changent, la requête se relance
+- les états `loading / success / error` sont regroupés dans un `Result` retourné par la lib
+- le client HTTP est injecté via un `Layer` Effect - testable et swappable sans mock global
 
 <!-- prettier-ignore -->
 ```typescript
+// AtomHttpApi - équivalent Effect de useQuery
 class WeatherClient extends AtomHttpApi.Tag<WeatherClient>()("WeatherClient", {
   api: WeatherApi,
   httpClient: MockedHttpClient,
@@ -438,17 +460,16 @@ function ForecastComponent() {
 }
 ```
 
-`Result.builder` offre un pattern matching sur l'état de la requête (`initial`, `loading`, `success`, `failure`).
+`Result.builder` offre un pattern matching exhaustif sur l'état de la requête (`initial`, `loading`, `success`, `failure`). Contrairement à destructurer `{ data, isLoading, error }`, le compilateur vous force à traiter chaque cas - impossible d'afficher `data` sans avoir vérifié que la requête a réussi.
 
 ### Exercice
 
-Lisez l'atom de query avec `useAtomValue` pour `DemoClient.query("items", "getAllItems", ...)` :
+Lisez l'atom de query avec `useAtomValue` pour récupérer tous les items :
 
 <!-- prettier-ignore -->
 ```typescript
 function TestComponent() {
-  const result = ??? as Result.Result<{ items: any[] }, any> // À compléter
-  // ...
+  const result = // À compléter
 }
 ```
 

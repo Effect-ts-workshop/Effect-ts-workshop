@@ -2,12 +2,12 @@
 sidebar_position: 11
 ---
 
-# Exercice 11 — Form
+# Exercice 11 - Form
 
 Les formulaires posent trois problèmes récurrents : valider les champs, afficher les erreurs au bon moment, et soumettre uniquement quand les données sont valides.
 
 :::note Package externe
-`effect-form-react` est un package distinct d'Effect core, créé par Lucas Barake — contributeur actif de la communauté Effect, auteur de nombreuses vidéos et ressources sur le sujet.
+`effect-form-react` est un package distinct d'Effect core, créé par Lucas Barake - contributeur actif de la communauté Effect, auteur de nombreuses vidéos et ressources sur le sujet.
 :::
 
 `effect-form-react` résout ces trois problèmes en s'appuyant sur `Schema` pour la validation et `Atom` pour l'état.
@@ -27,7 +27,7 @@ const contactFormBuilder = FormBuilder.empty
   .addField("email", Schema.NonEmptyTrimmedString)
 ```
 
-`FormBuilder` ne contient pas de logique de rendu — c'est une description du formulaire. Le rendu vient ensuite avec `FormReact.make`.
+`FormBuilder` ne contient pas de logique de rendu - c'est une description du formulaire. Le rendu vient ensuite avec `FormReact.make`.
 
 ### Exercice
 
@@ -130,36 +130,36 @@ const searchForm = FormReact.make(searchFormBuilder, {
 
 L'objet retourné expose deux catégories d'atoms :
 
-**Atoms en lecture** — à utiliser avec `useAtomValue` :
+**Atoms en lecture** - à utiliser avec `useAtomValue` :
 
-| Atom | Type | Description |
-|------|------|-------------|
-| `form.values` | `Atom<Option<Values>>` | Valeurs courantes de tous les champs |
-| `form.isDirty` | `Atom<boolean>` | `true` si au moins un champ a changé depuis l'initialisation |
-| `form.hasChangedSinceSubmit` | `Atom<boolean>` | `true` si des changements existent depuis la dernière soumission |
-| `form.lastSubmittedValues` | `Atom<Option<Values>>` | Valeurs de la dernière soumission valide |
-| `form.submitCount` | `Atom<number>` | Nombre de tentatives de soumission |
+| Atom                         | Type                   | Description                                                      |
+| ---------------------------- | ---------------------- | ---------------------------------------------------------------- |
+| `form.values`                | `Atom<Option<Values>>` | Valeurs courantes de tous les champs                             |
+| `form.isDirty`               | `Atom<boolean>`        | `true` si au moins un champ a changé depuis l'initialisation     |
+| `form.hasChangedSinceSubmit` | `Atom<boolean>`        | `true` si des changements existent depuis la dernière soumission |
+| `form.lastSubmittedValues`   | `Atom<Option<Values>>` | Valeurs de la dernière soumission valide                         |
+| `form.submitCount`           | `Atom<number>`         | Nombre de tentatives de soumission                               |
 
-**Atoms en écriture** — à utiliser avec `useAtomSet` :
+**Atoms en écriture** - à utiliser avec `useAtomSet` :
 
-| Atom | Description |
-|------|-------------|
-| `form.submit` | Déclenche la validation puis appelle `onSubmit` si valide |
-| `form.validate` | Déclenche la validation manuellement sans soumettre |
-| `form.reset` | Remet le formulaire à son état initial |
-| `form.revertToLastSubmit` | Revient aux valeurs de la dernière soumission valide |
-| `form.setValues` | Remplace programmatiquement toutes les valeurs |
+| Atom                      | Description                                               |
+| ------------------------- | --------------------------------------------------------- |
+| `form.submit`             | Déclenche la validation puis appelle `onSubmit` si valide |
+| `form.validate`           | Déclenche la validation manuellement sans soumettre       |
+| `form.reset`              | Remet le formulaire à son état initial                    |
+| `form.revertToLastSubmit` | Revient aux valeurs de la dernière soumission valide      |
+| `form.setValues`          | Remplace programmatiquement toutes les valeurs            |
 
 **Chaque champ** reçoit un objet `field` dans son composant de rendu :
 
-| Propriété | Type | Description |
-|-----------|------|-------------|
-| `field.value` | `T` | Valeur courante |
-| `field.onChange` | `(v: T) => void` | Mettre à jour la valeur |
-| `field.onBlur` | `() => void` | Marquer le champ comme touché |
-| `field.error` | `Option<string>` | Message d'erreur à afficher |
-| `field.isTouched` | `boolean` | `true` si le champ a été interagi |
-| `field.isDirty` | `boolean` | `true` si la valeur a changé depuis l'init |
+| Propriété         | Type             | Description                                |
+| ----------------- | ---------------- | ------------------------------------------ |
+| `field.value`     | `T`              | Valeur courante                            |
+| `field.onChange`  | `(v: T) => void` | Mettre à jour la valeur                    |
+| `field.onBlur`    | `() => void`     | Marquer le champ comme touché              |
+| `field.error`     | `Option<string>` | Message d'erreur à afficher                |
+| `field.isTouched` | `boolean`        | `true` si le champ a été interagi          |
+| `field.isDirty`   | `boolean`        | `true` si la valeur a changé depuis l'init |
 
 ### Exercice
 
@@ -218,7 +218,7 @@ const loginFormBuilder = FormBuilder.empty
 
 ## Déclencher la soumission
 
-Le formulaire expose un atom `submit`. `useAtomSet` renvoie un setter — ici, c'est le handler de soumission du `<form>` :
+Le formulaire expose un atom `submit`. `useAtomSet` renvoie un setter - ici, c'est le handler de soumission du `<form>` :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -237,8 +237,8 @@ function SearchWidget({ defaultValues }) {
 ```
 
 - `searchForm.Initialize` fournit les valeurs par défaut
-- `searchForm.query` — le composant de champ défini dans `FormReact.make`
-- `submit` — déclenche la validation et appelle `onSubmit` si tout est valide
+- `searchForm.query` - le composant de champ défini dans `FormReact.make`
+- `submit` - déclenche la validation et appelle `onSubmit` si tout est valide
 
 ### Exercice
 
@@ -274,6 +274,6 @@ const submit = useAtomSet(loginForm.submit)
 2. `FormReact.make(builder, { fields, onSubmit })` → crée les composants de rendu
 3. `useAtomSet(loginForm.submit)` → récupère le handler de soumission
 4. `<form.Initialize defaultValues={...}>` → initialise l'état du formulaire
-5. La validation s'exécute à la soumission — les erreurs apparaissent champ par champ
+5. La validation s'exécute à la soumission - les erreurs apparaissent champ par champ
 
 :::

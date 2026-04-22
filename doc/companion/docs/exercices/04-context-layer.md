@@ -2,7 +2,7 @@
 sidebar_position: 4
 ---
 
-# Exercice 4 — Context et Layer
+# Exercice 4 - Context et Layer
 
 Une fonction qui fait une requête HTTP dépend d'un client HTTP. En TypeScript classique, cette dépendance est soit une variable globale (difficile à tester), soit un paramètre en plus (bruyant à propager).
 
@@ -82,7 +82,7 @@ Chaque étape renvoie un `Effect`. Il faut les enchaîner :
 <details>
   <summary>Comment extraire le body d'une `Response` ?</summary>
 
-Une `Response` HTTP expose son body via une propriété qui renvoie un `Effect` — pas une valeur directe.
+Une `Response` HTTP expose son body via une propriété qui renvoie un `Effect` - pas une valeur directe.
 
 Cherchez sur `response` ce qui donne accès au JSON parsé.
 
@@ -115,7 +115,7 @@ const fetchJoke = () =>
 
 ## Créer son propre service
 
-Pour définir un service maison, on crée un `Tag` — un identifiant unique qui permet à Effect de trouver l'implémentation dans le contexte :
+Pour définir un service maison, on crée un `Tag` - un identifiant unique qui permet à Effect de trouver l'implémentation dans le contexte :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -182,7 +182,7 @@ const JokeServiceLive = Layer.succeed(
 Context.GenericTag<TypeDuService>("IdentifiantUnique");
 ```
 
-L'identifiant est une string unique dans l'application — par convention, le nom du service.
+L'identifiant est une string unique dans l'application - par convention, le nom du service.
 
 </details>
 
@@ -211,12 +211,12 @@ const JokeServiceLive = Layer.succeed(JokeService, {
 ## Simplifier la définition d'un service
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 :::warning Fuite de requirements
 
-Quand un service utilise un autre service en interne, ses méthodes doivent renvoyer `Effect<T>` — jamais `Effect<T, never, AutreService>`. Sinon la dépendance interne devient une contrainte pour tous les appelants.
+Quand un service utilise un autre service en interne, ses méthodes doivent renvoyer `Effect<T>` - jamais `Effect<T, never, AutreService>`. Sinon la dépendance interne devient une contrainte pour tous les appelants.
 
 [Comprendre la fuite de requirements →](../base-de-connaissance/05-layers.md#éviter-la-fuite-de-requirements)
 
@@ -246,8 +246,8 @@ Une classe `Effect.Service` génère automatiquement plusieurs membres statiques
 | Membre                                   | Type    | Usage                                                              |
 | ---------------------------------------- | ------- | ------------------------------------------------------------------ |
 | `UserService`                            | `Tag`   | Accéder au service depuis le contexte (`yield* UserService`)       |
-| `UserService.Default`                    | `Layer` | Layer complet, dépendances incluses — à fournir à l'exécution      |
-| `UserService.DefaultWithoutDependencies` | `Layer` | Layer sans ses dépendances — utile pour injecter des mocks en test |
+| `UserService.Default`                    | `Layer` | Layer complet, dépendances incluses - à fournir à l'exécution      |
+| `UserService.DefaultWithoutDependencies` | `Layer` | Layer sans ses dépendances - utile pour injecter des mocks en test |
 
 ### Exercice
 
@@ -312,12 +312,12 @@ class JokeService extends Effect.Service<JokeService>()("JokeService", {
 ## Tester un service sans dépendances réelles
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
-Pour tester un service qui dépend d'un autre, `Layer.mock` permet de remplacer une dépendance par un double de test — sans modifier l'implémentation.
+Pour tester un service qui dépend d'un autre, `Layer.mock` permet de remplacer une dépendance par un double de test - sans modifier l'implémentation.
 
-`Layer.mock` accepte une implémentation **partielle** : seules les méthodes utiles pour le test ont besoin d'être fournies. Toute méthode non fournie lèvera un `UnimplementedError` defect si elle est appelée — ce qui est un filet de sécurité utile en test.
+`Layer.mock` accepte une implémentation **partielle** : seules les méthodes utiles pour le test ont besoin d'être fournies. Toute méthode non fournie lèvera un `UnimplementedError` defect si elle est appelée - ce qui est un filet de sécurité utile en test.
 
 <!-- prettier-ignore -->
 ```typescript
@@ -328,7 +328,7 @@ class EmailService extends Effect.Service<EmailService>()("EmailService", {
   }),
 }) {}
 
-// En test : on ne fournit que `send` — `validate` lèvera un defect si appelée
+// En test : on ne fournit que `send` - `validate` lèvera un defect si appelée
 const EmailServiceTest = Layer.mock(EmailService, {
   send: () => Effect.succeed("sent"),
 });
@@ -344,11 +344,11 @@ const UserServiceTest = pipe(
 );
 ```
 
-`DefaultWithoutDependencies` est la version du layer _sans_ ses dépendances déclarées — c'est le point d'entrée pour substituer des dépendances en tests.
+`DefaultWithoutDependencies` est la version du layer _sans_ ses dépendances déclarées - c'est le point d'entrée pour substituer des dépendances en tests.
 
 ### Exercice
 
-Créez `JokeServiceTest` avec un `HttpClient` qui échoue toujours — le `orElseSucceed` de `JokeService` devra renvoyer `"No jokes for today"` :
+Créez `JokeServiceTest` avec un `HttpClient` qui échoue toujours - le `orElseSucceed` de `JokeService` devra renvoyer `"No jokes for today"` :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -362,7 +362,7 @@ const JokeServiceTest = ??? // À compléter
 <details>
   <summary>Deux étapes</summary>
 
-1. Créez un mock de `HttpClient.HttpClient` avec `Layer.mock` — faites échouer la méthode `get`
+1. Créez un mock de `HttpClient.HttpClient` avec `Layer.mock` - faites échouer la méthode `get`
 2. Fournissez ce mock à `JokeService.DefaultWithoutDependencies` via `Layer.provide`
 
 </details>

@@ -2,9 +2,9 @@
 sidebar_position: 6
 ---
 
-# Exercice 6 — Schema
+# Exercice 6 - Schema
 
-Les données entrent dans notre application depuis des sources qu'on ne contrôle pas : APIs, formulaires, fichiers JSON. Ces données sont `unknown` — on ne peut pas faire confiance à leur structure.
+Les données entrent dans notre application depuis des sources qu'on ne contrôle pas : APIs, formulaires, fichiers JSON. Ces données sont `unknown` - on ne peut pas faire confiance à leur structure.
 
 `Schema` d'Effect est une bibliothèque de validation qui résout deux problèmes à la fois : valider la structure _et_ inférer le type TypeScript. Un seul schema, zéro duplication.
 
@@ -26,7 +26,7 @@ type Product = typeof ProductSchema.Type
 // { model: string; price: number; available: boolean }
 ```
 
-`Schema.decodeUnknownSync` prend en paramètre un schéma et retourne une fonction qui valide les données et renvoie la valeur typée — ou lève une exception si la validation échoue.
+`Schema.decodeUnknownSync` prend en paramètre un schéma et retourne une fonction qui valide les données et renvoie la valeur typée - ou lève une exception si la validation échoue.
 
 ### Exercice
 
@@ -174,12 +174,12 @@ const schema = Schema.Struct({
 ## Erreurs lisibles
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 Les erreurs de validation de `Schema` sont structurées. Pour les afficher sous forme de tableau, `ParseResult.ArrayFormatter` transforme l'erreur brute en une liste d'objets `{ path, message }`.
 
-`Either.match` permet de couvrir les deux branches — succès et échec — sans condition explicite :
+`Either.match` permet de couvrir les deux branches - succès et échec - sans condition explicite :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -222,9 +222,9 @@ const errors = Either.match(result, {
 
 ---
 
-## Encode et decode — aller-retour de sérialisation
+## Encode et decode - aller-retour de sérialisation
 
-Un même `Schema` peut encoder de TypeScript vers JSON et décoder de JSON vers TypeScript. La cohérence entre ce qu'envoie le _serializer_ au _deserializer_ est garantir par construction. 
+Un même `Schema` peut encoder de TypeScript vers JSON et décoder de JSON vers TypeScript. La cohérence entre ce qu'envoie le _serializer_ au _deserializer_ est garantir par construction.
 
 <!-- prettier-ignore -->
 ```typescript
@@ -270,7 +270,7 @@ const decodedData = pipe(dataDto, Schema.decodeSync(DataSchema))
 ## Générer des données de test automatiquement
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 Pour les tests property-based, `Arbitrary.make` génère automatiquement des données aléatoires conformes à un schema qui lui est fourni. On peut tester que l'on récupère bien des valeurs de même validité que les originales après sérialisation et désérialisation :
@@ -281,7 +281,7 @@ const arbitrary = Arbitrary.make(EventSchema)
 
 fc.assert(
   fc.property(arbitrary, (event) => {
-    // event est valide selon EventSchema — garanti par la génération
+    // event est valide selon EventSchema - garanti par la génération
     const dto = pipe(event, Schema.encodeSync(EventSchema))
     const back = pipe(dto, Schema.decodeSync(EventSchema))
     expect(event).toEqual(back)
@@ -317,7 +317,7 @@ const arbitrary = Arbitrary.make(DataSchema)
 ## Créer un schema personnalisé
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 Pour valider une email, un UUID, un numéro de téléphone, on combine `Schema.pattern` (regex) avec `Schema.fromBrand` (type opaque) :
@@ -365,10 +365,10 @@ const EmailSchema = pipe(
 
 ---
 
-## Annotations — identifier et clarifier les erreurs
+## Annotations - identifier et clarifier les erreurs
 
 :::note Tests optionnels
-Ces tests sont marqués `[OPTIONAL]` dans la spec — passez-les si vous manquez de temps.
+Ces tests sont marqués `[OPTIONAL]` dans la spec - passez-les si vous manquez de temps.
 :::
 
 Les annotations enrichissent les messages d'erreur pour les rendre exploitables :
@@ -384,7 +384,7 @@ const Product = Schema.Struct({
 Sans annotations : `"Expected string, actual undefined"`
 Avec annotations : `"Expected Title, actual undefined"` dans le contexte `Product`
 
-### Exercice A — Annoter le type
+### Exercice A - Annoter le type
 
 Annotez le schema avec `{ identifier: "Person" }` :
 
@@ -393,7 +393,7 @@ Annotez le schema avec `{ identifier: "Person" }` :
 const Person = Schema.Struct({}).annotations(???) // À compléter
 ```
 
-### Exercice B — Annoter les champs
+### Exercice B - Annoter les champs
 
 Annotez les champs `name` (identifier: "Name") et `age` (identifier: "Age") :
 
@@ -413,12 +413,12 @@ const Person = Schema.Struct({
   <summary>L'ordre de déclaration des propriétés influe sur l'ordre des clés  erreurs</summary>
 
 ```typescript
-const badProduct = { price: '10€'}
+const badProduct = { price: "10€" };
 
 const Product = Schema.Struct({
   title: Schema.String.annotations({ identifier: "Title" }), // [0]
-  price: Schema.Number.annotations({ identifier: "Price" })  // [1]
-}).annotations({ identifier: "Product" })
+  price: Schema.Number.annotations({ identifier: "Price" }), // [1]
+}).annotations({ identifier: "Product" });
 
 // Formatted errors
 // [
@@ -432,6 +432,7 @@ const Product = Schema.Struct({
 //   }
 // ]
 ```
+
 </details>
 
 #### Solution A
@@ -482,7 +483,7 @@ const NormalizedRange = pipe(
 ### Exercice A
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 Créez `Person` avec un champ `age` contraint à être positif :

@@ -1,4 +1,4 @@
-# Plan — Effect-ts Workshop Companion
+# Plan - Effect-ts Workshop Companion
 
 > Document de référence pour la rédaction du companion. À consulter avant d'écrire chaque page d'exercice.
 
@@ -8,13 +8,13 @@
 
 **Public cible** : développeurs TypeScript ayant les bases du langage, curieux de découvrir Effect-ts.
 
-**Promesse** : à la fin de ce workshop, les participants savent modéliser des programmes asynchrones, faillibles et testables avec Effect. Ils ne repartent pas avec une liste d'API mémorisées — ils repartent avec un _modèle mental_.
+**Promesse** : à la fin de ce workshop, les participants savent modéliser des programmes asynchrones, faillibles et testables avec Effect. Ils ne repartent pas avec une liste d'API mémorisées - ils repartent avec un _modèle mental_.
 
 **Fil conducteur** : chaque exercice construit sur le précédent. On ne fait jamais un saut sans avoir posé les marches.
 
 ---
 
-## 2. Règles d'écriture — à respecter absolument
+## 2. Règles d'écriture - à respecter absolument
 
 ### Langue
 
@@ -24,7 +24,7 @@
 
 ### Syntaxe de code
 
-- **Toujours** `pipe(value, fn1, fn2)` — jamais `value.pipe(fn1, fn2)`.
+- **Toujours** `pipe(value, fn1, fn2)` - jamais `value.pipe(fn1, fn2)`.
 - Les imports sont toujours montrés quand ils éclairent le lecteur.
 - Les `TODO` dans les spec sont le point de départ, pas à copier-coller dans la doc.
 
@@ -34,7 +34,7 @@
 - On pose la question que le lecteur se pose avant qu'il la pose.
 - On montre le problème _avant_ la solution. Le lecteur doit ressentir la douleur avant d'apprécier le remède.
 - Phrases courtes. Pas de jargon gratuit.
-- "À vous de jouer !" pour lancer l'exercice — jamais plus tôt.
+- "À vous de jouer !" pour lancer l'exercice - jamais plus tôt.
 
 ### Pédagogie
 
@@ -45,7 +45,7 @@
 
 ### Titres de sections
 
-- Les titres de sections décrivent ce que le participant **fait**, pas l'API qu'il utilise. Pas de nom de fonction dans le titre : `Définir la structure d'un formulaire` et non ~~`FormBuilder — définir la structure du formulaire`~~.
+- Les titres de sections décrivent ce que le participant **fait**, pas l'API qu'il utilise. Pas de nom de fonction dans le titre : `Définir la structure d'un formulaire` et non ~~`FormBuilder - définir la structure du formulaire`~~.
 - S'inspirer du nom du test correspondant dans le fichier spec (ex: `"should create simple form builder"` → `"Définir la structure d'un formulaire"`). Le titre du test est souvent le meilleur résumé de l'intention.
 
 ---
@@ -57,13 +57,13 @@
 sidebar_position: N
 ---
 
-# Exercice N — [Titre court]
+# Exercice N - [Titre court]
 
 [1-2 phrases qui remettent en contexte : d'où on vient, où on va.]
 
 ## [Titre du concept]
 
-[Explication du problème que ce concept résout — avec un exemple concret qui fait "ah oui, j'ai déjà eu ce problème".]
+[Explication du problème que ce concept résout - avec un exemple concret qui fait "ah oui, j'ai déjà eu ce problème".]
 
 <!-- prettier-ignore -->
 ```ts
@@ -79,7 +79,7 @@ sidebar_position: N
 
 ## Exercice
 
-[Ce qu'on attend du participant — fichier(s) à modifier, résultat attendu.]
+[Ce qu'on attend du participant - fichier(s) à modifier, résultat attendu.]
 
 À vous de jouer !
 
@@ -122,15 +122,15 @@ sidebar_position: N
 
 ---
 
-## 4. Plan de contenu — Exercice 1 : Les bases
+## 4. Plan de contenu - Exercice 1 : Les bases
 
 > Fichier source : `packages/api/_exercices/1-base.spec.ts`
 
-Cet exercice est la fondation de tout le reste. On y introduit deux idées indépendantes : la composition de fonctions avec `pipe`, et la représentation d'effets avec `Effect`. Ces deux idées s'assemblent dès l'exercice suivant — il faut donc que les deux soient solides à la fin.
+Cet exercice est la fondation de tout le reste. On y introduit deux idées indépendantes : la composition de fonctions avec `pipe`, et la représentation d'effets avec `Effect`. Ces deux idées s'assemblent dès l'exercice suivant - il faut donc que les deux soient solides à la fin.
 
 ---
 
-### Section A — FP utils
+### Section A - FP utils
 
 #### A1 · `pipe`
 
@@ -158,7 +158,7 @@ const result = pipe(
 
 Compléter le `pipe` en ajoutant la transformation `multiply(a, 4)` sur le résultat de `add(4, 6)`.
 
-**Indice 1** — _Que fait-on du résultat de `add(4, 6)` ?_
+**Indice 1** - _Que fait-on du résultat de `add(4, 6)` ?_
 `pipe` passe le résultat de chaque étape à la suivante. La première étape produit `10`. Il faut une fonction qui prend `10` et renvoie `40`.
 
 **Solution :**
@@ -188,7 +188,7 @@ const add = (a: number, b: number) => a + b
 const add = (a: number) => (b: number) => a + b
 ```
 
-L'intérêt : `add(6)` renvoie une fonction `(b: number) => 6 + b` — une fonction qu'on peut passer directement à `pipe`.
+L'intérêt : `add(6)` renvoie une fonction `(b: number) => 6 + b` - une fonction qu'on peut passer directement à `pipe`.
 
 <!-- prettier-ignore -->
 ```ts
@@ -203,7 +203,7 @@ const result = pipe(
 
 Compléter le `pipe` en ajoutant `multiply(4)` après `add(6)`.
 
-**Indice 1** — _`add(6)` est une fonction, pas un nombre_
+**Indice 1** - _`add(6)` est une fonction, pas un nombre_
 `add(6)` renvoie une fonction. `pipe` va l'appeler avec le résultat de l'étape précédente (`10`). Il suffit de faire la même chose avec `multiply`.
 
 **Solution :**
@@ -219,7 +219,7 @@ const result = pipe(
 
 ---
 
-### Section B — Effect basics
+### Section B - Effect basics
 
 **Intro de section à écrire :**
 
@@ -232,7 +232,7 @@ En JavaScript, une fonction peut :
 - déclencher une opération asynchrone
 - avoir des effets de bord
 
-Le problème : rien dans la signature de la fonction ne le dit. Une fonction `async` qui peut lancer une erreur est typée `Promise<T>` — l'erreur est invisible.
+Le problème : rien dans la signature de la fonction ne le dit. Une fonction `async` qui peut lancer une erreur est typée `Promise<T>` - l'erreur est invisible.
 
 Effect résout ça en rendant tout explicite dans le type :
 
@@ -245,7 +245,7 @@ Effect<Value, Error, Requirements>
 //              rater
 ```
 
-Un `Effect` est une **description** d'un programme. Il ne s'exécute pas tout seul — on le lance explicitement avec `Effect.runSync`, `Effect.runPromise`, etc.
+Un `Effect` est une **description** d'un programme. Il ne s'exécute pas tout seul - on le lance explicitement avec `Effect.runSync`, `Effect.runPromise`, etc.
 
 ---
 
@@ -260,13 +260,13 @@ La brique de base : envelopper une valeur dans un `Effect` pour qu'elle entre da
 const result: Effect.Effect<number> = Effect.succeed(42)
 ```
 
-Ce n'est pas "juste un wrapper" — c'est la façon de dire "ce programme, quand il s'exécute, produit 42 sans risque d'erreur".
+Ce n'est pas "juste un wrapper" - c'est la façon de dire "ce programme, quand il s'exécute, produit 42 sans risque d'erreur".
 
 **Ce que le participant doit faire :**
 
 La fonction `add` renvoie la somme, mais la signature attend un `Effect.Effect<number>`. Il faut envelopper le résultat avec `Effect.succeed`.
 
-**Indice 1** — _Quand une fonction renvoie un `Effect`_
+**Indice 1** - _Quand une fonction renvoie un `Effect`_
 `Effect.succeed` prend une valeur et renvoie un `Effect` qui contient cette valeur. C'est l'équivalent de `Promise.resolve` mais pour Effect.
 
 **Solution :**
@@ -306,7 +306,7 @@ pipe(
 
 Transformer l'`Effect.succeed(2)` avec `add(8)` en utilisant `Effect.map`.
 
-**Indice 1** — _`add` est déjà une curried function_
+**Indice 1** - _`add` est déjà une curried function_
 `add(8)` renvoie une fonction `(b: number) => 8 + b`. C'est exactement ce qu'attend `Effect.map` : une fonction qui transforme la valeur.
 
 **Solution :**
@@ -353,7 +353,7 @@ Règle mnémotechnique : si la fonction passée renvoie un `Effect`, utilise `fl
 
 Remplacer `map` par `flatMap` puisque `add` renvoie maintenant un `Effect.succeed`.
 
-**Indice 1** — _Regarder le type de retour de `add`_
+**Indice 1** - _Regarder le type de retour de `add`_
 `add` renvoie `Effect.succeed(a + b)`, donc un `Effect`. Si on utilise `map`, on obtient `Effect<Effect<number>>`. Il faut "aplatir".
 
 **Solution :**
@@ -372,7 +372,7 @@ const result = pipe(
 
 **Concept à expliquer :**
 
-Pour intégrer du code asynchrone existant (une `Promise`) dans Effect, on utilise `Effect.promise`. Il faut passer une _fonction_ qui renvoie la `Promise` — pas la `Promise` directement — pour que l'exécution reste lazy.
+Pour intégrer du code asynchrone existant (une `Promise`) dans Effect, on utilise `Effect.promise`. Il faut passer une _fonction_ qui renvoie la `Promise` - pas la `Promise` directement - pour que l'exécution reste lazy.
 
 <!-- prettier-ignore -->
 ```ts
@@ -387,7 +387,7 @@ Effect.promise(() => fetch("https://api.example.com"))
 
 Envelopper l'appel `add(a, b)` (qui renvoie une `Promise`) dans `Effect.promise`.
 
-**Indice 1** — _Une fonction qui renvoie une Promise_
+**Indice 1** - _Une fonction qui renvoie une Promise_
 `Effect.promise` attend `() => Promise<T>`. Donc `() => add(a, b)` est exactement ce qu'il faut.
 
 **Solution :**
@@ -420,13 +420,13 @@ Effect.tryPromise({
 //                    l'erreur est visible dans le type
 ```
 
-C'est la différence fondamentale avec `Promise` : l'erreur n'est plus un "throw" invisible — elle fait partie du contrat.
+C'est la différence fondamentale avec `Promise` : l'erreur n'est plus un "throw" invisible - elle fait partie du contrat.
 
 **Ce que le participant doit faire :**
 
 Implémenter `fetch` en utilisant `Effect.tryPromise`, avec `baseFetch` pour la `Promise` et une `new Error("meh")` pour le catch.
 
-**Indice 1** — _La structure de `tryPromise`_
+**Indice 1** - _La structure de `tryPromise`_
 
 <!-- prettier-ignore -->
 ```ts
@@ -436,7 +436,7 @@ Effect.tryPromise({
 })
 ```
 
-**Indice 2** — _Quel `fetch` appeler ?_
+**Indice 2** - _Quel `fetch` appeler ?_
 `baseFetch` est importé de `undici`. C'est lui qui doit être appelé dans `try`, avec les arguments `input` et `init` déjà disponibles dans la closure.
 
 **Solution :**
@@ -484,7 +484,7 @@ Cherche toujours des infos en priorité dans les docs officielles, adapte ensuit
 - [ ] Le code utilise `pipe(...)` et jamais `xxx.pipe(...)`
 - [ ] Les termes anglais techniques, variables, types et noms de fonctions ne sont pas traduits (ex: `squareRoot` et non `racineCarrée`)
 - [ ] Les exemples dans l'explication du concept ne donne pas la solution, ni utiliser le meme domaine metier
-- [ ] Les titres de sections décrivent une action, sans nom de fonction — inspirés des noms de tests dans le fichier spec
+- [ ] Les titres de sections décrivent une action, sans nom de fonction - inspirés des noms de tests dans le fichier spec
 - [ ] Les indices sont progressifs (pas la solution au premier indice)
 - [ ] La solution est dans un `<details>`
 - [ ] Le `sidebar_position` est correct

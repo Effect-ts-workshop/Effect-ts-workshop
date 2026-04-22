@@ -15,9 +15,9 @@ Dans Effect, une API HTTP se définit en quatre étapes distinctes :
 4. Serveur   → démarrage avec le runtime Effect
 ```
 
-Cette séparation permet de partager le contrat entre le serveur et le client — les deux parlent le même langage, et le compilateur détecte toute divergence.
+Cette séparation permet de partager le contrat entre le serveur et le client - les deux parlent le même langage, et le compilateur détecte toute divergence.
 
-## Étape 1 — Déclarer le contrat avec `HttpApi`
+## Étape 1 - Déclarer le contrat avec `HttpApi`
 
 <!-- prettier-ignore -->
 ```typescript
@@ -33,15 +33,15 @@ const MyApi = HttpApi.make("MyApi").add(
 );
 ```
 
-- `HttpApi.make` — crée l'API, identifiée par un nom
-- `HttpApiGroup.make` — groupe d'endpoints (correspond à un domaine métier)
-- `HttpApiEndpoint.get/post/put/delete` — un endpoint avec sa méthode et son chemin
-- `.addSuccess(Schema)` — le type de la réponse en cas de succès
-- `.addError(Schema, { status })` — un type d'erreur avec son code HTTP
+- `HttpApi.make` - crée l'API, identifiée par un nom
+- `HttpApiGroup.make` - groupe d'endpoints (correspond à un domaine métier)
+- `HttpApiEndpoint.get/post/put/delete` - un endpoint avec sa méthode et son chemin
+- `.addSuccess(Schema)` - le type de la réponse en cas de succès
+- `.addError(Schema, { status })` - un type d'erreur avec son code HTTP
 
-Le contrat est un objet **purement déclaratif** — il ne fait rien par lui-même.
+Le contrat est un objet **purement déclaratif** - il ne fait rien par lui-même.
 
-## Étape 2 — Implémenter les handlers avec `HttpApiBuilder`
+## Étape 2 - Implémenter les handlers avec `HttpApiBuilder`
 
 <!-- prettier-ignore -->
 ```typescript
@@ -64,7 +64,7 @@ Chaque handler est un **Effect classique**. Il peut :
 - retourner des erreurs typées
 - utiliser toutes les mécaniques Effect vues dans les exercices précédents
 
-## Étape 3 — Assembler avec `HttpLayerRouter`
+## Étape 3 - Assembler avec `HttpLayerRouter`
 
 <!-- prettier-ignore -->
 ```typescript
@@ -77,9 +77,9 @@ const apiLayer = pipe(
 );
 ```
 
-L'API devient un `Layer` — elle se compose avec les autres services exactement comme dans l'exercice 4.
+L'API devient un `Layer` - elle se compose avec les autres services exactement comme dans l'exercice 4.
 
-## Étape 4 — Lancer le serveur avec `HttpLayerRouter.serve`
+## Étape 4 - Lancer le serveur avec `HttpLayerRouter.serve`
 
 `HttpLayerRouter.serve` est la façon Effect-native de démarrer un serveur HTTP. Il prend le Layer de routes et produit un `Layer` qui intègre le serveur, les finaliseurs, et la gestion du cycle de vie :
 
@@ -97,18 +97,18 @@ pipe(
 )
 ```
 
-- `HttpLayerRouter.serve` — transforme les routes en serveur Effect
-- `NodeHttpServer.layer` — fournit le serveur HTTP Node.js sous-jacent
-- `Layer.launch` — démarre le Layer et bloque jusqu'à l'arrêt
-- `NodeRuntime.runMain` — gère les signaux système (`SIGTERM`, `SIGINT`) et libère les ressources proprement
+- `HttpLayerRouter.serve` - transforme les routes en serveur Effect
+- `NodeHttpServer.layer` - fournit le serveur HTTP Node.js sous-jacent
+- `Layer.launch` - démarre le Layer et bloque jusqu'à l'arrêt
+- `NodeRuntime.runMain` - gère les signaux système (`SIGTERM`, `SIGINT`) et libère les ressources proprement
 
-## `toWebHandler` — compatibilité avec d'autres runtimes
+## `toWebHandler` - compatibilité avec d'autres runtimes
 
 `toWebHandler` n'est pas la façon Effect de lancer un serveur. C'est une **fonction d'interopérabilité** : elle expose le Layer de routes comme un handler standard `(Request) => Promise<Response>`, ce que la plupart des runtimes HTTP attendent.
 
 On l'utilise dans deux cas :
 
-**Déploiement serverless** (AWS Lambda, Cloudflare Workers…) — l'environnement impose son propre modèle de démarrage, Effect ne contrôle pas le cycle de vie :
+**Déploiement serverless** (AWS Lambda, Cloudflare Workers…) - l'environnement impose son propre modèle de démarrage, Effect ne contrôle pas le cycle de vie :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -131,7 +131,7 @@ Bun.serve({ fetch: handler });
 process.on("SIGTERM", () => dispose());
 ```
 
-Avec `toWebHandler`, la gestion du cycle de vie (arrêt propre, libération des ressources) est de votre responsabilité — c'est vous qui appelez `dispose()`. Avec `HttpLayerRouter.serve` + `NodeRuntime.runMain`, Effect s'en charge automatiquement.
+Avec `toWebHandler`, la gestion du cycle de vie (arrêt propre, libération des ressources) est de votre responsabilité - c'est vous qui appelez `dispose()`. Avec `HttpLayerRouter.serve` + `NodeRuntime.runMain`, Effect s'en charge automatiquement.
 
 ## Consommer l'API avec `HttpApiClient`
 

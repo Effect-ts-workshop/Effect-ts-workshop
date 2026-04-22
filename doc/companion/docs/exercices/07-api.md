@@ -2,11 +2,11 @@
 sidebar_position: 7
 ---
 
-# Exercice 7 — HTTP API
+# Exercice 7 - HTTP API
 
 Nous avons vu comment consommer un service externe. Voici maintenant comment en _définir_ un.
 
-`@effect/platform` sépare le **contrat** (ce que l'API expose) de l'**implémentation** (comment elle répond). Cette séparation garantit que serveur et client restent cohérents — TypeScript le vérifie à la compilation.
+`@effect/platform` sépare le **contrat** (ce que l'API expose) de l'**implémentation** (comment elle répond). Cette séparation garantit que serveur et client restent cohérents - TypeScript le vérifie à la compilation.
 
 Fichier à compléter : `packages/api/_exercices/7-api.spec.ts`
 
@@ -26,10 +26,10 @@ const MyApi = HttpApi.make("MyApi").add(
 )
 ```
 
-- `HttpApi.make("MyApi")` — crée l'API racine avec un identifiant
-- `HttpApiGroup.make("greet")` — un groupe d'endpoints (correspond souvent à une ressource)
-- `HttpApiEndpoint.get("sayHello", "/hello")` — un endpoint GET sur le chemin `/hello`
-- `.addSuccess(Schema.String)` — type de la réponse en cas de succès
+- `HttpApi.make("MyApi")` - crée l'API racine avec un identifiant
+- `HttpApiGroup.make("greet")` - un groupe d'endpoints (correspond souvent à une ressource)
+- `HttpApiEndpoint.get("sayHello", "/hello")` - un endpoint GET sur le chemin `/hello`
+- `.addSuccess(Schema.String)` - type de la réponse en cas de succès
 
 Ce contrat est la _source de vérité_ : le serveur l'implémente, le client le consomme. Les deux sont garantis cohérents par TypeScript.
 

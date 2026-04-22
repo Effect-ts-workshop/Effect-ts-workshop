@@ -6,20 +6,20 @@ sidebar_position: 16
 
 Dans un programme asynchrone, comprendre _ce qui s'est passé_ est souvent plus dur que d'écrire le code lui-même. Un bug en production ? Une lenteur inexplicable ? Sans traces, on navigue à l'aveugle.
 
-Effect intègre l'observabilité au cœur du runtime, via [OpenTelemetry](https://opentelemetry.io/). Pas de bibliothèque à brancher manuellement — le mécanisme est là par défaut, il suffit de l'activer.
+Effect intègre l'observabilité au cœur du runtime, via [OpenTelemetry](https://opentelemetry.io/). Pas de bibliothèque à brancher manuellement - le mécanisme est là par défaut, il suffit de l'activer.
 
-## Les `span` — l'unité de base
+## Les `span` - l'unité de base
 
-Un `span` représente une opération dans le temps : un nom, une durée, des attributs. Les `span` s'imbriquent pour former un `trace` — l'arbre complet d'une requête, du point d'entrée jusqu'aux feuilles.
+Un `span` représente une opération dans le temps : un nom, une durée, des attributs. Les `span` s'imbriquent pour former un `trace` - l'arbre complet d'une requête, du point d'entrée jusqu'aux feuilles.
 
 <!-- prettier-ignore -->
 ```typescript
-//  [  fetchJoke  — 230ms                     ]
-//    [  HttpClient.get  — 210ms  ]
-//      [  response.json  — 5ms  ]
+//  [  fetchJoke  - 230ms                     ]
+//    [  HttpClient.get  - 210ms  ]
+//      [  response.json  - 5ms  ]
 ```
 
-## `Effect.fn` — tracing automatique
+## `Effect.fn` - tracing automatique
 
 Quand on passe un nom à `Effect.fn`, chaque appel crée automatiquement un `span` :
 
@@ -36,7 +36,7 @@ const getUser = Effect.fn("getUser")(function* (id: string) {
 
 Sans nom, pas de `span`. C'est la seule différence entre `Effect.fn("name")(...)` et `Effect.fn(...)`.
 
-## `Effect.withSpan` — span manuel
+## `Effect.withSpan` - span manuel
 
 Pour instrumenter un bloc qui n'est pas une fonction `Effect.fn`, on peut créer un `span` manuellement :
 
@@ -85,4 +85,4 @@ pipe(
 );
 ```
 
-Sans ce layer, les `span` existent en mémoire mais ne sont pas exportés — les appels à `Effect.fn("name")` restent valides, ils ne produisent simplement rien dans Jaeger.
+Sans ce layer, les `span` existent en mémoire mais ne sont pas exportés - les appels à `Effect.fn("name")` restent valides, ils ne produisent simplement rien dans Jaeger.

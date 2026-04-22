@@ -8,8 +8,8 @@ sidebar_position: 15
 
 `Either<A, E>` est un type qui représente **deux cas exclusifs** :
 
-- `Right<A>` — le cas "succès" (la valeur `A`)
-- `Left<E>` — le cas "échec" (la valeur `E`)
+- `Right<A>` - le cas "succès" (la valeur `A`)
+- `Left<E>` - le cas "échec" (la valeur `E`)
 
 <!-- prettier-ignore -->
 ```typescript
@@ -19,11 +19,9 @@ Either.right(42)          // Either<number, never>
 Either.left("pas trouvé") // Either<never, string>
 ```
 
+La convention : `Right` = bien, `Left` = problème. C'est l'inverse de l'ordre alphabétique - mnémotechnique : `Right` = correct.
 
-La convention : `Right` = bien, `Left` = problème. C'est l'inverse de l'ordre alphabétique — mnémotechnique : `Right` = correct.
-
-`Either<A,E>` permet d'implémenter facilement le _railway pattern_ avec d'un côté le _happy path_ (`Right`) et de l'autre le canal des erreurs (`Left`)
----
+## `Either<A,E>` permet d'implémenter facilement le _railway pattern_ avec d'un côté le _happy path_ (`Right`) et de l'autre le canal des erreurs (`Left`)
 
 ## Quand utiliser `Either` plutôt qu'`Effect` ?
 
@@ -35,13 +33,13 @@ La convention : `Right` = bien, `Left` = problème. C'est l'inverse de l'ordre a
 
 <!-- prettier-ignore -->
 ```typescript
-// Either — synchrone, pas de runtime
+// Either - synchrone, pas de runtime
 const parseAge = (input: string): Either.Either<number, string> => {
   const n = parseInt(input)
   return isNaN(n) ? Either.left("pas un nombre") : Either.right(n)
 }
 
-// Effect — pour l'asynchrone, les dépendances, la composition
+// Effect - pour l'asynchrone, les dépendances, la composition
 const fetchUser = (id: string): Effect.Effect<User, NotFound> => ...
 ```
 
@@ -53,8 +51,8 @@ const fetchUser = (id: string): Effect.Effect<User, NotFound> => ...
 ```typescript
 import { Either } from "effect"
 
-Either.right(42)           // Right — succès
-Either.left("erreur")      // Left — échec
+Either.right(42)           // Right - succès
+Either.left("erreur")      // Left - échec
 
 // Depuis une valeur nullable
 Either.fromNullable(value, () => "valeur manquante")
@@ -104,7 +102,7 @@ pipe(
   Either.left("erreur"),
   Either.map((n) => n * 2)
 )
-// → Left("erreur") — inchangé
+// → Left("erreur") - inchangé
 
 // Transformer la valeur Left
 pipe(
@@ -140,7 +138,7 @@ const parseAndDouble = (input: string) =>
   )
 ```
 
-Si le premier `Either` est `Left`, `flatMap` ne s'exécute pas — comportement identique à `Effect.flatMap`.
+Si le premier `Either` est `Left`, `flatMap` ne s'exécute pas - comportement identique à `Effect.flatMap`.
 
 ---
 
@@ -200,8 +198,8 @@ const errors = pipe(
 | `Either<A, E>`    | Résultat qui peut réussir ou échouer                | Synchrone  |
 | `Option<A>`       | Valeur qui peut être absente                        | Synchrone  |
 | `Effect<A, E, R>` | Programme composable avec dépendances               | Les deux   |
-| `Exit<A, E>`      | Comment une Fiber s'est terminée                    | —          |
-| `Result<A, E>`    | État d'un Atom asynchrone (initial/success/failure) | —          |
+| `Exit<A, E>`      | Comment une Fiber s'est terminée                    | -          |
+| `Result<A, E>`    | État d'un Atom asynchrone (initial/success/failure) | -          |
 
 :::tip `Either` vs `Effect`
 Un `Either<A, E>` peut toujours être converti en `Effect<A, E>` avec `Effect.fromEither`. L'inverse (un Effect synchrone vers Either) est possible avec `Effect.runSyncExit` + conversion.

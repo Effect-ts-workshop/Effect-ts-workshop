@@ -1,4 +1,4 @@
-import { FetchHttpClient, HttpApiClient } from "@effect/platform"
+import { FetchHttpClient, HttpApiClient, HttpClient } from "@effect/platform"
 import { Effect, Layer, Option, pipe } from "effect"
 import { Api } from "shared/api"
 import { InventoryItemId } from "shared/item"
@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest"
 // L'exercice 8 montrait comment définir et tester une API côté serveur (Node.js).
 // Ici on est côté client (navigateur) : on consomme une API existante.
 //
-// Le contrat (Api) est importé depuis "shared" — même source de vérité que le serveur.
+// Le contrat (Api) est importé depuis "shared" - même source de vérité que le serveur.
 // On n'a pas besoin de redéfinir les endpoints.
 
 // ─── Données de test ─────────────────────────────────────────────────────────
@@ -62,8 +62,10 @@ describe("HttpApiClient", () => {
     // const program = TODO
     // #solution
     const program = pipe(
-      HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
-      Effect.flatMap((client) => client.items.getAllItems()),
+      Effect.gen(function*() {
+        const client = yield* HttpApiClient.make(Api, { baseUrl: "http://localhost" })
+        return yield* client.items.getAllItems()
+      }),
       Effect.provide(TestHttpClient)
     )
     // #end
@@ -80,8 +82,10 @@ describe("HttpApiClient", () => {
     // const program = TODO
     // #solution
     const program = pipe(
-      HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
-      Effect.flatMap((client) => client.items.getItemById({ path: { itemId: ITEM_1.id } })),
+      Effect.gen(function*() {
+        const client = yield* HttpApiClient.make(Api, { baseUrl: "http://localhost" })
+        return yield* client.items.getItemById({ path: { itemId: ITEM_1.id } })
+      }),
       Effect.provide(TestHttpClient)
     )
     // #end
@@ -91,25 +95,26 @@ describe("HttpApiClient", () => {
     // Le contrat déclare addSuccess(Schema.Option(InventoryItemSchema))
     // HttpApiClient désérialise automatiquement la réponse en Option<InventoryItem>
     expect(Option.isSome(result)).toBe(true)
-    if (Option.isSome(result)) {
-      expect(result.value.brand).toBe("Devoxx")
+    if (Option.isNone(result)) {
+      throw new Error("implement calls get return")
     }
+    expect(result.value.brand).toBe("Devoxx")
   })
 
   it("composes multiple calls with Effect.all", async () => {
     // Effect.all exécute les deux appels en parallèle par défaut
     const program = pipe(
-      HttpApiClient.make(Api, { baseUrl: "http://localhost" }),
-      Effect.flatMap((client) =>
-        // #start
-        // Effect.all(TODO)
-        // #solution
-        Effect.all({
+      // #start
+      // Effect.all(TODO)
+      // #solution
+      Effect.gen(function*() {
+        const client = yield* HttpApiClient.make(Api, { baseUrl: "http://localhost" })
+        return yield* Effect.all({
           list: client.items.getAllItems(),
           single: client.items.getItemById({ path: { itemId: ITEM_1.id } })
         })
-        // #end
-      ),
+      }),
+      // #end
       Effect.provide(TestHttpClient)
     )
 

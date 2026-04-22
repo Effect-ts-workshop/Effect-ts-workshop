@@ -2,11 +2,11 @@
 sidebar_position: 8
 ---
 
-# Exercice 8 — SQL
+# Exercice 8 - SQL
 
 Nos services utilisent une base de données PostgreSQL. Cet exercice couvre deux niveaux d'abstraction : le SQL natif avec `@effect/sql`, et le query builder Drizzle.
 
-Les tests de cet exercice démarrent un vrai conteneur PostgreSQL via `testcontainers`. Pas de mocks — les requêtes s'exécutent contre une vraie base.
+Les tests de cet exercice démarrent un vrai conteneur PostgreSQL via `testcontainers`. Pas de mocks - les requêtes s'exécutent contre une vraie base.
 
 Fichier à compléter : `packages/api/_exercices/8-sql.spec.ts`
 
@@ -18,7 +18,7 @@ Cet exercice démarre un conteneur PostgreSQL via `testcontainers`. **Docker doi
 
 ---
 
-## SQL natif — template literal
+## SQL natif - template literal
 
 `@effect/sql` fournit un client SQL (`SqlClient.SqlClient`) utilisable comme service Effect. Les requêtes s'écrivent avec des template literals :
 
@@ -32,7 +32,7 @@ const getActive = Effect.fn("getActive")(function*() {
 })
 ```
 
-Le template literal est _safe_ par construction : les variables interpolées sont automatiquement paramétrées — pas d'injection SQL possible.
+Le template literal est _safe_ par construction : les variables interpolées sont automatiquement paramétrées - pas d'injection SQL possible.
 
 ### Exercice
 
@@ -95,7 +95,7 @@ const getAll = Effect.fn("getAll")(function*() {
 ## CRUD automatique
 
 :::note Test optionnel
-Ce test est marqué `[OPTIONAL]` dans la spec — passez-le si vous manquez de temps.
+Ce test est marqué `[OPTIONAL]` dans la spec - passez-le si vous manquez de temps.
 :::
 
 Pour les opérations CRUD classiques, `Model.Class` et `Model.makeRepository` génèrent le repository automatiquement à partir d'un schema :
@@ -116,7 +116,7 @@ const repository = yield* Model.makeRepository(DbUser, {
 })
 ```
 
-Le `repository` expose `insert`, `findById`, `findAll`, `update`, `delete` — typés selon `DbUser`.
+Le `repository` expose `insert`, `findById`, `findAll`, `update`, `delete` - typés selon `DbUser`.
 
 ### Exercice
 
@@ -169,9 +169,9 @@ const getCrud = Effect.fn("getCrud")(function*() {
 
 ---
 
-## Drizzle — query builder typé
+## Drizzle - query builder typé
 
-En tant qu'amoureux de TypeScript, on aime les query builders : ils ajoutent de la sécurité de type là où le SQL natif ne voit que des strings. Drizzle a récemment créé une intégration Effect — les opérations renvoient des `Effect` au lieu de `Promise`, sans rien changer à l'API qu'on connaît déjà.
+En tant qu'amoureux de TypeScript, on aime les query builders : ils ajoutent de la sécurité de type là où le SQL natif ne voit que des strings. Drizzle a récemment créé une intégration Effect - les opérations renvoient des `Effect` au lieu de `Promise`, sans rien changer à l'API qu'on connaît déjà.
 
 Drizzle offre un query builder qui reste dans le monde Effect via le service `Database` :
 
@@ -188,7 +188,7 @@ const findByStatus = Effect.fn("findByStatus")(function*(status: string) {
 })
 ```
 
-`db` est une instance Drizzle wrappée dans Effect — toutes les opérations sont des `Effect`, pas des `Promise`.
+`db` est une instance Drizzle wrappée dans Effect - toutes les opérations sont des `Effect`, pas des `Promise`.
 
 ### Exercice
 

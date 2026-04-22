@@ -32,7 +32,7 @@ Effect.Effect<Item[], ErreurAPI, HttpClient.HttpClient | LoggingService>
 
 Toutes les dépendances sont **visibles dans le type**. Une fois celui-ci déclaré impossible d'oublier d'en fournir une.
 
-## `Context.GenericTag` — créer un service
+## `Context.GenericTag` - créer un service
 
 Un `Tag` est l'identifiant d'un service dans le contexte Effect. C'est la "clé" qui permet de retrouver l'implémentation.
 
@@ -69,7 +69,7 @@ const myProgram = Effect.gen(function* () {
 //                  LoggingService requis dans le contexte
 ```
 
-## `Effect.Service` — la façon moderne
+## `Effect.Service` - la façon moderne
 
 Effect fournit `Effect.Service` pour créer des services de façon plus concise :
 

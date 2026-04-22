@@ -2,7 +2,7 @@
 sidebar_position: 12
 ---
 
-# Bonus — Interruption et ressources
+# Bonus - Interruption et ressources
 
 Jusqu'ici nos programmes se terminent toujours : ils réussissent ou ils échouent. Mais il existe un troisième cas : l'interruption. Un utilisateur annule une requête, un timeout expire, un autre fiber termine en premier.
 
@@ -16,7 +16,7 @@ Fichier à compléter : `packages/api/_exercices/bonus-interruption.spec.ts`
 
 Les APIs Web (`fetch`, `XMLHttpRequest`) utilisent `AbortSignal` pour signaler une annulation. Effect peut propager son mécanisme d'interruption vers ces APIs via le signal disponible dans `Effect.tryPromise`.
 
-La `try` de `Effect.tryPromise` reçoit un `signal` en paramètre — il suffit de le passer à la `Promise` sous-jacente :
+La `try` de `Effect.tryPromise` reçoit un `signal` en paramètre - il suffit de le passer à la `Promise` sous-jacente :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -26,7 +26,7 @@ Effect.tryPromise({
 })
 ```
 
-Quand le fiber est interrompu (`Fiber.interrupt`), Effect annule le `signal` — la `Promise` reçoit l'événement `abort` et peut se nettoyer proprement.
+Quand le fiber est interrompu (`Fiber.interrupt`), Effect annule le `signal` - la `Promise` reçoit l'événement `abort` et peut se nettoyer proprement.
 
 ### Exercice
 
@@ -54,7 +54,7 @@ const program = Effect.tryPromise({
 <details>
   <summary>D'où vient le signal ?</summary>
 
-La fonction passée à `try` peut recevoir un argument optionnel — le signal d'annulation qu'Effect gère pour vous.
+La fonction passée à `try` peut recevoir un argument optionnel - le signal d'annulation qu'Effect gère pour vous.
 
 <!-- prettier-ignore -->
 ```typescript
@@ -84,7 +84,7 @@ const program = Effect.tryPromise({
 
 ## Garantir le nettoyage des ressources
 
-En JavaScript classique, si une exception surgit entre l'ouverture et la fermeture d'une ressource, la fermeture ne se produit jamais. `try/finally` est la réponse — mais ça ne couvre pas l'interruption.
+En JavaScript classique, si une exception surgit entre l'ouverture et la fermeture d'une ressource, la fermeture ne se produit jamais. `try/finally` est la réponse - mais ça ne couvre pas l'interruption.
 
 `Effect.addFinalizer` enregistre une action qui sera exécutée **quoi qu'il arrive** : succès, échec, ou interruption.
 
@@ -134,7 +134,7 @@ yield* Effect.addFinalizer(() => /* l'action de nettoyage */)
 <details>
   <summary>Quel type doit renvoyer le finalizer ?</summary>
 
-`Effect.addFinalizer` attend une fonction `() => Effect<void>`. Les deux helpers disponibles (`connection.close()` et `deleteTempFile`) renvoient déjà un `Effect` — passez-les directement :
+`Effect.addFinalizer` attend une fonction `() => Effect<void>`. Les deux helpers disponibles (`connection.close()` et `deleteTempFile`) renvoient déjà un `Effect` - passez-les directement :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -172,11 +172,11 @@ Quand une ressource a un cycle de vie clair (ouvrir / utiliser / fermer), `Effec
 
 <!-- prettier-ignore -->
 ```typescript
-// await using — fermeture couplée à l'ouverture
+// await using - fermeture couplée à l'ouverture
 await using conn = getConnection() // conn[Symbol.asyncDispose]() appelé à la sortie du bloc
 ```
 
-La différence : `await using` ne couvre pas l'interruption. `Effect.acquireRelease` garantit le `release` dans les trois cas — succès, échec, et interruption.
+La différence : `await using` ne couvre pas l'interruption. `Effect.acquireRelease` garantit le `release` dans les trois cas - succès, échec, et interruption.
 
 <!-- prettier-ignore -->
 ```typescript
@@ -193,11 +193,11 @@ const program = Effect.gen(function*() {
 Effect.runPromise(Effect.scoped(program))
 ```
 
-La différence avec `addFinalizer` : le `release` est défini au même endroit que le `acquire` — le couplage est explicite et la ressource est plus facilement réutilisable.
+La différence avec `addFinalizer` : le `release` est défini au même endroit que le `acquire` - le couplage est explicite et la ressource est plus facilement réutilisable.
 
 ### Exercice
 
-Le test est paramétré avec `it.each` — trois scénarios (succès, erreur, interruption) — et **une seule définition de `resource`** doit fonctionner pour les trois.
+Le test est paramétré avec `it.each` - trois scénarios (succès, erreur, interruption) - et **une seule définition de `resource`** doit fonctionner pour les trois.
 
 `makeConnection` renvoie directement un `Effect.succeed({...})` avec une `query` et un `close` déjà fournis. Définissez `resource` avec `Effect.acquireRelease` :
 

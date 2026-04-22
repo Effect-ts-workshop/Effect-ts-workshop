@@ -19,7 +19,7 @@ Un Layer peut lui-même avoir des dépendances (d'autres services). Effect réso
 
 ## Créer des Layers
 
-### `Layer.succeed` — implémentation sans dépendances
+### `Layer.succeed` - implémentation sans dépendances
 
 <!-- prettier-ignore -->
 ```typescript
@@ -30,7 +30,7 @@ const LoggingConsole = Layer.succeed(LoggingService, {
 });
 ```
 
-### `Layer.effect` — implémentation qui utilise des Effects
+### `Layer.effect` - implémentation qui utilise des Effects
 
 <!-- prettier-ignore -->
 ```typescript
@@ -52,7 +52,7 @@ const ItemRepositoryHttp = Layer.effect(
 //                                   ↑ requiert HttpClient
 ```
 
-### `Layer.scoped` — implémentation avec cycle de vie
+### `Layer.scoped` - implémentation avec cycle de vie
 
 Pour des ressources qui doivent être libérées (connexions de base de données, fichiers ouverts) :
 
@@ -94,7 +94,7 @@ Effect.runPromise(resolved)
 
 Les Layers peuvent se composer pour former des Layers plus complexes.
 
-### `Layer.provide` — fournir les dépendances d'un Layer
+### `Layer.provide` - fournir les dépendances d'un Layer
 
 <!-- prettier-ignore -->
 ```typescript
@@ -103,10 +103,10 @@ const AppLayer = pipe(
   ItemRepositoryHttp,
   Layer.provide(FetchHttpClient.layer)
 )
-// Type : Layer<ItemRepository> — plus de dépendance HttpClient !
+// Type : Layer<ItemRepository> - plus de dépendance HttpClient !
 ```
 
-### `Layer.merge` — combiner plusieurs Layers
+### `Layer.merge` - combiner plusieurs Layers
 
 <!-- prettier-ignore -->
 ```typescript
@@ -117,7 +117,7 @@ const AppLayer = Layer.merge(
 // Fournit à la fois LoggingService et HttpClient
 ```
 
-### `Layer.mergeAll` — combiner N Layers
+### `Layer.mergeAll` - combiner N Layers
 
 <!-- prettier-ignore -->
 ```typescript
@@ -163,7 +163,7 @@ type JokeService = {
 }
 ```
 
-Résultat : tout code qui appelle `getRandom()` doit aussi fournir `HttpClient`. La dépendance interne est devenue une contrainte externe — même dans les tests.
+Résultat : tout code qui appelle `getRandom()` doit aussi fournir `HttpClient`. La dépendance interne est devenue une contrainte externe - même dans les tests.
 
 La règle : **les méthodes d'un service doivent avoir `Requirements = never`**. Les dépendances se résolvent à la construction du layer, pas à l'usage.
 
@@ -191,7 +191,7 @@ const JokeServiceLive = Layer.effect(
 )
 ```
 
-`client` est capturé dans la closure au moment de la construction. Les appelants voient `Effect<string>` — aucune trace de `HttpClient`.
+`client` est capturé dans la closure au moment de la construction. Les appelants voient `Effect<string>` - aucune trace de `HttpClient`.
 
 `Effect.Service` applique ce pattern automatiquement via la clé `dependencies`.
 

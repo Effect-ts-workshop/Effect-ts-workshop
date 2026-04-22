@@ -28,7 +28,7 @@ npm run test
 
 Les exercices se trouvent dans les dossiers `_exercices/` de chaque package.
 
-**Les fondations — du type `Effect` aux services :**
+**Les fondations - du type `Effect` aux services :**
 
 | #   | Thème            | Fichier                                              |
 | --- | ---------------- | ---------------------------------------------------- |
@@ -40,7 +40,7 @@ Les exercices se trouvent dans les dossiers `_exercices/` de chaque package.
 | 6   | Générateurs      | `packages/api/_exercices/6-generators.spec.ts`       |
 | 7   | Schema           | `packages/api/_exercices/7-schema.spec.ts`           |
 
-**En pratique — appliquer ces concepts à une vraie application :**
+**En pratique - appliquer ces concepts à une vraie application :**
 
 | #   | Thème      | Fichier                                          |
 | --- | ---------- | ------------------------------------------------ |
@@ -77,6 +77,6 @@ La documentation ici [Effect ts Companion](https://effect-ts-workshop.github.io/
 
 ## Outils inclus
 
-- **Effect Language Service Plugin** — meilleure expérience TypeScript dans VSCode
-- **Tracing / Logs** — [Jaeger](http://localhost:16686/search?service=api)
-- **Base de données** — PostgreSQL sur le port `5433`
+- **Effect Language Service Plugin** - meilleure expérience TypeScript dans VSCode
+- **Tracing / Logs** - [Jaeger](http://localhost:16686/search?service=api)
+- **Base de données** - PostgreSQL sur le port `5433`

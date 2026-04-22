@@ -14,7 +14,7 @@ Effect-TS répond à ces trois problèmes en un seul concept : le type `Effect`.
 
 ## Qu'allons-nous apprendre ?
 
-À la fin de cet atelier, vous aurez un modèle mental pour écrire des programmes TypeScript asynchrones, faillibles et testables avec Effect. Pas une liste d'API mémorisées — une façon de penser les programmes.
+À la fin de cet atelier, vous aurez un modèle mental pour écrire des programmes TypeScript asynchrones, faillibles et testables avec Effect. Pas une liste d'API mémorisées - une façon de penser les programmes.
 
 Le repository contient une application fullstack complète (API REST + frontend React) à titre d'exemple. À la fin de l'atelier, vous aurez toutes les clés pour en construire une similaire.
 
@@ -47,7 +47,7 @@ L'atelier est divisé en **3 grandes sections** :
 
 Douze exercices progressifs. Chaque exercice introduit un concept, construit sur le précédent.
 
-**Les fondations — du type `Effect` aux services :**
+**Les fondations - du type `Effect` aux services :**
 
 | #   | Thème            | Concepts clés                                          |
 | --- | ---------------- | ------------------------------------------------------ |
@@ -59,7 +59,7 @@ Douze exercices progressifs. Chaque exercice introduit un concept, construit sur
 | 6   | Générateurs      | `Effect.fn`, syntaxe generator                         |
 | 7   | Schema           | Validation, inférence de types                         |
 
-**En pratique — appliquer ces concepts à une vraie application :**
+**En pratique - appliquer ces concepts à une vraie application :**
 
 | #   | Thème      | Concepts clés                                  |
 | --- | ---------- | ---------------------------------------------- |
@@ -78,7 +78,7 @@ Des fiches de référence pour chaque concept abordé. Chaque exercice y renvoie
 - Connaissances de base en TypeScript
 - Votre ordinateur 💻
 - Un éditeur de code (VS Code recommandé)
-- Docker installé et démarré (requis pour l'exercice 9 — SQL)
+- Docker installé et démarré (requis pour l'exercice 9 - SQL)
 - Désactiver vos VPN (pour les tests qui utilisent des fetchs)
   Nous vous recommandons de ne pas utiliser d'IA (Cursor, Copilot, Claude), n'hésitez pas à pairer.
 
@@ -100,7 +100,7 @@ npm run test
 
 2. **Ouvrez le fichier de test** correspondant à la page du companion (indiqué en haut de chaque exercice).
 
-3. **Retirez le `.skip`** devant le test sur lequel vous travaillez — le test passe rouge.
+3. **Retirez le `.skip`** devant le test sur lequel vous travaillez - le test passe rouge.
 
 4. **Faites passer le test au vert.**
 
@@ -108,7 +108,7 @@ npm run test
 
 :::note Erreurs TypeScript dans les fichiers de spec
 
-Certains fichiers de test contiennent des erreurs TypeScript dès l'ouverture — c'est normal. Ces erreurs disparaîtront au fur et à mesure que vous complétez les exercices. **Ignorez-les jusqu'à ce que vous arriviez à l'exercice concerné**.
+Certains fichiers de test contiennent des erreurs TypeScript dès l'ouverture - c'est normal. Ces erreurs disparaîtront au fur et à mesure que vous complétez les exercices. **Ignorez-les jusqu'à ce que vous arriviez à l'exercice concerné**.
 
 :::
 
@@ -117,7 +117,7 @@ Certains fichiers de test contiennent des erreurs TypeScript dès l'ouverture �
 - Chaque exercice n'introduit **qu'un seul nouveau concept** à la fois.
 - Utilisez les **indices** avant de regarder la solution.
 - La section **"Ressources"** de chaque exercice pointe vers la base de connaissance.
-- **Sollicitez-nous au maximum — on est là pour ça.**
+- **Sollicitez-nous au maximum - on est là pour ça.**
 
 ## La philosophie d'Effect
 
@@ -129,7 +129,7 @@ Exactement comme une recette de cuisine n'est pas le plat. La recette décrit ce
 
 <!-- prettier-ignore -->
 ```typescript
-// Ceci ne fait rien — c'est juste une description
+// Ceci ne fait rien - c'est juste une description
 const myEffect = Effect.succeed(42);
 
 // Ceci exécute la description et produit le résultat

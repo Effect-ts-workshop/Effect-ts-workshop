@@ -35,7 +35,7 @@ describe("Interruption", () => {
   })
 })
 
-describe("addFinalizer — database connection", () => {
+describe("addFinalizer - database connection", () => {
   it("[OPTIONAL] closes the connection even if an error occurs", async () => {
     class QueryError extends Data.TaggedError("QueryError") {}
 
@@ -49,7 +49,7 @@ describe("addFinalizer — database connection", () => {
     const program = Effect.gen(function*() {
       const connection = makeConnection()
       // #start
-      // // Le finalizer enregistre le cleanup — sera exécuté quoi qu'il arrive
+      // // Le finalizer enregistre le cleanup - sera exécuté quoi qu'il arrive
       // yield* TODO
       // #solution
       yield* Effect.addFinalizer(() => connection.close())
@@ -66,7 +66,7 @@ describe("addFinalizer — database connection", () => {
   })
 })
 
-describe("addFinalizer — temporary file", () => {
+describe("addFinalizer - temporary file", () => {
   it("[OPTIONAL] deletes the temporary file after use", async () => {
     // Simule un système de fichiers en mémoire
     const filesystem = new Set<string>()
@@ -99,14 +99,13 @@ describe("addFinalizer — temporary file", () => {
   })
 })
 
-describe("acquireRelease — release guarantee", () => {
+describe("acquireRelease - release guarantee", () => {
   class QueryError extends Data.TaggedError("QueryError") {}
   const close = vi.fn(() => Effect.void)
   beforeEach(() => {
     close.mockReset()
   })
 
-  // TODO simplify
   it.each([
     { queryResult: Effect.succeed("COOL"), isSuccess: true, label: "success" },
     { queryResult: Effect.fail(new QueryError()), isSuccess: false, label: "error" },

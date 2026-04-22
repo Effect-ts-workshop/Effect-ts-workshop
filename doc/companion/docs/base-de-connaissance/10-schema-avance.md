@@ -2,15 +2,15 @@
 sidebar_position: 10
 ---
 
-# Schema — Validation, Codec et Tests
+# Schema - Validation, Codec et Tests
 
 ## Qu'est-ce qu'un Schema ?
 
 Un `Schema` dans Effect est une description de la forme d'une donnée. Il remplace à la fois :
 
-- **Zod** — validation de données inconnues
-- **class-transformer** — sérialisation/désérialisation
-- **Test data builder** — génération de données pour les tests (cf _property-based testing_)
+- **Zod** - validation de données inconnues
+- **class-transformer** - sérialisation/désérialisation
+- **Test data builder** - génération de données pour les tests (cf _property-based testing_)
 
 La différence clé : un seul Schema fait les trois.
 
@@ -134,7 +134,7 @@ const arbitrary = Arbitrary.make(EventSchema)
 
 fc.assert(
   fc.property(arbitrary, (event) => {
-    // event est garanti par génération comme valide selon EventSchema — 
+    // event est garanti par génération comme valide selon EventSchema - 
     const dto = pipe(event, Schema.encodeSync(EventSchema))
     const back = pipe(dto, Schema.decodeSync(EventSchema))
     expect(event).toEqual(back)
@@ -148,7 +148,7 @@ Au lieu de tester 3 cas manuels, on vérifie qu'une **propriété tient pour des
 
 ## Schemas personnalisés avec Brand
 
-`Brand` crée des types nominaux — des types TypeScript **incompatibles** avec leur type de base, même s'ils ont la même structure :
+`Brand` crée des types nominaux - des types TypeScript **incompatibles** avec leur type de base, même s'ils ont la même structure :
 
 <!-- prettier-ignore -->
 ```typescript
@@ -188,7 +188,7 @@ Avec `identifier`, le message d'erreur affiche `Expected Name, actual null` au l
 
 ## Compatibilité Standard Schema
 
-Effect Schema implémente la spécification [Standard Schema v1](https://standardschema.dev) — un standard communautaire d'interopérabilité entre bibliothèques de schemas TypeScript.
+Effect Schema implémente la spécification [Standard Schema v1](https://standardschema.dev) - un standard communautaire d'interopérabilité entre bibliothèques de schemas TypeScript.
 
 Concrètement : tout outil compatible Standard Schema (tRPC v11+, TanStack Form, Hono, Valibot…) accepte directement un Schema Effect **sans adaptateur** :
 
@@ -211,10 +211,10 @@ const router = t.router({
 });
 ```
 
-L'interface Standard Schema est exposée via la propriété `~standard` sur chaque schema — les outils compatibles l'utilisent automatiquement.
+L'interface Standard Schema est exposée via la propriété `~standard` sur chaque schema - les outils compatibles l'utilisent automatiquement.
 
 :::tip Pourquoi c'est important ?
-Vous pouvez définir vos schemas Effect une seule fois dans `packages/shared` et les réutiliser à la fois dans le serveur Effect, le client React (TanStack Form, React Hook Form…), et les routes tRPC — sans duplication ni conversion.
+Vous pouvez définir vos schemas Effect une seule fois dans `packages/shared` et les réutiliser à la fois dans le serveur Effect, le client React (TanStack Form, React Hook Form…), et les routes tRPC - sans duplication ni conversion.
 :::
 
 ## Récapitulatif
@@ -227,5 +227,5 @@ Vous pouvez définir vos schemas Effect une seule fois dans `packages/shared` et
 | Générer des données de test             | `Arbitrary.make` + `fc.assert`                   |
 | Type nominal validé                     | `Brand` + `Schema.fromBrand`                     |
 | Personnaliser les erreurs               | `.annotations({ identifier, message })`          |
-| Utiliser sans runtime Effect            | Variantes `Sync` / `Either` — aucune dépendance  |
+| Utiliser sans runtime Effect            | Variantes `Sync` / `Either` - aucune dépendance  |
 | Interop avec tRPC, TanStack Form, Hono… | Standard Schema v1 via propriété `~standard`     |

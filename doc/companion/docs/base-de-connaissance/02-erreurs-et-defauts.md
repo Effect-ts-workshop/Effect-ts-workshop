@@ -70,7 +70,7 @@ console.log(erreur._tag);    // "ErrorWithMessage"
 
 ## Récupérer des erreurs
 
-### `Effect.catchTag` — une erreur spécifique
+### `Effect.catchTag` - une erreur spécifique
 
 <!-- prettier-ignore -->
 ```typescript
@@ -83,7 +83,7 @@ const safe = pipe(
 )
 ```
 
-### `Effect.catchTags` — plusieurs erreurs
+### `Effect.catchTags` - plusieurs erreurs
 
 <!-- prettier-ignore -->
 ```typescript
@@ -96,7 +96,7 @@ const safe = pipe(
 )
 ```
 
-### `Effect.catchAll` — toutes les erreurs
+### `Effect.catchAll` - toutes les erreurs
 
 <!-- prettier-ignore -->
 ```typescript
@@ -110,7 +110,7 @@ const sûr = pipe(
 `Effect.catchAll` masque les erreurs que vous n'avez pas prévues. Utilisez-le avec parcimonie.
 :::
 
-## Le tag — l'identifiant de l'erreur
+## Le tag - l'identifiant de l'erreur
 
 Le tag est la chaîne passée à `Data.TaggedError("MonTag")`. Effect l'utilise pour :
 

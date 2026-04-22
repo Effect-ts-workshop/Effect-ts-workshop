@@ -6,12 +6,12 @@ sidebar_position: 14
 
 ## Vue d'ensemble
 
-`@effect/sql` intègre les bases de données relationnelles dans le monde Effect. Les requêtes sont des Effects — elles bénéficient automatiquement de la gestion d'erreurs typée, de la composition, et du tracing distribué.
+`@effect/sql` intègre les bases de données relationnelles dans le monde Effect. Les requêtes sont des Effects - elles bénéficient automatiquement de la gestion d'erreurs typée, de la composition, et du tracing distribué.
 
 Deux niveaux d'abstraction sont disponibles :
 
-- **SQL natif** — requêtes SQL directes avec le template literal `sql`
-- **Drizzle** — query builder typé, intégré via le service `Database`
+- **SQL natif** - requêtes SQL directes avec le template literal `sql`
+- **Drizzle** - query builder typé, intégré via le service `Database`
 
 ---
 
@@ -34,9 +34,9 @@ Le service est fourni via `SqlLive`, un Layer qui gère la connexion PostgreSQL 
 
 ---
 
-## Template literals SQL — requêtes paramétrées
+## Template literals SQL - requêtes paramétrées
 
-Le client `sql` s'utilise comme un template literal. Les variables interpolées sont **automatiquement paramétrées** — pas d'injection SQL possible.
+Le client `sql` s'utilise comme un template literal. Les variables interpolées sont **automatiquement paramétrées** - pas d'injection SQL possible.
 
 <!-- prettier-ignore -->
 ```typescript
@@ -52,11 +52,11 @@ const findByBrand = Effect.fn("findByBrand")(function*(brand: string) {
 })
 ```
 
-Le résultat est un tableau de lignes brutes. Le type est `ReadonlyArray<unknown>` — à valider avec `Schema` si besoin.
+Le résultat est un tableau de lignes brutes. Le type est `ReadonlyArray<unknown>` - à valider avec `Schema` si besoin.
 
 ---
 
-## `Model.Class` — définir un modèle typé
+## `Model.Class` - définir un modèle typé
 
 `Model.Class` définit la forme d'un objet en base, avec des types spéciaux pour les timestamps :
 
@@ -73,12 +73,12 @@ class DbItem extends Model.Class<DbItem>("DbItem")({
 }) {}
 ```
 
-- `Model.DateTimeInsertFromDate` — la colonne est remplie automatiquement à la création
-- `Model.DateTimeUpdateFromDate` — la colonne est mise à jour automatiquement à chaque modification
+- `Model.DateTimeInsertFromDate` - la colonne est remplie automatiquement à la création
+- `Model.DateTimeUpdateFromDate` - la colonne est mise à jour automatiquement à chaque modification
 
 ---
 
-## `Model.makeRepository` — CRUD automatique
+## `Model.makeRepository` - CRUD automatique
 
 `Model.makeRepository` génère un repository complet à partir d'un `Model.Class` :
 
@@ -107,7 +107,7 @@ Toutes ces opérations sont des Effects typés.
 
 ---
 
-## Drizzle — query builder
+## Drizzle - query builder
 
 Pour des requêtes plus complexes (jointures, sous-requêtes, agrégations), Drizzle offre un query builder qui reste dans le monde Effect via le service `Database` :
 
@@ -150,7 +150,7 @@ export const items = pgTable("items", {
 
 ## Setup des tests avec `testcontainers`
 
-Les tests SQL démarrent un vrai conteneur PostgreSQL via `testcontainers` — pas de mock en mémoire. Cela garantit que les requêtes fonctionnent avec une vraie base.
+Les tests SQL démarrent un vrai conteneur PostgreSQL via `testcontainers` - pas de mock en mémoire. Cela garantit que les requêtes fonctionnent avec une vraie base.
 
 <!-- prettier-ignore -->
 ```typescript
@@ -191,9 +191,9 @@ const testLayer = pipe(
 )
 ```
 
-- `SqlLive` — connexion PostgreSQL (lit `DB_HOST`, `DB_PORT`, `DB_NAME`, etc.)
-- `MigratorLive` — applique les migrations au démarrage
-- `DatabaseLive` — service Drizzle (dépend de `SqlLive`)
+- `SqlLive` - connexion PostgreSQL (lit `DB_HOST`, `DB_PORT`, `DB_NAME`, etc.)
+- `MigratorLive` - applique les migrations au démarrage
+- `DatabaseLive` - service Drizzle (dépend de `SqlLive`)
 
 ---
 

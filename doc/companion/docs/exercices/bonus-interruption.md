@@ -134,14 +134,12 @@ yield* Effect.addFinalizer(() => /* l'action de nettoyage */)
 <details>
   <summary>Quel type doit renvoyer le finalizer ?</summary>
 
-`Effect.addFinalizer` attend une fonction `() => Effect<void>`. Pour envelopper une opération synchrone, utilisez `Effect.sync` :
+`Effect.addFinalizer` attend une fonction `() => Effect<void>`. Les deux helpers disponibles (`connection.close()` et `deleteTempFile`) renvoient déjà un `Effect` — passez-les directement :
 
 <!-- prettier-ignore -->
 ```typescript
-yield* Effect.addFinalizer(() => Effect.sync(() => conn.close()))
+yield* Effect.addFinalizer(() => connection.close())
 ```
-
-Certains helpers comme `deleteTempFile` renvoient déjà un `Effect` — pas besoin de les envelopper.
 
 </details>
 
@@ -154,7 +152,7 @@ Certains helpers comme `deleteTempFile` renvoient déjà un `Effect` — pas bes
 
 <!-- prettier-ignore -->
 ```typescript
-yield* Effect.addFinalizer(() => Effect.sync(() => connection.close()))
+yield* Effect.addFinalizer(() => connection.close())
 ```
 
 **Fichier temporaire**
@@ -183,8 +181,8 @@ La différence : `await using` ne couvre pas l'interruption. `Effect.acquireRele
 <!-- prettier-ignore -->
 ```typescript
 const resource = Effect.acquireRelease(
-  Effect.sync(() => makeConnection(log)), // acquire : ouvre la connexion
-  (conn) => Effect.sync(() => conn.close()) // release : toujours exécuté
+  makeConnection(), // acquire : ouvre la connexion
+  (conn) => conn.close() // release : toujours exécuté
 )
 
 const program = Effect.gen(function*() {
@@ -199,24 +197,13 @@ La différence avec `addFinalizer` : le `release` est défini au même endroit q
 
 ### Exercice
 
-**Tests `"executes the release after a success"` et `"executes the release even if an error occurs"`**
+Le test est paramétré avec `it.each` — trois scénarios (succès, erreur, interruption) — et **une seule définition de `resource`** doit fonctionner pour les trois.
 
-Définissez `resource` avec `Effect.acquireRelease`. Dans le second test, la `query` doit échouer avec `new Error("timeout")` — pensez à étendre `makeConnection` en remplaçant uniquement cette méthode.
+`makeConnection` renvoie directement un `Effect.succeed({...})` avec une `query` et un `close` déjà fournis. Définissez `resource` avec `Effect.acquireRelease` :
 
 <!-- prettier-ignore -->
 ```typescript
 const resource = ??? // À compléter
-```
-
----
-
-**Test `"executes the release if the fiber is interrupted"`**
-
-La ressource est déjà fournie. Il reste à déclencher l'interruption du fiber :
-
-<!-- prettier-ignore -->
-```typescript
-await Effect.runPromise(???) // À compléter
 ```
 
 À vous de jouer !
@@ -236,26 +223,9 @@ await Effect.runPromise(???) // À compléter
 <!-- prettier-ignore -->
 ```typescript
 Effect.acquireRelease(
-  Effect.sync(() => /* ouvrir la ressource */), // acquire
-  (resource) => Effect.sync(() => /* fermer la ressource */) // release
+  /* Effect qui ouvre la ressource */, // acquire
+  (resource) => /* Effect qui ferme la ressource */ // release
 )
-```
-
-</details>
-
-#### Indice 2
-
-<details>
-  <summary>Comment surcharger `query` dans le test "erreur" ?</summary>
-
-Étendez `makeConnection` avec un spread et remplacez uniquement `query` :
-
-<!-- prettier-ignore -->
-```typescript
-Effect.sync(() => ({
-  ...makeConnection(log),
-  query: () => Effect.fail(new Error("timeout"))
-}))
 ```
 
 </details>
@@ -265,35 +235,15 @@ Effect.sync(() => ({
 <details>
   <summary>Avant de déplier pour afficher la solution, n'hésitez pas à nous solliciter !</summary>
 
-**Succès**
-
 <!-- prettier-ignore -->
 ```typescript
 const resource = Effect.acquireRelease(
-  Effect.sync(() => makeConnection(log)),
-  (conn) => Effect.sync(() => conn.close())
+  makeConnection(), // acquire : ouvre la connexion
+  (conn) => conn.close() // release : toujours exécuté
 )
 ```
 
-**Erreur**
-
-<!-- prettier-ignore -->
-```typescript
-const resource = Effect.acquireRelease(
-  Effect.sync(() => ({
-    ...makeConnection(log),
-    query: () => Effect.fail(new Error("timeout"))
-  })),
-  (conn) => Effect.sync(() => conn.close())
-)
-```
-
-**Interruption**
-
-<!-- prettier-ignore -->
-```typescript
-await Effect.runPromise(Fiber.interrupt(fiber))
-```
+Le cas interruption est géré automatiquement : `timeout(Duration.millis(200))` interrompt le fiber quand `queryResult` est `Effect.never`. Le `release` est quand même déclenché.
 
 </details>
 

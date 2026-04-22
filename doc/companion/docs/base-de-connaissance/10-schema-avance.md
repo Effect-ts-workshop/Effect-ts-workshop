@@ -14,7 +14,7 @@ Un `Schema` dans Effect est une description de la forme d'une donnée. Il rempla
 
 La différence clé : un seul Schema fait les trois.
 
-:::success Vous pouvez utiliser Schema en dehors d'Effect
+:::tip Vous pouvez utiliser Schema en dehors d'Effect
 
 Effect Schema n'a **aucune dépendance avec le runtime Effect** (fibers, scheduler, etc.).
 

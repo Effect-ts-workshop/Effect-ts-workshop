@@ -1,5 +1,6 @@
-import { Data, Effect, Exit, Fiber } from "effect"
-import { describe, expect, it, vi } from "vitest"
+import { Data, Duration, Effect, Exit, Fiber, pipe } from "effect"
+import { timeout } from "effect/Effect"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("Interruption", () => {
   it("[OPTIONAL] could propagate interruption with AbortSignal", async () => {
@@ -36,21 +37,22 @@ describe("Interruption", () => {
 
 describe("addFinalizer — database connection", () => {
   it("[OPTIONAL] closes the connection even if an error occurs", async () => {
+    class QueryError extends Data.TaggedError("QueryError") {}
+
+    const close = vi.fn(() => Effect.void)
     // On simule une connexion avec un flag pour savoir si elle est ouverte
-    const makeConnection = (log: Array<string>) => ({
-      query: () => Effect.fail(new Error("requête échouée")),
-      close: () => log.push("connection:closed")
+    const makeConnection = () => ({
+      query: () => Effect.fail(new QueryError()),
+      close
     })
 
-    const closedLog: Array<string> = []
-
     const program = Effect.gen(function*() {
-      const connection = makeConnection(closedLog)
+      const connection = makeConnection()
       // #start
       // // Le finalizer enregistre le cleanup — sera exécuté quoi qu'il arrive
       // yield* TODO
       // #solution
-      yield* Effect.addFinalizer(() => Effect.sync(() => connection.close()))
+      yield* Effect.addFinalizer(() => connection.close())
       // #end
       // Cette requête va échouer
       return yield* connection.query()
@@ -60,7 +62,7 @@ describe("addFinalizer — database connection", () => {
     await Effect.runPromise(Effect.scoped(program)).catch(() => {})
 
     // Même si la requête a échoué, le finalizer a bien été exécuté
-    expect(closedLog).toContain("connection:closed")
+    expect(close).toHaveBeenCalled()
   })
 })
 
@@ -98,84 +100,44 @@ describe("addFinalizer — temporary file", () => {
 })
 
 describe("acquireRelease — release guarantee", () => {
-  // Helper partagé : connexion simulée
-  const makeConnection = (log: Array<string>) => ({
-    query: (sql: string) => Effect.sync(() => `résultat: ${sql}`),
-    close: () => log.push("connection:closed")
+  class QueryError extends Data.TaggedError("QueryError") {}
+  const close = vi.fn(() => Effect.void)
+  beforeEach(() => {
+    close.mockReset()
   })
 
-  it("[OPTIONAL] executes the release after a success", async () => {
-    const log: Array<string> = []
+  // TODO simplify
+  it.each([
+    { queryResult: Effect.succeed("COOL"), isSuccess: true, label: "success" },
+    { queryResult: Effect.fail(new QueryError()), isSuccess: false, label: "error" },
+    { queryResult: Effect.never, isSuccess: false, label: "interruption" } // never endinf query, will be interput by parent (see timeout)
+  ])(
+    "[OPTIONAL] executes the release after a $label",
+    async ({ isSuccess, queryResult }) => {
+      const makeConnection = () => Effect.succeed({ query: (_: string) => queryResult, close })
 
-    // acquireRelease couple explicitement l'ouverture et la fermeture
-    // #start
-    // const resource = TODO
-    // #solution
-    const resource = Effect.acquireRelease(
-      Effect.sync(() => makeConnection(log)), // acquire : ouvre la connexion
-      (conn) => Effect.sync(() => conn.close()) // release : toujours exécuté
-    )
-    // #end
+      // acquireRelease couple explicitement l'ouverture et la fermeture
+      // #start
+      // const resource = TODO
+      // #solution
+      const resource = Effect.acquireRelease(
+        makeConnection(), // acquire : ouvre la connexion
+        (conn) => conn.close() // release : toujours exécuté
+      )
+      // #end
 
-    const program = Effect.gen(function*() {
-      const conn = yield* resource
-      return yield* conn.query("SELECT 1")
-    })
+      const program = pipe(
+        Effect.gen(function*() {
+          const conn = yield* resource
+          return yield* conn.query("SELECT 1")
+        }),
+        timeout(Duration.millis(200))
+      )
 
-    const result = await Effect.runPromise(Effect.scoped(program))
+      const result = await Effect.runPromiseExit(Effect.scoped(program))
 
-    expect(result).toBe("résultat: SELECT 1") // la requête a abouti
-    expect(log).toContain("connection:closed") // connexion bien fermée
-  })
-
-  it("[OPTIONAL] executes the release even if an error occurs", async () => {
-    const log: Array<string> = []
-
-    // #start
-    // const resource = TODO
-    // #solution
-    const resource = Effect.acquireRelease(
-      Effect.sync(() => ({
-        ...makeConnection(log),
-        query: (_: string) => Effect.fail(new Error("timeout"))
-      })),
-      (conn) => Effect.sync(() => conn.close())
-    )
-    // #end
-
-    const program = Effect.gen(function*() {
-      const conn = yield* resource
-      return yield* conn.query("SELECT 1")
-    })
-
-    await Effect.runPromise(Effect.scoped(program)).catch(() => {})
-
-    // release appelé malgré l'échec → pas de connexion qui reste ouverte
-    expect(log).toContain("connection:closed")
-  })
-
-  it("[OPTIONAL] executes the release if the fiber is interrupted", async () => {
-    const log: Array<string> = []
-
-    const resource = Effect.acquireRelease(
-      Effect.sync(() => makeConnection(log)),
-      (conn) => Effect.sync(() => conn.close())
-    )
-
-    const program = Effect.gen(function*() {
-      yield* resource
-      yield* Effect.never // simule un traitement long
-    })
-
-    const fiber = Effect.runFork(Effect.scoped(program))
-
-    // #start
-    // await Effect.runPromise(TODO)
-    // #solution
-    await Effect.runPromise(Fiber.interrupt(fiber))
-    // #end
-
-    // release appelé malgré l'interruption → connexion proprement fermée
-    expect(log).toContain("connection:closed")
-  })
+      expect(Exit.isSuccess(result)).toEqual(isSuccess)
+      expect(close).toHaveBeenCalled() // connexion bien fermée
+    }
+  )
 })

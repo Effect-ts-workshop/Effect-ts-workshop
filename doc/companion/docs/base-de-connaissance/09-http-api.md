@@ -6,12 +6,13 @@ sidebar_position: 9
 
 ## L'approche Effect : contrat d'abord
 
-Dans Effect, une API HTTP se définit en trois étapes distinctes :
+Dans Effect, une API HTTP se définit en quatre étapes distinctes :
 
 ```
 1. Contrat   → ce que l'API expose (endpoints, schémas)
 2. Handlers  → l'implémentation de chaque endpoint
 3. Routeur   → assemblage du tout
+4. Serveur   → démarrage avec le runtime Effect
 ```
 
 Cette séparation permet de partager le contrat entre le serveur et le client — les deux parlent le même langage, et le compilateur détecte toute divergence.
@@ -73,27 +74,64 @@ import { Layer, pipe } from "effect";
 const apiLayer = pipe(
   HttpLayerRouter.addHttpApi(MyApi),
   Layer.provide(MyApiLive)
-) as Layer.Layer<never>;
+);
 ```
 
-L'API devient un `Layer` — elle se compose avec les autres services exactement comme dans l'exercice 5.
+L'API devient un `Layer` — elle se compose avec les autres services exactement comme dans l'exercice 4.
 
-## Tester sans serveur avec `toWebHandler`
+## Étape 4 — Lancer le serveur avec `HttpLayerRouter.serve`
 
-`HttpLayerRouter.toWebHandler` transforme le Layer en un simple handler `(Request) => Response`. Pas de port à ouvrir, pas de processus à démarrer :
+`HttpLayerRouter.serve` est la façon Effect-native de démarrer un serveur HTTP. Il prend le Layer de routes et produit un `Layer` qui intègre le serveur, les finaliseurs, et la gestion du cycle de vie :
+
+<!-- prettier-ignore -->
+```typescript
+import { NodeHttpServer, NodeRuntime } from "@effect/platform-node";
+import { createServer } from "node:http";
+import { Layer, pipe } from "effect";
+
+pipe(
+  HttpLayerRouter.serve(apiLayer),
+  Layer.provide(NodeHttpServer.layer(createServer, { port: 3000 })),
+  Layer.launch,
+  NodeRuntime.runMain
+)
+```
+
+- `HttpLayerRouter.serve` — transforme les routes en serveur Effect
+- `NodeHttpServer.layer` — fournit le serveur HTTP Node.js sous-jacent
+- `Layer.launch` — démarre le Layer et bloque jusqu'à l'arrêt
+- `NodeRuntime.runMain` — gère les signaux système (`SIGTERM`, `SIGINT`) et libère les ressources proprement
+
+## `toWebHandler` — compatibilité avec d'autres runtimes
+
+`toWebHandler` n'est pas la façon Effect de lancer un serveur. C'est une **fonction d'interopérabilité** : elle expose le Layer de routes comme un handler standard `(Request) => Promise<Response>`, ce que la plupart des runtimes HTTP attendent.
+
+On l'utilise dans deux cas :
+
+**Déploiement serverless** (AWS Lambda, Cloudflare Workers…) — l'environnement impose son propre modèle de démarrage, Effect ne contrôle pas le cycle de vie :
+
+<!-- prettier-ignore -->
+```typescript
+const { handler } = HttpLayerRouter.toWebHandler(apiLayer);
+
+// AWS Lambda handler
+export const lambdaHandler = (event: APIGatewayEvent) =>
+  handler(new Request(event.requestContext.http.path, { method: event.requestContext.http.method }));
+```
+
+**Intégration avec un serveur tiers** (Bun, Fastify, Express…) qui gère lui-même le démarrage :
 
 <!-- prettier-ignore -->
 ```typescript
 const { handler, dispose } = HttpLayerRouter.toWebHandler(apiLayer);
 
-const response = await handler(new Request("http://localhost/users/42"));
-const body = await response.json();
-// → { id: "42", name: "Alice" }
+Bun.serve({ fetch: handler });
 
-await dispose(); // libère les ressources
+// dispose() doit être appelé manuellement à l'arrêt
+process.on("SIGTERM", () => dispose());
 ```
 
-C'est une technique centrale dans Effect Platform : **les tests unitaires d'API ne nécessitent pas de réseau**.
+Avec `toWebHandler`, la gestion du cycle de vie (arrêt propre, libération des ressources) est de votre responsabilité — c'est vous qui appelez `dispose()`. Avec `HttpLayerRouter.serve` + `NodeRuntime.runMain`, Effect s'en charge automatiquement.
 
 ## Consommer l'API avec `HttpApiClient`
 
@@ -127,11 +165,13 @@ Modifier un endpoint dans `shared` provoque immédiatement une erreur de compila
 
 ## Récapitulatif
 
-| Brique                 | Rôle                                    |
-| ---------------------- | --------------------------------------- |
-| `HttpApi`              | Définit l'API (nom + groupes)           |
-| `HttpApiGroup`         | Regroupe les endpoints par domaine      |
-| `HttpApiEndpoint`      | Déclare une route avec son contrat      |
-| `HttpApiBuilder.group` | Implémente les handlers                 |
-| `HttpLayerRouter`      | Assemble et expose l'API                |
-| `HttpApiClient`        | Génère un client typé depuis le contrat |
+| Brique                         | Rôle                                                                 |
+| ------------------------------ | -------------------------------------------------------------------- |
+| `HttpApi`                      | Définit l'API (nom + groupes)                                        |
+| `HttpApiGroup`                 | Regroupe les endpoints par domaine                                   |
+| `HttpApiEndpoint`              | Déclare une route avec son contrat                                   |
+| `HttpApiBuilder.group`         | Implémente les handlers                                              |
+| `HttpLayerRouter.addHttpApi`   | Assemble le contrat et les handlers en Layer de routes               |
+| `HttpLayerRouter.serve`        | Lance le serveur Effect (cycle de vie géré automatiquement)          |
+| `HttpLayerRouter.toWebHandler` | Compatibilité : expose les routes en handler `(Request) => Response` |
+| `HttpApiClient`                | Génère un client typé depuis le contrat                              |

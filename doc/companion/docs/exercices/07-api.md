@@ -6,7 +6,7 @@ sidebar_position: 7
 
 Nous avons vu comment consommer un service externe. Voici maintenant comment en _définir_ un.
 
-`@effect/platform` fournit un système en trois couches : le **contrat** (ce que l'API expose), l'**implémentation** (comment elle répond), et le **layer** (qui branche les deux). Cette séparation permet de tester l'API sans démarrer de vrai serveur.
+`@effect/platform` sépare le **contrat** (ce que l'API expose) de l'**implémentation** (comment elle répond). Cette séparation garantit que serveur et client restent cohérents — TypeScript le vérifie à la compilation.
 
 Fichier à compléter : `packages/api/_exercices/7-api.spec.ts`
 
@@ -54,46 +54,9 @@ Si `"sayHello"` n'existe pas dans le contrat `MyApi`, TypeScript signale une err
 
 ---
 
-## Câbler le contrat et l'implémentation
-
-<!-- prettier-ignore -->
-```typescript
-const apiLayer = pipe(
-  HttpLayerRouter.addHttpApi(MyApi),  // branche le contrat
-  Layer.provide(MyApiLive)            // injecte l'implémentation
-)
-```
-
-Ce layer est ensuite converti en handler HTTP pour les tests — ou fourni à un serveur pour la production.
-
----
-
-## Tester l'API sans démarrer de serveur
-
-Pour les tests, `HttpLayerRouter.toWebHandler` crée un handler en mémoire. On le branche sur un `FetchHttpClient` personnalisé pour intercepter les requêtes :
-
-<!-- prettier-ignore -->
-```typescript
-const { dispose, handler } = HttpLayerRouter.toWebHandler(apiLayer, { disableLogger: true })
-
-const TestHttpClient = pipe(
-  FetchHttpClient.layer,
-  Layer.provide(
-    Layer.succeed(
-      FetchHttpClient.Fetch,
-      (input, init) => handler(new Request(input as string, init))
-    )
-  )
-)
-```
-
-Le `handler` reçoit une `Request` standard et renvoie une `Response` — sans passer par le réseau.
-
----
-
 ## Exercice
 
-L'implémentation et le client de test sont fournis. Votre rôle : écrire le **contrat**.
+L'implémentation est fournie. Votre rôle : écrire le **contrat**.
 
 Définissez `MyApi` pour qu'il décrive une route `GET /hello` qui retourne une string, regroupée dans un groupe `"greet"` :
 
@@ -102,12 +65,10 @@ Définissez `MyApi` pour qu'il décrive une route `GET /hello` qui retourne une 
 const MyApi = ??? // À compléter
 ```
 
-Le test vérifie ensuite que :
+Le test vérifie que :
 
-- `MyApi.identifier` vaut `"MyApi"`
 - l'endpoint `"sayHello"` est bien en `GET` sur `/hello`
 - le schema de succès accepte des strings
-- l'appel `client.greet.sayHello()` retourne `"Hello, World!"`
 
 À vous de jouer !
 
@@ -169,10 +130,10 @@ const MyApi = HttpApi.make("MyApi").add(
 
 :::tip À retenir
 
-Le découpage en trois couches — contrat, implémentation, layer — est la clé de testabilité :
+La séparation contrat / implémentation est la clé de la cohérence :
 
-- Le **contrat** est partagé entre serveur et client (dans `packages/shared`)
-- L'**implémentation** peut être substituée en tests sans changer le contrat
-- Le **layer** est le câblage — il peut pointer vers un vrai serveur ou un handler en mémoire
+- Le **contrat** est la source de vérité partagée entre serveur et client (dans `packages/shared`)
+- L'**implémentation** peut être substituée en tests sans modifier le contrat
+- Si un endpoint n'existe pas dans le contrat, TypeScript refuse de compiler
 
 :::
